@@ -25,7 +25,7 @@ class Drawer(object):
 
         pygame.draw.circle(
             self.screen, self.colors.quad_sensor,
-            quad.get_pos_2d(), int(quad.get_sensor_radius()), 2
+            quad.get_pos_2d(), int(quad.get_sensor_radius())
         )
 
         return self

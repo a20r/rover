@@ -25,5 +25,5 @@ class Problem(object):
         self.quad_size = kwargs.get("quad_size", 4)
         self.viewing_angle = kwargs.get("viewing_angle", 30)
         self.grid = timegrid.TimeGrid(self.width, self.height)
-        self.num_steps = kwargs.get("num_steps", 200)
+        self.num_steps = kwargs.get("num_steps", 250)
         self.delay = kwargs.get("delay", 0.1) # seconds

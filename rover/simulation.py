@@ -9,6 +9,7 @@ class Simulation(object):
         self.problem = problem
         self.quad_list = self.init_quads()
         self.drawer = drawer
+        map(self.problem.grid.update_grid, self.quad_list)
 
 
     def init_quads(self):
@@ -43,7 +44,7 @@ class Simulation(object):
 
     def run(self):
         for _ in xrange(self.problem.num_steps):
-            self.drawer.clear_all()
+            # self.drawer.clear_all()
             self.step()
             self.drawer.update()
             time.sleep(self.problem.delay)

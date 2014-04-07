@@ -53,17 +53,24 @@ class TimeGrid(object):
         ret_x = x
         ret_y = y
 
+        b_x = False
+        b_y = False
+
         if x < 0:
             ret_x = 0
+            b_x = True
         elif x >= self.width:
             ret_x = self.width - 1
+            b_x = True
 
         if y < 0:
             ret_y = 0
+            b_y = True
         elif ret_y >= self.height:
             ret_y = self.height - 1
+            b_y = True
 
-        return ret_x, ret_y
+        return ret_x, ret_y, b_x and b_y
 
 
     def get_new_direction(self, quad):
@@ -80,21 +87,23 @@ class TimeGrid(object):
         for _ in xrange(self.num_samples):
             x = int(quad.get_x() + sample_radius * math.cos(angle))
             y = int(quad.get_y() + sample_radius * math.sin(angle))
-            x, y = self.constrain(x, y)
+            x, y, out = self.constrain(x, y)
+
+            angle += angle_step
+            if out:
+                continue
 
             if min_time == None or min_time > self[x, y]:
                 min_time = self[x, y]
-                min_x_y = point.Point(x, y)
-
-            angle += angle_step
+                min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
 
         return min_x_y.to_unit_vector()
 
 
     def __getitem__(self, index):
-        return self.grid[index[0]][index[1]]
+        return self.grid[index[1]][index[0]]
 
 
     def __setitem__(self, index, value):
-        self.grid[index[0]][index[1]] = value
+        self.grid[index[1]][index[0]] = value
 
