@@ -11,6 +11,7 @@ class TimeGrid(object):
         self.grid = list()
         self.init_grid(self.grid)
         self.num_samples = 100
+        self.radius_ext = 2
 
 
     def init_grid(self, grid):
@@ -19,8 +20,11 @@ class TimeGrid(object):
             grid.append([current_time for _ in xrange(self.width)])
 
 
-    def update_grid(self, x, y, radius):
-        # approximate with square for now
+    def update_grid(self, quad):
+        x = quad.x
+        y = quad.y
+        radius = int(quad.get_sensor_radius())
+
         top_left_x = x - radius if x - radius > 0 else 0
         top_left_y = y - radius if y - radius > 0 else 0
 
@@ -40,15 +44,51 @@ class TimeGrid(object):
 
         for x_i in xrange(top_left_x, bottom_right_x + 1):
             for y_i in xrange(top_left_y, bottom_right_y + 1):
-                self[x_i, y_i] = current_time
+                dist = math.sqrt(pow(x - x_i, 2) + pow(y - y_i, 2))
+                if dist <= radius:
+                    self[x_i, y_i] = current_time
 
 
-    def sample_new_point(self, quad):
-        self.update_grid(
-            quad.get_x(), quad.get_y(), quad.get_sensor_radius()
-        )
+    def constrain(self, x, y):
+        ret_x = x
+        ret_y = y
 
-        # WORK ON THIS SHIT MOFO
+        if x < 0:
+            ret_x = 0
+        elif x >= self.width:
+            ret_x = self.width - 1
+
+        if y < 0:
+            ret_y = 0
+        elif ret_y >= self.height:
+            ret_y = self.height - 1
+
+        return ret_x, ret_y
+
+
+    def get_new_direction(self, quad):
+        """
+        Returns the unit vector of the direction the quad should go
+        """
+
+        angle_step = 2 * math.pi / self.num_samples
+        angle = float(0)
+        sample_radius = quad.get_sensor_radius() + self.radius_ext
+        min_time = None
+        min_x_y = None
+
+        for _ in xrange(self.num_samples):
+            x = int(quad.get_x() + sample_radius * math.cos(angle))
+            y = int(quad.get_y() + sample_radius * math.sin(angle))
+            x, y = self.constrain(x, y)
+
+            if min_time == None or min_time > self[x, y]:
+                min_time = self[x, y]
+                min_x_y = point.Point(x, y)
+
+            angle += angle_step
+
+        return min_x_y.to_unit_vector()
 
 
     def __getitem__(self, index):
