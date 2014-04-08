@@ -19,6 +19,10 @@ class RiskGrid(object):
         ) / (math.sqrt(2 * math.pi) * sigma)
 
 
+    def get_risk_points(self):
+        return self.risk_points
+
+
     def get_risk(self, x, y):
         p = point.Point(x, y)
         risk_sum = float(0)

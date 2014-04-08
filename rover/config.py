@@ -11,6 +11,7 @@ class Colors(object):
         self.quad = self.color_dict[kwargs.get("quad", "blue")]
         self.quad_sensor = self.color_dict[kwargs.get("quad_sensor", "green")]
         self.background = self.color_dict[kwargs.get("background", "white")]
+        self.risk_point = self.color_dict[kwargs.get("risk_point", "red")]
 
 
 class Problem(object):
@@ -20,10 +21,9 @@ class Problem(object):
         self.height = kwargs.get("height", 480)
         self.num_quads = kwargs.get("num_quads", 40)
         self.min_height = kwargs.get("min_height", 60)
-        self.max_height = kwargs.get("max_height", 100)
+        self.max_height = kwargs.get("max_height", 200)
         self.step_size = kwargs.get("step_size", 10)
         self.quad_size = kwargs.get("quad_size", 4)
         self.viewing_angle = kwargs.get("viewing_angle", 30)
         self.num_steps = kwargs.get("num_steps", 250)
-        self.delay = kwargs.get("delay", 0.00) # seconds
         self.grid = timegrid.TimeGrid(self.width, self.height)
