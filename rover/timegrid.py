@@ -2,7 +2,6 @@
 import time
 import point
 import math
-import array
 import numpy as np
 
 class TimeGrid(object):

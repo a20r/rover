@@ -9,9 +9,10 @@ class Colors(object):
     def __init__(self, **kwargs):
         self.color_dict = color.THECOLORS
         self.quad = self.color_dict[kwargs.get("quad", "blue")]
-        self.quad_sensor = self.color_dict[kwargs.get("quad_sensor", "green")]
+        self.quad_sensor = self.color_dict[kwargs.get("quad_sensor", "purple")]
         self.background = self.color_dict[kwargs.get("background", "white")]
         self.risk_point = self.color_dict[kwargs.get("risk_point", "red")]
+        self.coverage = self.color_dict[kwargs.get("coverage", "lightgrey")]
 
 
 class Problem(object):

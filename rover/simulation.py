@@ -19,9 +19,12 @@ class Simulation(object):
 
     def render(self):
         for _ in xrange(self.problem.num_steps):
-            self.drawer.clear_all()
-            self.drawer.draw_risk_grid(self.risk_grid)
             quads = self.planner.step()
+            for quad in quads:
+                self.drawer.add_coverage(quad)
+            self.drawer.clear_all()
+            self.drawer.draw_coverage()
+            self.drawer.draw_risk_grid(self.risk_grid)
             for quad in quads:
                 self.drawer.draw_quad(quad)
             frame = self.drawer.update()

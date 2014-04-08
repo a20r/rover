@@ -1,6 +1,7 @@
 
 import pygame
 import pygame.color as color
+import collections
 
 class Drawer(object):
 
@@ -17,6 +18,24 @@ class Drawer(object):
         self.clear_all().update()
         self.constants = pygame
 
+        self.coverage = collections.deque(list(), 100)
+
+
+    def draw_coverage(self):
+        for qp, r in self.coverage:
+            pygame.draw.circle(
+                self.screen, self.colors.coverage,
+                qp, r
+            )
+
+        return self
+
+
+    def add_coverage(self, quad):
+        self.coverage.append((
+            quad.get_pos_2d(), int(quad.get_sensor_radius())
+        ))
+
 
     def draw_quad(self, quad):
         pygame.draw.circle(
@@ -26,14 +45,13 @@ class Drawer(object):
 
         pygame.draw.circle(
             self.screen, self.colors.quad_sensor,
-            quad.get_pos_2d(), int(quad.get_sensor_radius()), 2
+            quad.get_pos_2d(), int(quad.get_sensor_radius()), 4
         )
 
         return self
 
 
     def draw_risk_grid(self, risk_grid):
-
         for _, _, r_point in risk_grid.get_risk_points():
             pygame.draw.circle(
                 self.screen, self.colors.risk_point,
