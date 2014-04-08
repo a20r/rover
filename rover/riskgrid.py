@@ -1,16 +1,27 @@
 
 import point
 import math
+import random
 
 class RiskGrid(object):
 
-    def __init__(self):
+    def __init__(self, problem):
         self.risk_points = list()
+        self.problem = problem
 
 
     def add_risk_point(self, x, y, sensor_range, init_risk):
         self.risk_points.append((sensor_range, init_risk, point.Point(x, y)))
         return self
+
+
+    def add_random_points(self, num_points):
+        for _ in xrange(num_points):
+            x = random.randint(0, self.problem.width)
+            y = random.randint(0, self.problem.height)
+            sensor_range = min(self.problem.width, self.problem.height)
+            init_risk = 1.0 # random.random()
+            self.add_risk_point(x, y, sensor_range, init_risk)
 
 
     def normal_dist(self, x, sigma):

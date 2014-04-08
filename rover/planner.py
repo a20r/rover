@@ -2,7 +2,6 @@
 import quadcopter
 import time
 import math
-import numpy as np
 
 class Planner(object):
 
@@ -13,16 +12,6 @@ class Planner(object):
 
         for quad in self.quad_list:
             self.problem.grid.update_grid(quad)
-
-
-    def determine_height(self, init_risk):
-        poly = [
-            1 / float(self.problem.max_height - self.problem.min_height),
-            -1, 0,
-            float(math.pow(self.problem.min_height, 2)) / init_risk
-        ]
-
-        return np.roots(poly)
 
 
     def init_quads(self):

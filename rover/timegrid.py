@@ -2,13 +2,15 @@
 import time
 import point
 import math
+import array
+import numpy as np
 
 class TimeGrid(object):
 
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.grid = list()
+        self.grid = np.zeros((480, 640))
         self.init_grid(self.grid)
         self.num_samples = 100
         self.radius_ext = 2
@@ -16,8 +18,9 @@ class TimeGrid(object):
 
     def init_grid(self, grid):
         current_time = time.time()
-        for _ in xrange(self.height):
-            grid.append([current_time for _ in xrange(self.width)])
+        for h in xrange(self.height):
+            for w in xrange(self.width):
+                self.grid[h, w] = current_time
 
 
     def update_grid(self, quad):
@@ -101,9 +104,9 @@ class TimeGrid(object):
 
 
     def __getitem__(self, index):
-        return self.grid[index[1]][index[0]]
+        return self.grid[index[1], index[0]]
 
 
     def __setitem__(self, index, value):
-        self.grid[index[1]][index[0]] = value
+        self.grid[index[1], index[0]] = value
 

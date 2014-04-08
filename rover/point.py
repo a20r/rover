@@ -54,6 +54,17 @@ class Point(object):
         return "Point({0}, {1})".format(self.x, self.y)
 
 
+    def __hash__(self):
+        return hash(str(self))
+
+
+    def __eq__(self, val):
+        try:
+            return val.x == self.x and val.y == self.y
+        except:
+            return False
+
+
 def get_random_point(width, height):
     x = random.randint(width)
     y = random.randint(height)

@@ -11,6 +11,8 @@ class Quadcopter(object):
 
         # in degrees
         self.viewing_angle = problem.viewing_angle
+        self.heading_x = 0
+        self.heading_y = 0
 
     def get_x(self):
         return self.x
@@ -40,8 +42,15 @@ class Quadcopter(object):
 
 
     def move_2d(self, unit_heading):
-        self.x = self.x + int(unit_heading.get_x() * self.problem.step_size)
-        self.y = self.y + int(unit_heading.get_y() * self.problem.step_size)
+
+        h_x = int(unit_heading.get_x() * self.problem.step_size)
+        h_y = int(unit_heading.get_y() * self.problem.step_size)
+
+        self.x = self.x + self.heading_x + h_x
+        self.y = self.y + self.heading_y + h_y
+
+        self.heading_x = h_x
+        self.heading_y = h_y
         return self.x, self.y
 
 
