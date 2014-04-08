@@ -36,7 +36,10 @@ class Point(object):
 
     def to_unit_vector(self):
         mag = self.dist_to(Point(0, 0))
-        return Point(self.x / mag, self.y / mag)
+        try:
+            return Point(self.x / mag, self.y / mag)
+        except ZeroDivisionError:
+            return Point(0, 0)
 
 
     def to_list(self):
