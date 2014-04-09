@@ -9,7 +9,7 @@ class TimeGrid(object):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.grid = np.zeros((480, 640))
+        self.grid = np.zeros((height, width))
         self.init_grid(self.grid)
         self.num_samples = 100
         self.radius_ext = 2

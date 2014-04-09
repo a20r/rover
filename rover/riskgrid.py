@@ -49,6 +49,14 @@ class RiskGrid(object):
         return risk_sum / float(len(self.risk_points))
 
 
+    def get_risk_3d(self, x, y, z):
+        init_risk = self.get_risk(x, y)
+        actual_risk = -1 * z * float(init_risk) / (
+            self.problem.max_height - self.problem.min_height
+        ) + init_risk
+        return actual_risk
+
+
     def __getitem__(self, index):
         return self.get_risk(index[0], index[1])
 

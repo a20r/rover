@@ -10,6 +10,7 @@ class Planner(object):
         self.quad_list = self.init_quads()
         self.risk_grid = risk_grid
 
+
         for quad in self.quad_list:
             self.problem.grid.update_grid(quad)
 
