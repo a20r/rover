@@ -2,6 +2,7 @@
 import planner
 import time
 import stats
+import evader
 
 class Simulation(object):
 
@@ -10,12 +11,28 @@ class Simulation(object):
         self.planner = planner.Planner(problem, risk_grid)
         self.drawer = drawer
         self.risk_grid = risk_grid
+        self.droid_list = self.init_droids()
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(problem)
         self.ra = stats.RiskAverage(problem, risk_grid)
         self.surface_list = list()
         if not out_file == None:
             self.out_file = open(out_file, "w")
+
+
+    def init_droids(self):
+        droid_pos_list = [
+            (0, 0), (self.problem.width, 0), (0, self.problem.height),
+            (self.problem.width, self.problem.height)
+        ]
+
+        droid_list = [
+            evader.Evader(
+                x, y, 0, 0, self.problem, self.risk_grid
+            ) for x, y in droid_pos_list
+        ]
+
+        return droid_list
 
 
     def run(self):
@@ -29,12 +46,19 @@ class Simulation(object):
         for _ in xrange(self.problem.num_steps):
             quads = self.planner.step()
 
+            for droid in self.droid_list:
+                droid.step(quads)
+
             if not self.drawer == None:
                 for quad in quads:
                     self.drawer.add_coverage(quad)
 
                 self.drawer.clear_all()
                 self.drawer.draw_coverage()
+
+                for droid in self.droid_list:
+                    self.drawer.draw_evader(droid.x, droid.y)
+
                 self.drawer.draw_risk_grid(self.risk_grid)
 
                 for quad in quads:

@@ -19,6 +19,15 @@ class Drawer(object):
         self.constants = pygame
 
         self.coverage = collections.deque(list(), 100)
+        self.evader_list = collections.deque(list(), 100)
+
+
+    def draw_evader(self, e_x, e_y):
+        self.evader_list.append((e_x, e_y))
+        pygame.draw.circle(
+                self.screen, self.colors.evader,
+                (e_x, e_y), self.problem.evader_size
+            )
 
 
     def draw_coverage(self):
@@ -26,6 +35,12 @@ class Drawer(object):
             pygame.draw.circle(
                 self.screen, self.colors.coverage,
                 qp, r
+            )
+
+        for e_pos in self.evader_list:
+            pygame.draw.circle(
+                self.screen, self.colors.evader_past,
+                e_pos, self.problem.evader_size
             )
 
         return self

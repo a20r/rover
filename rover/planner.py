@@ -2,6 +2,7 @@
 import quadcopter
 import time
 import math
+import numpy as np
 
 class Planner(object):
 
@@ -13,6 +14,17 @@ class Planner(object):
 
         for quad in self.quad_list:
             self.problem.grid.update_grid(quad)
+
+
+    def determine_height(self, x, y):
+        # TODO HIGHLY EXPERMIMENTAL
+        init_risk = float(self.risk_grid.get_risk(x, y))
+        c3 = init_risk / (self.problem.max_height - self.problem.min_height)
+        c2 = 1 - init_risk
+        c1 = 0
+        c0 = -1 * math.pow(self.problem.min_height, 2)
+        root = max(np.roots([c3, c2, c1, c0]))
+        return root.real
 
 
     def init_quads(self):
@@ -41,8 +53,12 @@ class Planner(object):
             quad.move_2d(uv)
             self.problem.grid.update_grid(quad)
             risk = self.risk_grid.get_risk(quad.x, quad.y)
-            quad.z = self.problem.min_height + risk *\
+            quad.set_z(
+                self.problem.min_height + risk *\
                 (self.problem.max_height - self.problem.min_height)
+            )
+
+            # quad.z = self.determine_height(quad.x, quad.y)
 
         return self.quad_list
 

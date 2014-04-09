@@ -13,6 +13,8 @@ class TimeGrid(object):
         self.init_grid(self.grid)
         self.num_samples = 100
         self.radius_ext = 2
+        self.angle_range = math.pi / 8
+        self.angle_step = 2 * math.pi / self.num_samples
 
 
     def init_grid(self, grid):
@@ -72,7 +74,47 @@ class TimeGrid(object):
             ret_y = self.height - 1
             b_y = True
 
-        return ret_x, ret_y, b_x and b_y
+        return ret_x, ret_y, b_x or b_y
+
+
+    def get_sample_direction(self, angle, quad):
+
+        sample_radius = quad.get_sensor_radius() + self.radius_ext
+        inner_angle = angle - self.angle_range
+
+        max_time = 0.0
+        min_time = None
+        time_dict = dict()
+        total_time = 0.0
+        counter = 0
+
+        while inner_angle < angle + self.angle_range:
+            x = int(quad.get_x() + sample_radius * math.cos(inner_angle))
+            y = int(quad.get_y() + sample_radius * math.sin(inner_angle))
+            x, y, out = self.constrain(x, y)
+
+            inner_angle += self.angle_step
+
+            if out:
+                raise ValueError("Exists an unvaible point")
+
+            time_dict[(x, y)] = self[x, y]
+            total_time += self[x, y]
+            counter += 1
+
+            if self[x, y] > max_time:
+                max_time = self[x, y]
+            elif min_time == None or self[x, y] < min_time:
+                min_time = self[x, y]
+
+        avg_x = 0.0
+        avg_y = 0.0
+        for (x, y), t in time_dict.iteritems():
+            weight = t / total_time
+            avg_x += x * weight
+            avg_y += y * weight
+
+        return avg_x, avg_y, total_time / counter
 
 
     def get_new_direction(self, quad):
@@ -80,23 +122,21 @@ class TimeGrid(object):
         Returns the unit vector of the direction the quad should go
         """
 
-        angle_step = 2 * math.pi / self.num_samples
         angle = float(0)
-        sample_radius = quad.get_sensor_radius() + self.radius_ext
         min_time = None
         min_x_y = None
 
-        for _ in xrange(self.num_samples):
-            x = int(quad.get_x() + sample_radius * math.cos(angle))
-            y = int(quad.get_y() + sample_radius * math.sin(angle))
-            x, y, out = self.constrain(x, y)
+        while angle < 2 * math.pi:
 
-            angle += angle_step
-            if out:
+            try:
+                x, y, avg_time = self.get_sample_direction(angle, quad)
+            except ValueError:
                 continue
+            finally:
+                angle += self.angle_range
 
-            if min_time == None or min_time > self[x, y]:
-                min_time = self[x, y]
+            if min_time == None or min_time > avg_time:
+                min_time = avg_time
                 min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
 
         return min_x_y.to_unit_vector()
