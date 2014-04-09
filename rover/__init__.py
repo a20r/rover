@@ -7,7 +7,7 @@ import plot
 def run(**kwargs):
     colors = config.Colors(**kwargs)
     problem = config.Problem(**kwargs)
-    # dr = drawer.Drawer(problem, colors)
+    dr = drawer.Drawer(problem, colors)
 
     risk_grid = riskgrid.RiskGrid(problem)
     risk_grid.add_random_points(kwargs.get("num_risk_points", 4))
@@ -17,6 +17,7 @@ def run(**kwargs):
     )
 
     sim = simulation.Simulation(
-        problem, risk_grid, out_file=kwargs.get("out_file", "data/all.txt")
+        problem, risk_grid, drawer=dr,
+        out_file=kwargs.get("out_file", "data/all.txt")
     )
     sim.run()

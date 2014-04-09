@@ -23,9 +23,7 @@ class Planner(object):
             accross = int(i % init_length)
 
             s_x, s_y = (
-                # self.problem.width / 2 +
                 3 * self.problem.quad_size * accross,
-                # self.problem.height / 2 +
                 3 * self.problem.quad_size * down
             )
 
