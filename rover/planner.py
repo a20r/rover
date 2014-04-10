@@ -3,6 +3,7 @@ import quadcopter
 import time
 import math
 import numpy as np
+import scipy.optimize as opt
 import point
 
 class Planner(object):
@@ -20,15 +21,22 @@ class Planner(object):
             self.problem.grid.update_grid(quad)
 
 
+    def get_risk_sq_func(self, x, y):
+        def risk_sq(z):
+            init_risk = float(self.risk_grid.get_risk(x, y))
+            sq = math.pow(self.problem.min_height / float(z), 2)
+            risk = 1 - math.pow(float(z - self.problem.min_height) /\
+                (init_risk * (self.problem.max_height -\
+                self.problem.min_height)), 2)
+            return risk - sq
+
+        return risk_sq
+
+
     def determine_height(self, x, y):
-        # TODO HIGHLY EXPERMIMENTAL
-        init_risk = float(self.risk_grid.get_risk(x, y))
-        c3 = init_risk / (self.problem.max_height - self.problem.min_height)
-        c2 = 1 - init_risk
-        c1 = 0
-        c0 = -1 * math.pow(self.problem.min_height, 2)
-        root = max(np.roots([c3, c2, c1, c0]))
-        return root.real
+        risk_sq_func = self.get_risk_sq_func(x, y)
+        res = opt.fsolve(risk_sq_func, self.problem.max_height)
+        return int(res[0])
 
 
     def init_quads(self):
@@ -145,13 +153,7 @@ class Planner(object):
             uv = self.get_new_direction(quad)
             quad.move_2d(uv)
             self.problem.grid.update_grid(quad)
-            risk = self.risk_grid.get_risk(quad.x, quad.y)
-            quad.set_z(
-                self.problem.min_height + risk *\
-                (self.problem.max_height - self.problem.min_height)
-            )
-
-            # quad.z = self.determine_height(quad.x, quad.y)
+            quad.set_z(self.determine_height(quad.x, quad.y))
 
         return self.quad_list
 
