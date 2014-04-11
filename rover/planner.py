@@ -25,17 +25,17 @@ class Planner(object):
         def risk_sq(z):
             init_risk = float(self.risk_grid.get_risk(x, y))
             sq = math.pow(self.problem.min_height / float(z), 2)
-            risk = 1 - math.pow(float(z - self.problem.min_height) /\
+            risk = init_risk * (1 - math.pow(float(z - self.problem.min_height) /\
                 (init_risk * (self.problem.max_height -\
-                self.problem.min_height)), 2)
-            return risk - sq
+                self.problem.min_height)), 2))
+            return abs(risk - sq)
 
         return risk_sq
 
 
     def determine_height(self, x, y):
         risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.fsolve(risk_sq_func, self.problem.max_height)
+        res = opt.fmin(risk_sq_func, self.problem.max_height, disp=0)
         return int(res[0])
 
 
@@ -148,12 +148,17 @@ class Planner(object):
         return min_x_y.to_unit_vector()
 
 
+    def update_quad(self, quad):
+        uv = self.get_new_direction(quad)
+        quad.move_2d(uv)
+        self.problem.grid.update_grid(quad)
+        quad.set_z(self.determine_height(quad.x, quad.y))
+
+
+
     def step(self):
         for quad in self.quad_list:
-            uv = self.get_new_direction(quad)
-            quad.move_2d(uv)
-            self.problem.grid.update_grid(quad)
-            quad.set_z(self.determine_height(quad.x, quad.y))
+            self.update_quad(quad)
 
         return self.quad_list
 

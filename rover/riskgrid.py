@@ -20,7 +20,7 @@ class RiskGrid(object):
             x = random.randint(0, self.problem.width)
             y = random.randint(0, self.problem.height)
             sensor_range = min(self.problem.width, self.problem.height)
-            init_risk = random.random()
+            init_risk = 1.0
             self.add_risk_point(x, y, sensor_range, init_risk)
 
 
@@ -53,9 +53,10 @@ class RiskGrid(object):
 
     def get_risk_3d(self, x, y, z):
         init_risk = self.get_risk(x, y)
-        actual_risk = -1 * z * float(init_risk) / (
-            self.problem.max_height - self.problem.min_height
-        ) + init_risk
+
+        actual_risk = init_risk * (1 - pow(z - self.problem.min_height, 2) /\
+            pow(init_risk * (self.problem.max_height -\
+            self.problem.min_height), 2))
         return actual_risk
 
 

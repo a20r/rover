@@ -22,9 +22,9 @@ class Problem(object):
     def __init__(self, **kwargs):
         self.width = kwargs.get("width", 640)
         self.height = kwargs.get("height", 480)
-        self.num_quads = kwargs.get("num_quads", 10)
+        self.num_quads = kwargs.get("num_quads", 20)
         self.min_height = kwargs.get("min_height", 60)
-        self.max_height = kwargs.get("max_height", 300)
+        self.max_height = kwargs.get("max_height", 200)
         self.step_size = kwargs.get("step_size", 10)
         self.quad_size = kwargs.get("quad_size", 4)
         self.evader_size = kwargs.get("evader_size", 6)
