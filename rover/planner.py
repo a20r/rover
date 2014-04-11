@@ -25,18 +25,27 @@ class Planner(object):
         def risk_sq(z):
             init_risk = float(self.risk_grid.get_risk(x, y))
             sq = math.pow(self.problem.min_height / float(z), 2)
-            risk = init_risk * (1 - math.pow(float(z - self.problem.min_height) /\
+            risk = (1 - math.pow(float(z - self.problem.min_height) /\
                 (init_risk * (self.problem.max_height -\
                 self.problem.min_height)), 2))
-            return abs(risk - sq)
+            return risk - sq
+
+        # def risk_sq(z):
+        #     init_risk = float(self.risk_grid.get_risk(x, y))
+        #     dsq = -2 * math.pow(self.problem.min_height, 2) / math.pow(z, 3)
+        #     drisk = (1 - init_risk) * 2 * (self.problem.min_height - z) /\
+        #             math.pow(self.problem.max_height -\
+        #             self.problem.min_height, 2)
+
+        #     return math.pow(dsq - drisk, 2)
 
         return risk_sq
 
 
     def determine_height(self, x, y):
         risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.fmin(risk_sq_func, self.problem.max_height, disp=0)
-        return int(res[0])
+        res = opt.fsolve(risk_sq_func, self.problem.max_height)
+        return int(max(res))
 
 
     def init_quads(self):
@@ -144,6 +153,9 @@ class Planner(object):
             if min_time == None or min_time > avg_time:
                 min_time = avg_time
                 min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
+
+        if time.time() - min_time < 0.1:
+            min_x_y = point.Point(0, 0)
 
         return min_x_y.to_unit_vector()
 
