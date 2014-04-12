@@ -37,11 +37,11 @@ class Drawer(object):
                 qp, r
             )
 
-        for e_pos in self.evader_list:
-            pygame.draw.circle(
-                self.screen, self.colors.evader_past,
-                e_pos, self.problem.evader_size
-            )
+        # for e_pos in self.evader_list:
+        #     pygame.draw.circle(
+        #         self.screen, self.colors.evader_past,
+        #         e_pos, self.problem.evader_size
+        #     )
 
         return self
 
