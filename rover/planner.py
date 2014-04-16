@@ -141,10 +141,13 @@ class Planner(object):
         min_time = None
         min_x_y = None
 
-        while angle < 2 * math.pi:
+        while angle < 2 * math.pi + self.angle_range:
 
             try:
                 x, y, avg_time = self.get_sample_direction(angle, quad)
+                if math.isnan(x) or math.isnan(y):
+                    raise ValueError()
+
             except ValueError:
                 continue
             finally:
@@ -154,8 +157,8 @@ class Planner(object):
                 min_time = avg_time
                 min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
 
-        if time.time() - min_time < 0.1:
-            min_x_y = point.Point(0, 0)
+        # if time.time() - min_time < 0.1:
+            # min_x_y = point.Point(0, 0)
 
         return min_x_y.to_unit_vector()
 
@@ -165,7 +168,6 @@ class Planner(object):
         quad.move_2d(uv)
         self.problem.grid.update_grid(quad)
         quad.set_z(self.determine_height(quad.x, quad.y))
-
 
 
     def step(self):

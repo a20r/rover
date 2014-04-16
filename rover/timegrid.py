@@ -7,7 +7,7 @@ import numpy as np
 class TimeGrid(object):
 
     def __init__(self, width, height):
-        self.scaling_factor = 16
+        self.scaling_factor = 4
         self.width = width // self.scaling_factor
         self.height = height // self.scaling_factor
         self.grid = np.zeros((height, width))
