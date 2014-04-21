@@ -1,7 +1,6 @@
 
 import timegrid
 import pygame.color as color
-import drawer
 
 
 class Colors(object):
@@ -14,7 +13,9 @@ class Colors(object):
         self.risk_point = self.color_dict[kwargs.get("risk_point", "red")]
         self.coverage = self.color_dict[kwargs.get("coverage", "lightgrey")]
         self.evader = self.color_dict[kwargs.get("evader", "darkgreen")]
-        self.evader_past = self.color_dict[kwargs.get("evader_past", "darkblue")]
+        self.evader_past = self.color_dict[
+            kwargs.get("evader_past", "darkblue")
+        ]
 
 
 class Problem(object):

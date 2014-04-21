@@ -3,17 +3,16 @@ import point
 import math
 import random
 
+
 class RiskGrid(object):
 
     def __init__(self, problem):
         self.risk_points = list()
         self.problem = problem
 
-
     def add_risk_point(self, x, y, sensor_range, init_risk):
         self.risk_points.append((sensor_range, init_risk, point.Point(x, y)))
         return self
-
 
     def add_random_points(self, num_points):
         for _ in xrange(num_points):
@@ -23,16 +22,13 @@ class RiskGrid(object):
             init_risk = 1.0
             self.add_risk_point(x, y, sensor_range, init_risk)
 
-
     def normal_dist(self, x, sigma):
         return math.exp(
             -0.5 * math.pow(float(x) / sigma, 2)
         ) / (math.sqrt(2 * math.pi) * sigma)
 
-
     def get_risk_points(self):
         return self.risk_points
-
 
     def get_risk(self, x, y):
         p = point.Point(x, y)
@@ -50,16 +46,13 @@ class RiskGrid(object):
 
         return max_risk
 
-
     def get_risk_3d(self, x, y, z):
         init_risk = self.get_risk(x, y)
 
-        actual_risk = init_risk * (1 - pow(z - self.problem.min_height, 2) /\
-            pow(init_risk * (self.problem.max_height -\
-            self.problem.min_height), 2))
+        actual_risk = init_risk * (1 - pow(z - self.problem.min_height, 2) /
+                                   pow(init_risk * (self.problem.max_height -
+                                            self.problem.min_height), 2))
         return actual_risk
-
 
     def __getitem__(self, index):
         return self.get_risk(index[0], index[1])
-

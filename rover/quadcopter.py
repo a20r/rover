@@ -2,6 +2,7 @@
 import math
 import point
 
+
 class Quadcopter(object):
 
     def __init__(self, x, y, z, problem):
@@ -19,31 +20,24 @@ class Quadcopter(object):
     def get_x(self):
         return self.x
 
-
     def get_y(self):
         return self.y
-
 
     def get_z(self):
         return self.z
 
-
     def get_pos_2d(self):
         return (self.x, self.y)
-
 
     def within_range(self, point_like):
         return self.get_point_2d().dist_to(point_like) <\
             self.get_sensor_radius()
 
-
     def get_point_2d(self):
         return point.Point(self.x, self.y)
 
-
     def get_viewing_angle(self):
         return self.viewing_angle
-
 
     def set_position(self, x, y, z):
         self.x = x
@@ -51,10 +45,8 @@ class Quadcopter(object):
         self.z = z
         return self
 
-
     def set_z(self, z):
         self.z = z
-
 
     def move_2d(self, unit_heading):
 
@@ -72,12 +64,10 @@ class Quadcopter(object):
         self.heading_y = h_y
         return self.x, self.y
 
-
     def intify(self):
         self.x = int(self.x)
         self.y = int(self.y)
         self.z = int(self.z)
-
 
     def get_sensor_radius(self):
         return self.z * math.tan(math.radians(self.viewing_angle))

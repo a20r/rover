@@ -4,6 +4,7 @@ import drawer
 import riskgrid
 import plot
 
+
 def run(**kwargs):
     colors = config.Colors(**kwargs)
     problem = config.Problem(**kwargs)

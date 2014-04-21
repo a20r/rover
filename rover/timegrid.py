@@ -1,8 +1,8 @@
 
 import time
-import point
 import math
 import numpy as np
+
 
 class TimeGrid(object):
 
@@ -13,13 +13,11 @@ class TimeGrid(object):
         self.grid = np.zeros((height, width))
         self.init_grid(self.grid)
 
-
     def init_grid(self, grid):
         current_time = time.time()
         for h in xrange(self.height):
             for w in xrange(self.width):
                 self.grid[h, w] = current_time
-
 
     def update_grid(self, quad):
         # scale this dude
@@ -50,10 +48,8 @@ class TimeGrid(object):
                 if dist <= radius:
                     self.raw_set_item(x_i, y_i, current_time)
 
-
     def raw_set_item(self, x, y, value):
         self.grid[y, x] = value
-
 
     def __getitem__(self, index):
         return self.grid[
@@ -61,10 +57,8 @@ class TimeGrid(object):
             index[0] // self.scaling_factor
         ]
 
-
     def __setitem__(self, index, value):
         self.grid[
             index[1] // self.scaling_factor,
             index[0] // self.scaling_factor
         ] = value
-

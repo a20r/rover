@@ -2,6 +2,7 @@
 import point
 import math
 
+
 class Evader(object):
 
     def __init__(self, x, y, g_x, g_y, problem, risk_grid):
@@ -12,7 +13,6 @@ class Evader(object):
         self.risk_grid = risk_grid
         self.sensing_radius = 100
         self.num_samples = 100
-
 
     def constrain(self, x, y):
         ret_x = x
@@ -37,7 +37,6 @@ class Evader(object):
 
         return ret_x, ret_y, b_x or b_y
 
-
     def get_potential(self, x, y, quads):
         sensor_quality = 0.0
         for quad in quads:
@@ -47,7 +46,6 @@ class Evader(object):
                 )
         return sensor_quality
 
-
     def move_2d(self, unit_heading):
         h_x = int(unit_heading.get_x() * 1.5 * self.problem.step_size)
         h_y = int(unit_heading.get_y() * 1.5 * self.problem.step_size)
@@ -55,7 +53,6 @@ class Evader(object):
         self.y = self.y + h_y
 
         return self.x, self.y
-
 
     def sample_random_point(self):
         r_point = point.get_random_point(
@@ -86,7 +83,7 @@ class Evader(object):
 
             potential = self.get_potential(x_s, y_s, quads)
 
-            if min_potential == None or potential < min_potential:
+            if min_potential is None or potential < min_potential:
                 min_potential = potential
                 min_x = x_s
                 min_y = y_s
@@ -99,10 +96,8 @@ class Evader(object):
 
         return unit_heading
 
-
     def get_x(self):
         return self.x
-
 
     def get_y(self):
         return self.y

@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
+
 
 def plot_risk_grid(risk_grid, filename):
     fig = plt.figure("Risk Map")
@@ -23,8 +23,8 @@ def plot_risk_grid(risk_grid, filename):
 
     zs = np.array(
         [
-            risk_grid.get_risk(x, y_max - y)
-            for x, y in zip(np.ravel(X), np.ravel(Y))
+            risk_grid.get_risk(x_i, y_max - y_i)
+            for x_i, y_i in zip(np.ravel(X), np.ravel(Y))
         ]
     )
 
@@ -36,5 +36,3 @@ def plot_risk_grid(risk_grid, filename):
 
     plt.savefig(filename)
     return plt
-
-
