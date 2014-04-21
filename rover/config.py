@@ -7,14 +7,26 @@ class Colors(object):
 
     def __init__(self, **kwargs):
         self.color_dict = color.THECOLORS
-        self.quad = self.color_dict[kwargs.get("quad", "blue")]
-        self.quad_sensor = self.color_dict[kwargs.get("quad_sensor", "purple")]
-        self.background = self.color_dict[kwargs.get("background", "white")]
-        self.risk_point = self.color_dict[kwargs.get("risk_point", "red")]
-        self.coverage = self.color_dict[kwargs.get("coverage", "lightgrey")]
-        self.evader = self.color_dict[kwargs.get("evader", "darkgreen")]
+        self.quad = self.color_dict[
+            kwargs.get("quad_colour", "blue")
+        ]
+        self.quad_sensor = self.color_dict[
+            kwargs.get("quad_sensor_colour", "purple")
+        ]
+        self.background = self.color_dict[
+            kwargs.get("background_colour", "white")
+        ]
+        self.risk_point = self.color_dict[
+            kwargs.get("risk_point_colour", "red")
+        ]
+        self.coverage = self.color_dict[
+            kwargs.get("coverage_colour", "lightgrey")
+        ]
+        self.evader = self.color_dict[
+            kwargs.get("evader_colour", "darkgreen")
+        ]
         self.evader_past = self.color_dict[
-            kwargs.get("evader_past", "darkblue")
+            kwargs.get("evader_past_colour", "darkblue")
         ]
 
 

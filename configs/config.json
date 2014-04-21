@@ -1,0 +1,24 @@
+{
+    "quad_colour": "blue",
+    "quad_sensor_colour": "purple",
+    "background_colour": "white",
+    "risk_point_colour": "red",
+    "coverage_colour": "lightgrey",
+    "evader_colour": "darkgreen",
+    "evader_past_colour": "darkblue",
+
+    "width": 1000,
+    "height": 600,
+    "num_quads": 40,
+    "min_height": 60,
+    "max_height": 200,
+    "step_size": 20,
+    "quad_size": 4,
+    "evader_size": 6,
+    "viewing_angle": 30,
+    "num_steps": 1000,
+
+    "num_risk_points": 4,
+    "img_file": "sandbox/test_heatmap.png",
+    "out_file": "sandbox/all.txt"
+}
