@@ -1,6 +1,5 @@
 
 import config
-import riskgrid
 import plot
 import random
 import riskgrid
@@ -71,7 +70,8 @@ class Experiments(object):
 
                 sim = simulation.Simulation(
                     problem, risk_grid,
-                    out_file=self.data_file_output.format(nrp, nq)
+                    out_file=self.data_file_output.format(nrp, nq),
+                    position_file=self.experiments_folder + "positions.csv"
                 )
 
                 sim.run()

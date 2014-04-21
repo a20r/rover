@@ -3,22 +3,31 @@ import planner
 import time
 import stats
 import evader
+import json
 
 
 class Simulation(object):
 
-    def __init__(self, problem, risk_grid, drawer=None, out_file=None):
+    def __init__(self, problem, risk_grid, **kwargs):
         self.problem = problem
         self.planner = planner.Planner(problem, risk_grid)
-        self.drawer = drawer
+        self.drawer = kwargs.get("drawer", None)
         self.risk_grid = risk_grid
         self.droid_list = self.init_droids()
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(problem)
         self.ra = stats.RiskAverage(problem, risk_grid)
         self.surface_list = list()
-        if not out_file is None:
-            self.out_file = open(out_file, "w")
+
+        if not kwargs.get("out_file", None) is None:
+            self.out_file = open(kwargs.get("out_file", None), "w")
+        else:
+            self.out_file = None
+
+        if not kwargs.get("position_file", None) is None:
+            self.position_file = open(kwargs.get("position_file", None), "w")
+        else:
+            self.position_file = None
 
     def init_droids(self):
         droid_pos_list = [
@@ -41,7 +50,7 @@ class Simulation(object):
             self.play()
 
     def render(self):
-        for _ in xrange(self.problem.num_steps):
+        for i in xrange(self.problem.num_steps):
             quads = self.planner.step()
 
             for droid in self.droid_list:
@@ -68,12 +77,23 @@ class Simulation(object):
             self.mca.update_average_efficiency(quads)
             self.sqa.update_average_sq(quads)
             self.ra.update_average_risk(quads)
+            self.write_results(quads, i)
 
-            if not self.out_file is None:
-                self.out_file.write(
-                    str(self.mca.get_moving_average_efficiency()) + " " +
-                    str(self.sqa.get_moving_average()) + " " +
-                    str(self.ra.get_moving_average()) + "\n"
+    def write_results(self, quads, i):
+        if not self.out_file is None:
+            self.out_file.write(
+                str(self.mca.get_moving_average_efficiency()) + " " +
+                str(self.sqa.get_moving_average()) + " " +
+                str(self.ra.get_moving_average()) + "\n"
+            )
+
+        if not self.position_file is None:
+            for j, quad in enumerate(quads):
+                self.position_file.write(
+                    "{}, {}, {}, {}, {}, {}\n".format(
+                        i, j, quad.x, quad.y, quad.z,
+                        quad.get_sensor_radius()
+                    )
                 )
 
     def play(self):

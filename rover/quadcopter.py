@@ -45,6 +45,14 @@ class Quadcopter(object):
         self.z = z
         return self
 
+    def get_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "coverage": self.get_sensor_radius()
+        }
+
     def set_z(self, z):
         self.z = z
 
