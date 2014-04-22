@@ -29,7 +29,7 @@ class Experiments(object):
         self.init_experiments_folder()
 
         self.img_file_output = self.experiments_folder +\
-            "imgs/heatmap_{0}_{1}.png"
+            "imgs/heatmap_{0}.png"
 
         self.data_file_output = self.experiments_folder +\
             "data/out_{0}_{1}.txt"
@@ -58,6 +58,14 @@ class Experiments(object):
             self.max_risk_points + self.risk_points_step,
             self.risk_points_step
         ):
+            default_problem = config.Problem(**self.kwargs)
+            risk_grid = riskgrid.RiskGrid(default_problem)
+            risk_grid.add_random_points(nrp)
+            plot.plot_risk_grid(
+                risk_grid,
+                self.img_file_output.format(nrp)
+            )
+
             for nq in range(
                 self.min_quads,
                 self.max_quads + self.quads_step,
@@ -65,12 +73,6 @@ class Experiments(object):
             ):
                 self.print_status(nrp, nq)
                 problem = config.Problem(num_quads=nq, **self.kwargs)
-                risk_grid = riskgrid.RiskGrid(problem)
-                risk_grid.add_random_points(nrp)
-                plot.plot_risk_grid(
-                    risk_grid,
-                    self.img_file_output.format(nrp, nq)
-                )
 
                 sim = simulation.Simulation(
                     problem, risk_grid,
