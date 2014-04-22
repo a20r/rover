@@ -17,6 +17,7 @@
     "evader_size": 6,
     "viewing_angle": 30,
     "num_steps": 1000,
+    "planner": "rover",
 
     "num_risk_points": 4,
     "img_file": "sandbox/test_heatmap.png",

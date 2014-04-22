@@ -1,0 +1,1 @@
+{"max_risk_points": 20, "planner": "lawnmower", "quad_size": 4, "quads_step": 5, "viewing_angle": 30, "num_steps": 1000, "max_height": 200, "height": 600, "min_height": 60, "width": 1000, "step_size": 20, "max_quads": 40, "min_risk_points": 1, "min_quads": 1, "risk_points_step": 2, "seed": 0, "experimental": true}

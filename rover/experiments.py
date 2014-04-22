@@ -7,6 +7,7 @@ import simulation
 import time
 import os
 import json
+import planner
 
 
 class Experiments(object):
@@ -22,8 +23,11 @@ class Experiments(object):
         self.min_quads = kwargs.get("min_quads", 1)
         self.max_quads = kwargs.get("max_quads", 20)
         self.quads_step = kwargs.get("quads_step", 5)
-        self.experiments_folder = "experiments/{}/".format(
-            time.asctime(time.gmtime()).replace(" ", "_").replace(":", "_")
+
+        self.planner_name = kwargs.get("planner", "rover")
+
+        self.pl = planner.planners.get(
+            self.planner_name, planner.Planner
         )
 
         self.init_experiments_folder()
@@ -40,6 +44,12 @@ class Experiments(object):
         self.status_output = "Num Risk Points -> {} :: Num Quads -> {} ==="
 
     def init_experiments_folder(self):
+        self.experiments_folder = "experiments/{}-{}/".format(
+            time.asctime(
+                time.localtime()
+            ).replace(" ", "_").replace(":", "_"),
+            self.planner_name
+        )
         os.mkdir(self.experiments_folder)
         os.mkdir(self.experiments_folder + "imgs")
         os.mkdir(self.experiments_folder + "data")
@@ -49,7 +59,7 @@ class Experiments(object):
             f.write(config_str)
 
     def print_status(self, num_risk_points, num_quads):
-        print "===", time.asctime(time.gmtime()), "::",
+        print "===", time.asctime(time.localtime()), "::",
         print self.status_output.format(num_risk_points, num_quads)
 
     def run(self):
@@ -77,7 +87,8 @@ class Experiments(object):
                 sim = simulation.Simulation(
                     problem, risk_grid,
                     out_file=self.data_file_output.format(nrp, nq),
-                    position_file=self.positions_file_output.format(nrp, nq)
+                    position_file=self.positions_file_output.format(nrp, nq),
+                    algorithm=self.pl
                 )
 
                 sim.run()

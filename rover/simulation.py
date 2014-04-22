@@ -10,7 +10,8 @@ class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
         self.problem = problem
-        self.planner = planner.Planner(problem, risk_grid)
+        self.planner_obj = kwargs.get("algorithm", planner.Planner)
+        self.planner = self.planner_obj(problem, risk_grid)
         self.drawer = kwargs.get("drawer", None)
         self.risk_grid = risk_grid
         self.droid_list = self.init_droids()

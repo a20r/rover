@@ -1,0 +1,21 @@
+{
+    "experimental": true,
+
+    "width": 1000,
+    "height": 600,
+    "min_height": 60,
+    "max_height": 200,
+    "step_size": 20,
+    "quad_size": 4,
+    "viewing_angle": 30,
+    "num_steps": 1000,
+
+    "min_risk_points": 1,
+    "max_risk_points": 20,
+    "risk_points_step": 2,
+    "min_quads": 1,
+    "max_quads": 40,
+    "quads_step": 5,
+    "planner": "lawnmower",
+    "seed": 0
+}

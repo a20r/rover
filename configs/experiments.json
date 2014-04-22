@@ -1,8 +1,8 @@
 {
     "experimental": true,
 
-    "width": 2000,
-    "height": 1200,
+    "width": 1000,
+    "height": 600,
     "min_height": 60,
     "max_height": 200,
     "step_size": 20,
@@ -16,5 +16,6 @@
     "min_quads": 1,
     "max_quads": 40,
     "quads_step": 5,
+    "planner": "rover",
     "seed": 0
 }

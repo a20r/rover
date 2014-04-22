@@ -4,6 +4,7 @@ import quadcopter
 import math
 import scipy.optimize as opt
 import point
+import lawnmower
 
 
 class Planner(object):
@@ -141,8 +142,8 @@ class Planner(object):
                 min_time = avg_time
                 min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
 
-        if time.time() - min_time < 0.1:
-            min_x_y = point.Point(0, 0)
+        # if time.time() - min_time < 0.1:
+            # min_x_y = point.Point(0, 0)
 
         return min_x_y.to_unit_vector()
 
@@ -157,3 +158,9 @@ class Planner(object):
             self.update_quad(quad)
 
         return self.quad_list
+
+
+planners = {
+    "rover": Planner,
+    "lawnmower": lawnmower.LawnMower
+}

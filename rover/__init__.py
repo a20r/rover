@@ -4,6 +4,7 @@ import drawer
 import riskgrid
 import plot
 import experiments
+import planner
 
 
 def run(**kwargs):
@@ -21,9 +22,14 @@ def run(**kwargs):
             risk_grid, kwargs.get("img_file", "imgs/test_heatmap.png")
         )
 
+        pl = planner.planners.get(
+            kwargs.get("planner", "rover"), planner.Planner
+        )
+
         sim = simulation.Simulation(
             problem, risk_grid, drawer=dr,
-            out_file=kwargs.get("out_file", "data/all.txt")
+            out_file=kwargs.get("out_file", "data/all.txt"),
+            algorithm=pl
         )
         sim.run()
     else:
