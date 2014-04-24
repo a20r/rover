@@ -212,23 +212,24 @@ function plotAll(rns, qns)
     [QNS, RNS] = meshgrid(qns, rns);
     [t_avg_ta, t_avg_sq, t_avg_risk] = getAverageMatrices(rns, qns);
     figure;
-    hold on;
+    % hold on;
+    subplot(2, 2, 1);
+    surf(QNS, RNS, t_avg_ta);
     title("Total Area");
     xlabel("Number of Quads");
     ylabel("Number of Risk Points");
-    surf(QNS, RNS, t_avg_ta);
-    figure;
-    hold on;
+
+    subplot(2, 2, 2);
+    surf(QNS, RNS, t_avg_sq);
     title("Sensor Quality");
     xlabel("Number of Quads");
     ylabel("Number of Risk Points");
-    surf(QNS, RNS, t_avg_sq);
-    figure;
-    hold on;
+
+    subplot(2, 2, 3);
+    surf(QNS, RNS, t_avg_risk);
     xlabel("Number of Quads");
     ylabel("Number of Risk Points");
     title("Average Risk");
-    surf(QNS, RNS, t_avg_risk);
 endfunction
 
 function waitForEnd()
