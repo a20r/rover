@@ -9,6 +9,9 @@ function [data json] = parse_json(json)
 % matlab_results = parse_json(urlread(google_search));
 % disp(matlab_results{1}.responseData.results{1}.titleNoFormatting)
 % disp(matlab_results{1}.responseData.results{1}.visibleUrl)
+%
+% DISCLAIMER --> THIS IS NOT MY CODE
+% IT IS FROM HERE: http://www.mathworks.co.uk/matlabcentral/fileexchange/20565-json-parser
 
     data = cell(0,1);
 
