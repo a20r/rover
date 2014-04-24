@@ -1,7 +1,7 @@
 ## How to read experimental results
 
 ### File Structure
-    [date]/
+    [date]-[algorithm]/
         data/
         imgs/
         positions/
@@ -25,3 +25,12 @@ radius.
 
 ### `config.json`
 This file shows the setup parameters used for the experiments.
+
+## How to generate the graphs
+
+There is a Octave script, `scripts/generate_graphs.m`, that will automatically generate the
+graphs assuming that the script is being run from the directory that the experimental
+results are stored. Below is some code that shows how the graphs can be generated.
+
+    cd experiments/[date of the experiment]-[algorithm name]
+    octave ../../scripts/generate_graphs.m
