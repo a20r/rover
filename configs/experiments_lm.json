@@ -9,6 +9,8 @@
     "quad_size": 4,
     "viewing_angle": 30,
     "num_steps": 1000,
+    "mean_risk": 1,
+    "ref_height": 60,
 
     "min_risk_points": 1,
     "max_risk_points": 20,

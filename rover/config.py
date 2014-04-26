@@ -43,4 +43,6 @@ class Problem(object):
         self.evader_size = kwargs.get("evader_size", 6)
         self.viewing_angle = kwargs.get("viewing_angle", 30)
         self.num_steps = kwargs.get("num_steps", 1000)
+        self.mean_risk = kwargs.get("mean_risk", 1)
+        self.ref_height = kwargs.get("ref_height", 60)
         self.grid = timegrid.TimeGrid(self.width, self.height)

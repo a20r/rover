@@ -18,8 +18,16 @@ class RiskGrid(object):
         for _ in xrange(num_points):
             x = random.randint(0, self.problem.width)
             y = random.randint(0, self.problem.height)
-            sensor_range = min(self.problem.width, self.problem.height)
-            init_risk = 1.0
+            sensor_range = min(self.problem.width, self.problem.height) / 2.0
+            init_risk = self.problem.mean_risk * (
+                1 - math.pow(
+                    self.problem.min_height -
+                    self.problem.ref_height, 2) /
+                math.pow(self.problem.mean_risk * (
+                    self.problem.max_height -
+                    self.problem.ref_height), 2))
+            print init_risk
+
             self.add_risk_point(x, y, sensor_range, init_risk)
 
     def normal_dist(self, x, sigma):
@@ -49,9 +57,12 @@ class RiskGrid(object):
     def get_risk_3d(self, x, y, z):
         init_risk = self.get_risk(x, y)
 
-        actual_risk = init_risk * (1 - pow(z - self.problem.min_height, 2) /
-                                   pow(init_risk * (self.problem.max_height -
-                                            self.problem.min_height), 2))
+        actual_risk = init_risk * (
+            1 - math.pow(z - self.problem.min_height, 2) /
+            math.pow(init_risk * (
+                self.problem.max_height -
+                self.problem.min_height), 2))
+
         return actual_risk
 
     def __getitem__(self, index):

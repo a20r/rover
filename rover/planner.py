@@ -1,5 +1,4 @@
 
-import time
 import quadcopter
 import math
 import scipy.optimize as opt
@@ -24,9 +23,11 @@ class Planner(object):
         def risk_sq(z):
             init_risk = float(self.risk_grid.get_risk(x, y))
             sq = math.pow(self.problem.min_height / float(z), 2)
-            risk = (1 - math.pow(float(z - self.problem.min_height) /
-                                 (init_risk * (self.problem.max_height -
-                                               self.problem.min_height)), 2))
+            risk = (
+                1 - math.pow(
+                    float(z - self.problem.min_height) /
+                    (init_risk * (self.problem.max_height -
+                                  self.problem.min_height)), 2))
             return risk - sq
 
         return risk_sq
@@ -131,8 +132,7 @@ class Planner(object):
             try:
                 x, y, avg_time = self.get_sample_direction(angle, quad)
                 if math.isnan(x) or math.isnan(y):
-                    raise ValueError()
-
+                    continue
             except ValueError:
                 continue
             finally:
@@ -141,9 +141,6 @@ class Planner(object):
             if min_time is None or min_time > avg_time:
                 min_time = avg_time
                 min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
-
-        # if time.time() - min_time < 0.1:
-            # min_x_y = point.Point(0, 0)
 
         return min_x_y.to_unit_vector()
 
