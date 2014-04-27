@@ -3,7 +3,7 @@
 
     "width": 1000,
     "height": 600,
-    "min_height": 60,
+    "min_height": 100,
     "max_height": 200,
     "step_size": 20,
     "quad_size": 4,

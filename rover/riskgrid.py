@@ -26,7 +26,6 @@ class RiskGrid(object):
                 math.pow(self.problem.mean_risk * (
                     self.problem.max_height -
                     self.problem.ref_height), 2))
-            print init_risk
 
             self.add_risk_point(x, y, sensor_range, init_risk)
 
