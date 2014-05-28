@@ -8,8 +8,8 @@ import rospy
 class Drawer(object):
 
     def __init__(self, problem, colors):
+        rospy.init_node("rover_drawer", anonymous=True)
         self.pub = rospy.Publisher("visualization_marker", Marker)
-        rospy.init_node("rover_drawer")
 
         self.problem = problem
         self.colors = colors
@@ -73,24 +73,25 @@ class Drawer(object):
 
     def draw_risk_grid(self, risk_grid):
         for i, (_, _, r_point) in enumerate(risk_grid.get_risk_points()):
-            marker = Marker()
-            marker.header.frame_id = "/my_frame"
-            marker.lifetime = rospy.Duration(1)
-            marker.type = marker.CYLINDER
-            marker.action = marker.ADD
-            marker.scale.x = 20
-            marker.scale.y = 20
-            marker.scale.z = 40
-            marker.color.a = 1
-            marker.color.r = 1.0
-            marker.color.g = 0.0
-            marker.color.b = 0.0
-            marker.pose.orientation.w = 1.0
-            marker.pose.position.x = r_point.get_x()
-            marker.pose.position.y = r_point.get_y()
-            marker.pose.position.z = 0
-            marker.id = i
-            self.markers.append(marker)
+            if not rospy.is_shutdown():
+                marker = Marker()
+                marker.header.frame_id = "/my_frame"
+                marker.lifetime = rospy.Duration(1)
+                marker.type = marker.CYLINDER
+                marker.action = marker.ADD
+                marker.scale.x = 20
+                marker.scale.y = 20
+                marker.scale.z = 40
+                marker.color.a = 1
+                marker.color.r = 1.0
+                marker.color.g = 0.0
+                marker.color.b = 0.0
+                marker.pose.orientation.w = 1.0
+                marker.pose.position.x = r_point.get_x()
+                marker.pose.position.y = r_point.get_y()
+                marker.pose.position.z = 0
+                marker.id = i
+                self.markers.append(marker)
         return self
 
     def update(self):

@@ -7,6 +7,7 @@ import plot
 import experiments
 import planner
 import drawer
+import rospy
 
 
 def run(**kwargs):
@@ -39,7 +40,11 @@ def run(**kwargs):
             out_file=kwargs.get("out_file", "data/all.txt"),
             algorithm=pl
         )
-        sim.run()
+
+        try:
+            sim.run()
+        except rospy.ROSInterruptException:
+            exit()
     else:
         if "num_quads" in kwargs.keys():
             del kwargs["num_quads"]
