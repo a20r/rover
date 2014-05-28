@@ -32,7 +32,7 @@ def run(**kwargs):
         )
 
         pl = planner.planners.get(
-            kwargs.get("planner", "rover"), planner.Planner
+            kwargs.get("planner", "rover_monotonic"), planner.PlannerMonotonic
         )
 
         sim = simulation.Simulation(

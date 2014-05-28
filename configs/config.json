@@ -9,7 +9,7 @@
 
     "width": 1000,
     "height": 1000,
-    "num_quads": 20,
+    "num_quads": 4,
     "min_height": 60,
     "max_height": 200,
     "mean_risk": 1,
@@ -18,9 +18,12 @@
     "quad_size": 4,
     "evader_size": 6,
     "viewing_angle": 40,
-    "num_steps": 1000,
-    "planner": "rover",
+    "num_steps": 250,
+    "planner": "rover_guassian",
+    "sq_height": 130,
+    "sq_std": 20,
     "drawer": "ros",
+    "camera_angle": 0,
 
     "num_risk_points": 15,
     "img_file": "sandbox/test_heatmap.png",

@@ -4,9 +4,10 @@ import math
 import scipy.optimize as opt
 import point
 import lawnmower
+import scipy.stats
 
 
-class Planner(object):
+class PlannerInterface(object):
     def __init__(self, problem, risk_grid):
         self.problem = problem
         self.quad_list = self.init_quads()
@@ -18,24 +19,6 @@ class Planner(object):
 
         for quad in self.quad_list:
             self.problem.grid.update_grid(quad)
-
-    def get_risk_sq_func(self, x, y):
-        def risk_sq(z):
-            init_risk = float(self.risk_grid.get_risk(x, y))
-            sq = math.pow(self.problem.min_height / float(z), 2)
-            risk = (
-                1 - math.pow(
-                    float(z - self.problem.min_height) /
-                    (init_risk * (self.problem.max_height -
-                                  self.problem.min_height)), 2))
-            return risk - sq
-
-        return risk_sq
-
-    def determine_height(self, x, y):
-        risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.fsolve(risk_sq_func, self.problem.max_height)
-        return int(max(res))
 
     def init_quads(self):
         quad_list = list()
@@ -159,7 +142,65 @@ class Planner(object):
         return self.quad_list
 
 
+class PlannerMonotonic(PlannerInterface):
+
+    def risk(self, x, y, z):
+        init_risk = float(self.risk_grid.get_risk(x, y))
+        risk_val = (1 - math.pow(
+            float(z - self.problem.min_height) /
+            (
+                init_risk *
+                (self.problem.max_height - self.problem.min_height)
+            ), 2
+        ))
+
+        return risk_val
+
+    def sq(self, z):
+        return math.pow(self.problem.min_height / float(z), 2)
+
+    def get_risk_sq_func(self, x, y):
+        def risk_sq(z):
+            return self.risk(x, y, z) - self.sq(z)
+
+        return risk_sq
+
+    def determine_height(self, x, y):
+        risk_sq_func = self.get_risk_sq_func(x, y)
+        res = opt.fsolve(risk_sq_func, self.problem.max_height)
+        return int(max(res))
+
+
+
+class PlannerGaussian(PlannerInterface):
+
+    def risk(self, x, y, z):
+        init_risk = float(self.risk_grid.get_risk(x, y))
+        return (self.problem.min_height / z) * init_risk
+
+    def sq(self, z):
+        norm_dist = scipy.stats.norm(
+            self.problem.sq_height,
+            self.problem.sq_std
+        )
+
+        return norm_dist.pdf(z) / norm_dist.pdf(self.problem.sq_height)
+
+    def get_risk_sq_func(self, x, y):
+        def risk_sq(z):
+            return self.risk(x, y, z) - self.sq(z)
+
+        return risk_sq
+
+    def determine_height(self, x, y):
+        risk_sq_func = self.get_risk_sq_func(x, y)
+        res = opt.fsolve(risk_sq_func, self.problem.max_height)
+        return int(max(res))
+
+
+
 planners = {
-    "rover": Planner,
+    "rover_monotonic": PlannerMonotonic,
+    "rover_guassian": PlannerGaussian,
     "lawnmower": lawnmower.LawnMower
 }

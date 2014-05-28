@@ -45,5 +45,7 @@ class Problem(object):
         self.num_steps = kwargs.get("num_steps", 1000)
         self.mean_risk = kwargs.get("mean_risk", 1)
         self.ref_height = kwargs.get("ref_height", 60)
-        self.safety_file = kwargs.get("safety_file", "safety/general.py")
+        self.camera_angle = kwargs.get("camera_angle", 0)
+        self.sq_height = kwargs.get("sq_height", 130)
+        self.sq_std = kwargs.get("sq_std", 20)
         self.grid = timegrid.TimeGrid(self.width, self.height)
