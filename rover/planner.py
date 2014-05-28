@@ -138,9 +138,11 @@ class Planner(object):
             finally:
                 angle += self.angle_range
 
+            vec_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
+
             if min_time is None or min_time > avg_time:
                 min_time = avg_time
-                min_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
+                min_x_y = vec_x_y
 
         return min_x_y.to_unit_vector()
 

@@ -2,6 +2,8 @@
 import pygame
 import pygame.color as color
 import collections
+from visualization_msgs.msg import Marker
+import rospy
 
 
 class Drawer(object):
@@ -35,12 +37,6 @@ class Drawer(object):
                 self.screen, self.colors.coverage,
                 qp, r
             )
-
-        # for e_pos in self.evader_list:
-        #     pygame.draw.circle(
-        #         self.screen, self.colors.evader_past,
-        #         e_pos, self.problem.evader_size
-        #     )
 
         return self
 
@@ -97,3 +93,6 @@ class Drawer(object):
     def clear_all(self):
         self.screen.fill(self.colors.background)
         return self
+
+    def can_play(self):
+        return True

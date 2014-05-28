@@ -11,6 +11,7 @@
     "num_steps": 1000,
     "mean_risk": 1,
     "ref_height": 60,
+    "safety_file": "safety/general.py",
 
     "min_risk_points": 1,
     "max_risk_points": 20,

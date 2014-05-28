@@ -1,10 +1,12 @@
+
 import config
 import simulation
-import drawer
+import rosdrawer
 import riskgrid
 import plot
 import experiments
 import planner
+import drawer
 
 
 def run(**kwargs):
@@ -13,7 +15,13 @@ def run(**kwargs):
     if not experimental:
         colors = config.Colors(**kwargs)
         problem = config.Problem(**kwargs)
-        dr = drawer.Drawer(problem, colors)
+
+        dr_type = kwargs.get("drawer", "pygame")
+
+        if dr_type == "pygame":
+            dr = drawer.Drawer(problem, colors)
+        elif dr_type == "ros":
+            dr = rosdrawer.Drawer(problem, colors)
 
         risk_grid = riskgrid.RiskGrid(problem)
         risk_grid.add_random_points(kwargs.get("num_risk_points", 4))

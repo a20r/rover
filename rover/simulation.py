@@ -98,6 +98,9 @@ class Simulation(object):
                 )
 
     def play(self):
+        if not self.drawer.can_play():
+            return
+
         done = False
         counter = 0
         while not done:
