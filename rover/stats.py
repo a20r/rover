@@ -45,18 +45,15 @@ class MonteCarloArea(object):
 
 class SensorQualityAverage(object):
 
-    def __init__(self, problem):
+    def __init__(self, planner):
         self.moving_average = 0.0
         self.learning_rate = 0.9
-        self.problem = problem
-
-    def get_sensor_quality(self, quad):
-        return math.pow(self.problem.min_height / float(quad.get_z()), 2)
+        self.planner = planner
 
     def update_average_sq(self, quads):
         sub_total = 0.0
         for quad in quads:
-            sub_total += self.get_sensor_quality(quad)
+            sub_total += self.planner.sq(quad.x, quad.y, quad.z)
 
         self.moving_average = (1 - self.learning_rate) *\
             self.moving_average + self.learning_rate *\
@@ -70,16 +67,15 @@ class SensorQualityAverage(object):
 
 class RiskAverage(object):
 
-    def __init__(self, problem, risk_grid):
-        self.problem = problem
-        self.risk_grid = risk_grid
+    def __init__(self, planner):
         self.moving_average = 0.0
         self.learning_rate = 0.9
+        self.planner = planner
 
     def update_average_risk(self, quads):
         sub_total = 0.0
         for quad in quads:
-            sub_total += self.risk_grid.get_risk_3d(quad.x, quad.y, quad.z)
+            sub_total += self.planner.risk(quad.x, quad.y, quad.z)
 
         self.moving_average = (1 - self.learning_rate) *\
             self.moving_average + self.learning_rate *\

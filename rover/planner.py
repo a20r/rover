@@ -133,7 +133,7 @@ class PlannerInterface(object):
         uv = self.get_new_direction(quad)
         quad.move_2d(uv)
         self.problem.grid.update_grid(quad)
-        quad.set_z(self.determine_height(quad.x, quad.y))
+        quad.set_z(self.determine_height(quad))
 
     def step(self):
         for quad in self.quad_list:
@@ -156,16 +156,17 @@ class PlannerMonotonic(PlannerInterface):
 
         return risk_val
 
-    def sq(self, z):
+    def sq(self, x, y, z):
         return math.pow(self.problem.min_height / float(z), 2)
 
     def get_risk_sq_func(self, x, y):
         def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(z)
+            return self.risk(x, y, z) - self.sq(x, y, z)
 
         return risk_sq
 
-    def determine_height(self, x, y):
+    def determine_height(self, quad):
+        x, y = quad.x, quad.y
         risk_sq_func = self.get_risk_sq_func(x, y)
         res = opt.fsolve(risk_sq_func, self.problem.max_height)
         return int(max(res))
@@ -175,10 +176,17 @@ class PlannerMonotonic(PlannerInterface):
 class PlannerGaussian(PlannerInterface):
 
     def risk(self, x, y, z):
-        init_risk = float(self.risk_grid.get_risk(x, y))
-        return (self.problem.min_height / z) * init_risk
 
-    def sq(self, z):
+        if z > self.problem.max_height:
+            return 0
+
+        init_risk = float(self.risk_grid.get_risk(x, y))
+
+        return init_risk * (
+            self.problem.max_height - float(z)
+        ) / (self.problem.max_height - self.problem.min_height)
+
+    def sq(self, x, y, z):
         norm_dist = scipy.stats.norm(
             self.problem.sq_height,
             self.problem.sq_std
@@ -188,16 +196,26 @@ class PlannerGaussian(PlannerInterface):
 
     def get_risk_sq_func(self, x, y):
         def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(z)
+            return self.risk(x, y, z) - self.sq(x, y, z)
 
         return risk_sq
 
-    def determine_height(self, x, y):
-        risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.minimize(risk_sq_func, self.problem.min_height)
-        print res["x"]
-        return int(max(res["x"]))
+    def determine_height(self, quad):
+        risk_sq_func = self.get_risk_sq_func(quad.x, quad.y)
 
+        sample_eps = 10
+
+        sample_min = quad.z - sample_eps
+        sample_max = quad.z + sample_eps
+        sample_range = range(sample_min, sample_max + 1)
+
+        j_list = map(risk_sq_func, sample_range)
+
+        opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
+
+        print opt_val[0] - sample_eps + quad.z
+
+        return opt_val[0] - sample_eps + quad.z
 
 
 planners = {

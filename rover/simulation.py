@@ -11,13 +11,13 @@ class Simulation(object):
     def __init__(self, problem, risk_grid, **kwargs):
         self.problem = problem
         self.planner_obj = kwargs.get("algorithm", planner.PlannerMonotonic)
-        self.planner = self.planner_obj(problem, risk_grid)
+        self.pl = self.planner_obj(problem, risk_grid)
         self.drawer = kwargs.get("drawer", None)
         self.risk_grid = risk_grid
         self.droid_list = self.init_droids()
         self.mca = stats.MonteCarloArea(problem, 1000)
-        self.sqa = stats.SensorQualityAverage(problem)
-        self.ra = stats.RiskAverage(problem, risk_grid)
+        self.sqa = stats.SensorQualityAverage(self.pl)
+        self.ra = stats.RiskAverage(self.pl)
         self.surface_list = list()
 
         if not kwargs.get("out_file", None) is None:
@@ -52,7 +52,7 @@ class Simulation(object):
 
     def render(self):
         for i in xrange(self.problem.num_steps):
-            quads = self.planner.step()
+            quads = self.pl.step()
 
             for droid in self.droid_list:
                 droid.step(quads)
