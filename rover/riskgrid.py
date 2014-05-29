@@ -62,13 +62,14 @@ class RiskGrid(object):
         return max_risk
 
     def get_risk_3d(self, x, y, z):
-        init_risk = self.get_risk(x, y)
+        # init_risk = self.get_risk(x, y)
 
-        actual_risk = init_risk * (
-            1 - math.pow(z - self.problem.min_height, 2) /
-            math.pow(init_risk * (
-                self.problem.max_height -
-                self.problem.min_height), 2))
+        # actual_risk = init_risk * (
+        #     1 - math.pow(z - self.problem.min_height, 2) /
+        #     math.pow(init_risk * (
+        #         self.problem.max_height -
+        #         self.problem.min_height), 2))
+        actual_risk = 0
 
         return actual_risk
 

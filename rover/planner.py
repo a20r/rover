@@ -194,8 +194,9 @@ class PlannerGaussian(PlannerInterface):
 
     def determine_height(self, x, y):
         risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.fsolve(risk_sq_func, self.problem.max_height)
-        return int(max(res))
+        res = opt.minimize(risk_sq_func, self.problem.min_height)
+        print res["x"]
+        return int(max(res["x"]))
 
 
 

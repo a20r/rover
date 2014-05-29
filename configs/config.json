@@ -21,7 +21,7 @@
     "num_steps": 250,
     "planner": "rover_guassian",
     "sq_height": 130,
-    "sq_std": 20,
+    "sq_std": 100,
     "drawer": "ros",
     "camera_angle": 0,
 
