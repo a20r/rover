@@ -3,13 +3,16 @@ import pygame.color as color
 import collections
 from visualization_msgs.msg import Marker
 import rospy
+import random
 
 
 class Drawer(object):
 
     def __init__(self, problem, colors):
         rospy.init_node("rover_drawer", anonymous=True)
-        self.pub = rospy.Publisher("visualization_marker", Marker)
+        self.pub = rospy.Publisher(
+            "visualization_marker", Marker, queue_size=1000
+        )
 
         self.problem = problem
         self.colors = colors
@@ -29,6 +32,8 @@ class Drawer(object):
 
     def draw_quad(self, quad):
 
+        quad_id = hash(quad)
+
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
@@ -46,7 +51,7 @@ class Drawer(object):
             marker.pose.position.x = quad.get_x()
             marker.pose.position.y = quad.get_y()
             marker.pose.position.z = quad.get_z()
-            marker.id = hash(quad)
+            marker.id = quad_id
             self.markers.append(marker)
 
         if not rospy.is_shutdown():
@@ -66,7 +71,7 @@ class Drawer(object):
             marker.pose.position.x = quad.get_x()
             marker.pose.position.y = quad.get_y()
             marker.pose.position.z = 0
-            marker.id = self.problem.num_quads + hash(quad) + 1
+            marker.id = self.problem.num_quads + quad_id + 1
             self.markers.append(marker)
 
         return self

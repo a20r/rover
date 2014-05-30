@@ -1,6 +1,8 @@
 
 import math
 import point
+import time
+import random
 
 
 class Quadcopter(object):
@@ -10,6 +12,7 @@ class Quadcopter(object):
         self.y = y
         self.z = z
         self.problem = problem
+        self.hash_val = int(1000 * random.random())
 
         # in degrees
         self.viewing_angle = problem.viewing_angle
@@ -79,3 +82,7 @@ class Quadcopter(object):
 
     def get_sensor_radius(self):
         return self.z * math.tan(math.radians(self.viewing_angle))
+
+    def __hash__(self):
+        return self.hash_val
+

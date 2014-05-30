@@ -2,6 +2,7 @@
 import quadcopter
 import math
 import point
+import scipy.stats
 
 
 class Directions(object):
@@ -11,8 +12,9 @@ class Directions(object):
 
 class LawnMower(object):
 
-    def __init__(self, problem, *args):
+    def __init__(self, problem, risk_grid):
         self.problem = problem
+        self.risk_grid = risk_grid
         self.quad_list = self.init_quads()
         self.current_heading = [0, 1]
         self.right = [1, 0]
@@ -84,3 +86,19 @@ class LawnMower(object):
             ))
 
         return self.quad_list
+
+    def risk(self, x, y, z):
+        init_risk = float(self.risk_grid.get_risk(x, y))
+        norm_dist = scipy.stats.norm(
+            0, init_risk * self.problem.risk_constant
+        )
+
+        return norm_dist.pdf(z) / norm_dist.pdf(0)
+
+    def sq(self, x, y, z):
+        norm_dist = scipy.stats.norm(
+            self.problem.sq_height,
+            self.problem.sq_std
+        )
+
+        return norm_dist.pdf(z) / norm_dist.pdf(self.problem.sq_height)
