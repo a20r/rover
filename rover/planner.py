@@ -176,15 +176,12 @@ class PlannerMonotonic(PlannerInterface):
 class PlannerGaussian(PlannerInterface):
 
     def risk(self, x, y, z):
-
-        if z > self.problem.max_height:
-            return 0
-
         init_risk = float(self.risk_grid.get_risk(x, y))
+        norm_dist = scipy.stats.norm(
+            0, init_risk * self.problem.risk_constant
+        )
 
-        return init_risk * (
-            self.problem.max_height - float(z)
-        ) / (self.problem.max_height - self.problem.min_height)
+        return norm_dist.pdf(z) / norm_dist.pdf(0)
 
     def sq(self, x, y, z):
         norm_dist = scipy.stats.norm(
@@ -203,7 +200,7 @@ class PlannerGaussian(PlannerInterface):
     def determine_height(self, quad):
         risk_sq_func = self.get_risk_sq_func(quad.x, quad.y)
 
-        sample_eps = 10
+        sample_eps = 5
 
         sample_min = quad.z - sample_eps
         sample_max = quad.z + sample_eps
@@ -213,7 +210,7 @@ class PlannerGaussian(PlannerInterface):
 
         opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
 
-        print opt_val[0] - sample_eps + quad.z
+        # print opt_val[0] - sample_eps + quad.z
 
         return opt_val[0] - sample_eps + quad.z
 

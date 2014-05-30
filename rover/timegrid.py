@@ -7,10 +7,10 @@ import numpy as np
 class TimeGrid(object):
 
     def __init__(self, width, height):
-        self.scaling_factor = 4
+        self.scaling_factor = 8
         self.width = width // self.scaling_factor
         self.height = height // self.scaling_factor
-        self.grid = np.zeros((height, width))
+        self.grid = np.zeros((self.height, self.width))
         self.init_grid(self.grid)
 
     def init_grid(self, grid):
@@ -20,7 +20,6 @@ class TimeGrid(object):
                 self.grid[h, w] = current_time
 
     def update_grid(self, quad):
-        # scale this dude
         x = quad.x // self.scaling_factor
         y = quad.y // self.scaling_factor
         radius = int(quad.get_sensor_radius()) // self.scaling_factor
