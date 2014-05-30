@@ -210,8 +210,6 @@ class PlannerGaussian(PlannerInterface):
 
         opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
 
-        # print opt_val[0] - sample_eps + quad.z
-
         return opt_val[0] - sample_eps + quad.z
 
 
