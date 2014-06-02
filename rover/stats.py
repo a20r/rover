@@ -22,7 +22,23 @@ class MonteCarloArea(object):
             )
 
             for quad in quads:
-                if r_p.dist_to(quad) <= quad.get_sensor_radius():
+                old_x = r_p.x - quad.x
+                old_y = r_p.y - quad.y
+
+                beta_r = math.radians(quad.beta)
+                X = old_x * math.cos(-beta_r) - old_y * math.sin(-beta_r)
+                Y = old_y * math.cos(-beta_r) + old_x * math.sin(-beta_r)
+
+                r_ma = quad.get_ellipse_major()
+                r_mi = quad.get_ellipse_minor()
+                h = quad.get_ellipse_center_dist()
+                k = 0
+
+                el_eval_x = pow(X - h, 2) / float(pow(r_ma, 2))
+                el_eval_y = pow(Y - k, 2) / float(pow(r_mi, 2))
+
+
+                if el_eval_x + el_eval_y <= 1:
                     num_in += 1
                     break
 

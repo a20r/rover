@@ -142,9 +142,24 @@ class PlannerInterface(object):
         return min_x_y.to_unit_vector(), min_time
 
     def get_new_direction(self, quad):
-        return self.get_instance_direction(
-            quad, quad.get_orientation()
-        )
+        min_time = None
+        min_direction = None
+        min_beta = None
+        for n_b in xrange(
+            quad.beta,
+            quad.beta + self.problem.orientation_freedom + 1, 2
+        ):
+            new_direction, n_time = self.get_instance_direction(
+                quad, n_b
+            )
+
+            if min_time is None or n_time < min_time:
+                min_time = n_time
+                min_direction = new_direction
+                min_beta = n_b
+
+        quad.set_orientation(min_beta)
+        return min_direction
 
     def update_quad(self, quad):
         uv = self.get_new_direction(quad)
