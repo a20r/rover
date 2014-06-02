@@ -4,6 +4,7 @@ import collections
 from visualization_msgs.msg import Marker
 import rospy
 import random
+import math
 
 
 class Drawer(object):
@@ -21,6 +22,9 @@ class Drawer(object):
         self.clear_all().update()
         self.markers = collections.deque(list(), 100)
 
+    def hash32(self, value):
+        return hash(value) & 0xffffffff
+
     def draw_evader(self, e_x, e_y):
         return self
 
@@ -30,9 +34,31 @@ class Drawer(object):
     def add_coverage(self, quad):
         return self
 
+    def angle2quat(self, bank, heading, attitude):
+        #Assuming the angles are in radians.
+        c1 = math.cos(heading/2)
+        s1 = math.sin(heading/2)
+        c2 = math.cos(attitude/2)
+        s2 = math.sin(attitude/2)
+        c3 = math.cos(bank/2)
+        s3 = math.sin(bank/2)
+        c1c2 = c1*c2
+        s1s2 = s1*s2
+        w = c1c2*c3 - s1s2*s3
+        x = c1c2*s3 + s1s2*c3
+        y = s1*c2*c3 + c1*s2*s3
+        z = c1*s2*c3 - s1*c2*s3
+        n = math.sqrt(pow(w, 2) + pow(w, 2) + pow(w, 2) + pow(w, 2))
+        w_n = w / n
+        x_n = x / n
+        y_n = y / n
+        z_n = z / n
+        return (w_n, x_n, y_n, z_n)
+
+
     def draw_quad(self, quad):
 
-        quad_id = hash(quad)
+        quad_id = self.hash32(quad)
 
         if not rospy.is_shutdown():
             marker = Marker()
@@ -54,24 +80,35 @@ class Drawer(object):
             marker.id = quad_id
             self.markers.append(marker)
 
+        rotation = self.angle2quat(
+            0, 0, quad.get_orientation()
+        )
+
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
             marker.lifetime = rospy.Duration(1)
             marker.type = marker.CYLINDER
             marker.action = marker.ADD
-            marker.scale.x = 2 * quad.get_sensor_radius()
-            marker.scale.y = 2 * quad.get_sensor_radius()
+            marker.scale.x = 2 * quad.get_ellipse_major()
+            marker.scale.y = 2 * quad.get_ellipse_minor()
             marker.scale.z = 1
             marker.color.a = 0.3
             marker.color.r = 1.0
             marker.color.g = 0.0
             marker.color.b = 1.0
-            marker.pose.orientation.w = 1.0
-            marker.pose.position.x = quad.get_x()
-            marker.pose.position.y = quad.get_y()
+            marker.pose.orientation.w = math.cos(
+                math.radians(quad.get_orientation() / 2)
+            )
+            marker.pose.orientation.x = 0
+            marker.pose.orientation.y = 0
+            marker.pose.orientation.z = math.sin(
+                math.radians(quad.get_orientation() / 2)
+            )
+            marker.pose.position.x = quad.get_ellipse_center()[0]
+            marker.pose.position.y = quad.get_ellipse_center()[1]
             marker.pose.position.z = 0
-            marker.id = self.problem.num_quads + quad_id + 1
+            marker.id = quad_id + self.problem.num_quads
             self.markers.append(marker)
 
         return self

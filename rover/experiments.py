@@ -27,7 +27,7 @@ class Experiments(object):
         self.planner_name = kwargs.get("planner", "rover")
 
         self.pl = planner.planners.get(
-            self.planner_name, planner.Planner
+            self.planner_name, planner.PlannerGaussian
         )
 
         self.init_experiments_folder()

@@ -48,3 +48,4 @@ class Problem(object):
         self.sq_std = kwargs.get("sq_std", 20)
         self.risk_constant = kwargs.get("risk_constant", 100)
         self.grid = timegrid.TimeGrid(self.width, self.height)
+        self.orientation_freedom = kwargs.get("orientation_freedom", 10)

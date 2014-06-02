@@ -5,6 +5,7 @@ import scipy.optimize as opt
 import point
 import lawnmower
 import scipy.stats
+import numpy as np
 
 
 class PlannerInterface(object):
@@ -28,12 +29,12 @@ class PlannerInterface(object):
             accross = int(i % init_length)
 
             s_x, s_y = (
-                3 * self.problem.quad_size * accross,
-                3 * self.problem.quad_size * down
+                20 * self.problem.quad_size * accross,
+                20 * self.problem.quad_size * down
             )
 
             quad_list.append(quadcopter.Quadcopter(
-                s_x, s_y, self.problem.min_height,
+                s_x, s_y, self.problem.min_height, 90,
                 self.problem
             ))
 
@@ -62,9 +63,10 @@ class PlannerInterface(object):
 
         return ret_x, ret_y, b_x or b_y
 
-    def get_sample_direction(self, angle, quad):
-
-        sample_radius = quad.get_sensor_radius() + self.radius_ext
+    def get_sample_direction(self, angle, quad, beta):
+        beta = math.radians(beta)
+        sample_radius_ma = quad.get_ellipse_major() + self.radius_ext
+        sample_radius_mi = quad.get_ellipse_minor() + self.radius_ext
         inner_angle = angle - self.angle_range
 
         max_time = 0.0
@@ -74,8 +76,18 @@ class PlannerInterface(object):
         counter = 0
 
         while inner_angle < angle + self.angle_range:
-            x = int(quad.get_x() + sample_radius * math.cos(inner_angle))
-            y = int(quad.get_y() + sample_radius * math.sin(inner_angle))
+            old_x = int(
+                quad.get_ellipse_center_dist() +
+                sample_radius_ma *
+                math.cos(inner_angle)
+            )
+            old_y = int(
+                sample_radius_mi *
+                math.sin(inner_angle)
+            )
+
+            x = old_x * math.cos(beta) - old_y * math.sin(beta) + quad.x
+            y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
             x, y, out = self.constrain(x, y)
 
             inner_angle += self.angle_step
@@ -101,7 +113,7 @@ class PlannerInterface(object):
 
         return avg_x, avg_y, total_time / counter
 
-    def get_new_direction(self, quad):
+    def get_instance_direction(self, quad, beta):
         """
         Returns the unit vector of the direction the quad should go
         """
@@ -113,7 +125,7 @@ class PlannerInterface(object):
         while angle < 2 * math.pi + self.angle_range:
 
             try:
-                x, y, avg_time = self.get_sample_direction(angle, quad)
+                x, y, avg_time = self.get_sample_direction(angle, quad, beta)
                 if math.isnan(x) or math.isnan(y):
                     continue
             except ValueError:
@@ -127,7 +139,12 @@ class PlannerInterface(object):
                 min_time = avg_time
                 min_x_y = vec_x_y
 
-        return min_x_y.to_unit_vector()
+        return min_x_y.to_unit_vector(), min_time
+
+    def get_new_direction(self, quad):
+        return self.get_instance_direction(
+            quad, quad.get_orientation()
+        )
 
     def update_quad(self, quad):
         uv = self.get_new_direction(quad)
@@ -181,7 +198,7 @@ class PlannerGaussian(PlannerInterface):
             0, init_risk * self.problem.risk_constant
         )
 
-        return norm_dist.pdf(z) / norm_dist.pdf(0)
+        return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
 
     def sq(self, x, y, z):
         norm_dist = scipy.stats.norm(

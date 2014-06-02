@@ -3,16 +3,18 @@ import math
 import point
 import time
 import random
+import numpy as np
 
 
 class Quadcopter(object):
 
-    def __init__(self, x, y, z, problem):
+    def __init__(self, x, y, z, beta, problem):
         self.x = x
         self.y = y
         self.z = z
+        self.beta = beta
         self.problem = problem
-        self.hash_val = int(1000 * random.random())
+        self.hash_val = int(100000 * random.random())
 
         # in degrees
         self.viewing_angle = problem.viewing_angle
@@ -28,6 +30,10 @@ class Quadcopter(object):
 
     def get_z(self):
         return self.z
+
+    def get_orientation(self):
+        # Degrees dude
+        return self.beta
 
     def get_pos_2d(self):
         return (self.x, self.y)
@@ -58,6 +64,12 @@ class Quadcopter(object):
 
     def set_z(self, z):
         self.z = z
+        return self
+
+    def set_orientation(self, beta):
+        # Degrees dude
+        self.beta = beta
+        return self
 
     def move_2d(self, unit_heading):
 
@@ -82,6 +94,34 @@ class Quadcopter(object):
 
     def get_sensor_radius(self):
         return self.z * math.tan(math.radians(self.viewing_angle))
+
+    def get_ellipse_major(self):
+        P = self.z * math.tan(
+            math.radians(self.problem.camera_angle + self.problem.viewing_angle)
+        )
+        M = self.z * math.tan(math.radians(self.problem.camera_angle))
+        return P - M
+
+    def get_ellipse_minor(self):
+        tan_alpha = math.tan(
+            math.radians(self.problem.viewing_angle)
+        )
+        cos_phi = math.cos(math.radians(self.problem.camera_angle))
+        return self.z * tan_alpha / cos_phi
+
+    def get_ellipse_center_dist(self):
+        Q = self.z * math.tan(math.radians(
+            self.problem.camera_angle - self.problem.viewing_angle
+        ))
+        return self.get_ellipse_major() + Q
+
+    def get_ellipse_center(self):
+        old_x = self.get_ellipse_center_dist()
+        old_y = 0
+        beta_r = math.radians(self.beta)
+        X = old_x * math.cos(beta_r) - old_y * math.sin(beta_r)
+        Y = old_y * math.cos(beta_r) + old_x * math.sin(beta_r)
+        return self.x + X, self.y + Y
 
     def __hash__(self):
         return self.hash_val
