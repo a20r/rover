@@ -29,7 +29,7 @@ class Quadcopter(object):
         return self.y
 
     def get_z(self):
-        return self.z
+            return self.z
 
     def get_orientation(self):
         # Degrees dude
@@ -96,9 +96,9 @@ class Quadcopter(object):
         return self.z * math.tan(math.radians(self.viewing_angle))
 
     def get_ellipse_major(self):
-        P = self.z * math.tan(
-            math.radians(self.problem.camera_angle + self.problem.viewing_angle)
-        )
+        P = self.z * math.tan(math.radians(
+            self.problem.camera_angle + self.problem.viewing_angle
+        ))
         M = self.z * math.tan(math.radians(self.problem.camera_angle))
         return P - M
 

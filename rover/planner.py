@@ -34,7 +34,7 @@ class PlannerInterface(object):
             )
 
             quad_list.append(quadcopter.Quadcopter(
-                s_x, s_y, self.problem.min_height, 90,
+                s_x, s_y, self.problem.min_height, 0,
                 self.problem
             ))
 
@@ -69,8 +69,6 @@ class PlannerInterface(object):
         sample_radius_mi = quad.get_ellipse_minor() + self.radius_ext
         inner_angle = angle - self.angle_range
 
-        max_time = 0.0
-        min_time = None
         time_dict = dict()
         total_time = 0.0
         counter = 0
@@ -90,28 +88,26 @@ class PlannerInterface(object):
             y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
             x, y, out = self.constrain(x, y)
 
-            inner_angle += self.angle_step
-
             if out:
                 raise ValueError("Exists an unvaible point")
 
-            time_dict[(x, y)] = self.problem.grid[x, y]
+            time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
             total_time += self.problem.grid[x, y]
             counter += 1
 
-            if self.problem.grid[x, y] > max_time:
-                max_time = self.problem.grid[x, y]
-            elif min_time is None or self.problem.grid[x, y] < min_time:
-                min_time = self.problem.grid[x, y]
+            inner_angle += self.angle_step
 
         avg_x = 0.0
         avg_y = 0.0
-        for (x, y), t in time_dict.iteritems():
+        avg_angle = 0.0
+
+        for (x, y, i_angle), t in time_dict.iteritems():
             weight = t / total_time
             avg_x += x * weight
             avg_y += y * weight
+            avg_angle += i_angle * weight
 
-        return avg_x, avg_y, total_time / counter
+        return avg_x, avg_y, avg_angle, total_time / counter
 
     def get_instance_direction(self, quad, beta):
         """
@@ -123,9 +119,11 @@ class PlannerInterface(object):
         min_x_y = None
 
         while angle < 2 * math.pi + self.angle_range:
-
             try:
-                x, y, avg_time = self.get_sample_direction(angle, quad, beta)
+                x, y, i_angle, avg_time = self.get_sample_direction(
+                    angle, quad, beta
+                )
+
                 if math.isnan(x) or math.isnan(y):
                     continue
             except ValueError:
@@ -133,7 +131,11 @@ class PlannerInterface(object):
             finally:
                 angle += self.angle_range
 
-            vec_x_y = point.Point(x - quad.get_x(), y - quad.get_y())
+            e_x, e_y = quad.get_ellipse_center()
+
+            vec_x_y = point.Point(
+                x - e_x, y - e_y
+            )
 
             if min_time is None or min_time > avg_time:
                 min_time = avg_time
@@ -145,10 +147,12 @@ class PlannerInterface(object):
         min_time = None
         min_direction = None
         min_beta = None
-        for n_b in xrange(
-            quad.beta,
-            quad.beta + self.problem.orientation_freedom + 1, 2
-        ):
+        sample_betas = np.random.randint(
+            quad.beta - self.problem.orientation_freedom,
+            quad.beta + self.problem.orientation_freedom + 1,
+            10
+        )
+        for n_b in sample_betas:
             new_direction, n_time = self.get_instance_direction(
                 quad, n_b
             )
@@ -204,7 +208,6 @@ class PlannerMonotonic(PlannerInterface):
         return int(max(res))
 
 
-
 class PlannerGaussian(PlannerInterface):
 
     def risk(self, x, y, z):
@@ -216,12 +219,15 @@ class PlannerGaussian(PlannerInterface):
         return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
 
     def sq(self, x, y, z):
+        hyp_dist = z / math.cos(math.radians(
+            self.problem.camera_angle
+        ))
         norm_dist = scipy.stats.norm(
             self.problem.sq_height,
             self.problem.sq_std
         )
 
-        return norm_dist.pdf(z) / norm_dist.pdf(self.problem.sq_height)
+        return norm_dist.pdf(hyp_dist) / norm_dist.pdf(self.problem.sq_height)
 
     def get_risk_sq_func(self, x, y):
         def risk_sq(z):

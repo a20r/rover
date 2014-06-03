@@ -4,6 +4,7 @@ import time
 import stats
 import evader
 import json
+import plot
 
 
 class Simulation(object):
@@ -13,12 +14,14 @@ class Simulation(object):
         self.planner_obj = kwargs.get("algorithm", planner.PlannerMonotonic)
         self.pl = self.planner_obj(problem, risk_grid)
         self.drawer = kwargs.get("drawer", None)
+        self.show_time_grid = kwargs.get("show_time_grid", True)
         self.risk_grid = risk_grid
         self.droid_list = self.init_droids()
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(self.pl)
         self.ra = stats.RiskAverage(self.pl)
         self.surface_list = list()
+        self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
 
         if not kwargs.get("out_file", None) is None:
             self.out_file = open(kwargs.get("out_file", None), "w")
@@ -53,6 +56,8 @@ class Simulation(object):
     def render(self):
         for i in xrange(self.problem.num_steps):
             quads = self.pl.step()
+            if self.show_time_grid:
+                self.t_plotter.update()
 
             for droid in self.droid_list:
                 droid.step(quads)

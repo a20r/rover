@@ -27,10 +27,10 @@ class TimeGrid(object):
         h = (quad.get_ellipse_center_dist() + quad.x) // self.scaling_factor
         k = quad.y // self.scaling_factor
 
-        top_left_x = x - r_ma
-        top_left_y = y - r_mi
-        bottom_right_x = x + r_ma
-        bottom_right_y = y + r_mi
+        top_left_x = int(h - r_ma)
+        top_left_y = int(k - r_mi)
+        bottom_right_x = int(h + r_ma)
+        bottom_right_y = int(k + r_mi)
 
         current_time = time.time()
 
@@ -46,7 +46,6 @@ class TimeGrid(object):
                     y_o = y_i - y
 
                     x_i_n = x_o * math.cos(beta) - y_o * math.sin(beta)
-
                     y_i_n = y_o * math.cos(beta) + x_o * math.sin(beta)
 
                     new_x = x_i_n + x
@@ -66,6 +65,9 @@ class TimeGrid(object):
             y = 0
 
         self.grid[y, x] = value
+
+    def get_raw(self, x, y):
+        return self.grid[y, x]
 
     def __getitem__(self, index):
         return self.grid[

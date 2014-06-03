@@ -1,7 +1,7 @@
 {
     "width": 1000,
     "height": 1000,
-    "num_quads": 20,
+    "num_quads": 15,
     "min_height": 60,
     "max_height": 200,
     "step_size": 20,
@@ -15,7 +15,8 @@
     "risk_constant": 100,
     "drawer": "ros",
     "camera_angle": 15,
-    "orientation_freedom": 10,
+    "orientation_freedom": 20,
+    "show_time_grid": true,
 
     "num_risk_points": 15,
     "img_file": "sandbox/test_heatmap.png",
