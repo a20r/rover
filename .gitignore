@@ -54,3 +54,10 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Tex
+*.bak
+*.log
+*.aux
+
+# Ctags
+tags

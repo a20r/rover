@@ -21,7 +21,8 @@ class Simulation(object):
         self.sqa = stats.SensorQualityAverage(self.pl)
         self.ra = stats.RiskAverage(self.pl)
         self.surface_list = list()
-        self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
+        if self.show_time_grid:
+            self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
 
         if not kwargs.get("out_file", None) is None:
             self.out_file = open(kwargs.get("out_file", None), "w")

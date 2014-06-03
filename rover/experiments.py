@@ -25,6 +25,7 @@ class Experiments(object):
         self.quads_step = kwargs.get("quads_step", 5)
 
         self.planner_name = kwargs.get("planner", "rover")
+        self.show_time_grid = kwargs.get("show_time_grid", False)
 
         self.pl = planner.planners.get(
             self.planner_name, planner.PlannerGaussian
@@ -88,7 +89,7 @@ class Experiments(object):
                     problem, risk_grid,
                     out_file=self.data_file_output.format(nrp, nq),
                     position_file=self.positions_file_output.format(nrp, nq),
-                    algorithm=self.pl
+                    algorithm=self.pl, show_time_grid=self.show_time_grid
                 )
 
                 sim.run()

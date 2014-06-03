@@ -17,7 +17,7 @@ def run(**kwargs):
         colors = config.Colors(**kwargs)
         problem = config.Problem(**kwargs)
 
-        dr_type = kwargs.get("drawer", "pygame")
+        dr_type = kwargs.get("drawer", "ros")
 
         if dr_type == "pygame":
             dr = drawer.Drawer(problem, colors)

@@ -12,8 +12,8 @@
     "sq_height": 90,
     "sq_std": 120,
     "risk_constant": 100,
-    "drawer": "ros",
     "camera_angle": 0,
+    "show_time_grid": false,
 
     "min_risk_points": 1,
     "max_risk_points": 20,

@@ -14,7 +14,7 @@ class PlannerInterface(object):
         self.quad_list = self.init_quads()
         self.risk_grid = risk_grid
         self.num_samples = 100
-        self.radius_ext = 2
+        self.radius_ext = 8
         self.angle_range = math.pi / 8
         self.angle_step = 2 * math.pi / self.num_samples
 
