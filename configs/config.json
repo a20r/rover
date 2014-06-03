@@ -1,10 +1,10 @@
 {
     "width": 1000,
     "height": 1000,
-    "num_quads": 6,
+    "num_quads": 5,
     "min_height": 60,
     "max_height": 200,
-    "step_size": 20,
+    "step_size": 40,
     "quad_size": 4,
     "evader_size": 6,
     "viewing_angle": 50,
