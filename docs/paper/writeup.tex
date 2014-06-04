@@ -124,24 +124,18 @@ The quadrotors used in simulation have a variable camera angle. This means that
 instead of simply having a down facing camera, the quadrotor can have the
 camera at an angle, $\phi$. This means that the camera's projection onto the
 time grid is not a circle but an ellipse. The major and minor axis of the
-ellipse are,
-
-$$ z \cdot \tan{(\phi + \alpha)} - z \cdot \tan{\phi} $$
-
-and
-
-$$ \frac{z \cdot \tan{\alpha}}{\cos{\phi}} $$ 
-
-where $z$ is the height of the quadrotor, $\phi$ is the camera angle and
-$\alpha$ is the viewing angle.
+ellipse are, $ z \cdot \tan{(\phi + \alpha)} - z \cdot \tan{\phi} $ and $
+\frac{z \cdot tan{\alpha}}{\cos{\phi}} $ where $z$ is the height of the
+quadrotor, $\phi$ is the camera angle and $\alpha$ is the viewing angle.
 
 Since an ellipse is not symmetrical for every angle, orientation cannot be
 ignored.  This means that the 2-D planner must plan for not only $x$ and $y$
 but also an orientation, $\beta$. In order to plan the movements, we sample
-viable new orientations, each time determining the new $x$ and $y$ to go to.
-Then once the sampling has completed, we choose a $(x', y', \beta')$ that would
-lead the quadrotor to a configuration that not has been sensed in the largest
-amount of time. This is shown in \fig{timegrid}
+viable new orientations, each time determining the new $x$ and $y$ direction to
+go in.  Then once the sampling has completed, we choose a $(x', y',
+\beta')$ that would lead the quadrotor to a configuration that not has been
+sensed in the largest amount of time. An instance of the time grid with a
+non-zero camera angle is shown in \fig{timegrid}.
 
 \begin{figure}[ht]
 
@@ -151,9 +145,9 @@ amount of time. This is shown in \fig{timegrid}
 
     \end{center}
 
-    \caption{The time grid where blue represents locations that have not been
-    visited in a large amount of time and where red represents locations that
-have just been visited}
+    \caption{An instance of the time grid where blue represents locations that
+        have not been visited in a large amount of time and where red
+    represents locations that have just been visited}
     
     \label{fig:timegrid}
 
@@ -234,20 +228,26 @@ In order to determine the height of the quadrotor, me must optimize an
 objective function parametrized by the altitude that maximizes the sensor
 quality and minimizes the risk. This can be modelled as,
 
-$$ J(z) = SQ(z) - R(z) $$
+$$ J(x, y, z) = SQ(z) - R(x, y, z) $$
 
 and therefore to determine the optimal altitude, we must find the $z$ value
-that maximizes $J$. This can be solved with many open source non-linear
-optimizers.  The package being used in this implementation is SciPy. Once the
-altitude needed for the quad has been determined, the new height is set and the
-time grid is updated. Since the time grid is updated and it is shared within
-the swarm, the change in altitude (and therefore a change in the sensor radii)
-will have reactive side effects by the swarm. If a quad, $q$, increases it's
-height, the swarm will move away from it, and if $q$ decreases it's height,
-there will be more unfilled space around it and the swarm will move to fill the
-new space. These properties are what allow us to break the planning into two
-parts, one algorithm determining the new $x, y$ position and orientation and
-another algorithm determining the new height of the quadrotor.
+that maximizes $J$ for a given $x, y$. This is shown in the equation,
+
+$$ H(x, y) = \argmax{z \in [z_{min}, z_{max}]} J(x, y, z) $$
+
+where $H$ takes the current $x, y$ position as parameters and returns the $z$
+value that minimizes the risk whilst maximizing the sensor quality. This can be
+solved with many open source non-linear optimizers.  The package being used in
+this implementation is SciPy.  Once the altitude needed for the quad has been
+determined, the new height is set and the time grid is updated.  Since the time
+grid is updated and it is shared within the swarm, the change in altitude (and
+therefore a change in the sensor radii) will have reactive side effects by the
+swarm. If a quad, $q$, increases it's height, the swarm will move away from it,
+and if $q$ decreases it's height, there will be more unfilled space around it
+and the swarm will move to fill the new space.  These properties are what allow
+us to break the planning into two parts, one algorithm determining the new $x,
+y$ position and orientation and another algorithm determining the new height of
+the quadrotor.
 
 \section{Experimental Setup}
 
