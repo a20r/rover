@@ -203,8 +203,8 @@ class PlannerInterface(object):
     def update_quad(self, quad):
         uv = self.get_new_direction(quad)
         quad.move_2d(uv)
-        self.problem.grid.update_grid(quad)
         quad.set_z(self.determine_height(quad))
+        self.problem.grid.update_grid(quad)
 
     def step(self):
         for quad in self.quad_list:
