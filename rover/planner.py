@@ -9,11 +9,12 @@ import numpy as np
 
 
 class PlannerInterface(object):
+
     def __init__(self, problem, risk_grid):
         self.problem = problem
         self.quad_list = self.init_quads()
         self.risk_grid = risk_grid
-        self.num_samples = 100
+        self.num_samples = 30
         self.radius_ext = 8
         self.angle_range = math.pi / 8
         self.angle_step = 2 * math.pi / self.num_samples
@@ -35,6 +36,7 @@ class PlannerInterface(object):
 
             quad_list.append(quadcopter.Quadcopter(
                 s_x, s_y, self.problem.min_height, 0,
+                self.problem.initial_camera_angle,
                 self.problem
             ))
 
@@ -67,13 +69,13 @@ class PlannerInterface(object):
         beta = math.radians(beta)
         sample_radius_ma = quad.get_ellipse_major() + self.radius_ext
         sample_radius_mi = quad.get_ellipse_minor() + self.radius_ext
-        inner_angle = angle - self.angle_range
+        inner_angle = angle - self.angle_range / 2
 
         time_dict = dict()
         total_time = 0.0
         counter = 0
 
-        while inner_angle < angle + self.angle_range:
+        while inner_angle < angle + self.angle_range / 2:
             old_x = int(
                 quad.get_ellipse_center_dist() +
                 sample_radius_ma *
@@ -147,21 +149,54 @@ class PlannerInterface(object):
         min_time = None
         min_direction = None
         min_beta = None
+        min_phi = None
+        num_samples = 10
+
+        if self.problem.camera_angle_freedom < num_samples:
+            num_samples_phi = self.problem.camera_angle_freedom + 1
+        else:
+            num_samples_phi = num_samples
+
+        if 2 * self.problem.orientation_freedom < num_samples:
+            num_samples_beta = 2 * self.problem.orientation_freedom
+        else:
+            num_samples_beta = num_samples
+
+        if (
+                self.problem.initial_camera_angle -
+                self.problem.camera_angle_freedom < 0
+        ):
+            initial_sample_phi = 0
+        else:
+            initial_sample_phi = self.problem.initial_camera_angle -\
+                    self.problem.camera_angle_freedom
+
+        sample_phis = np.random.randint(
+            initial_sample_phi,
+            self.problem.initial_camera_angle +
+            self.problem.camera_angle_freedom + 1,
+            num_samples_phi
+        )
+
         sample_betas = np.random.randint(
             quad.beta - self.problem.orientation_freedom,
             quad.beta + self.problem.orientation_freedom + 1,
-            10
+            num_samples_beta
         )
-        for n_b in sample_betas:
-            new_direction, n_time = self.get_instance_direction(
-                quad, n_b
-            )
+        for n_p in sample_phis:
+            quad.set_camera_angle(n_p)
+            for n_b in sample_betas:
+                new_direction, n_time = self.get_instance_direction(
+                    quad, n_b
+                )
 
-            if min_time is None or n_time < min_time:
-                min_time = n_time
-                min_direction = new_direction
-                min_beta = n_b
+                if min_time is None or n_time < min_time:
+                    min_time = n_time
+                    min_direction = new_direction
+                    min_beta = n_b
+                    min_phi = n_p
 
+        quad.set_camera_angle(min_phi)
         quad.set_orientation(min_beta)
         return min_direction
 
@@ -192,12 +227,12 @@ class PlannerMonotonic(PlannerInterface):
 
         return risk_val
 
-    def sq(self, x, y, z):
+    def sq(self, z):
         return math.pow(self.problem.min_height / float(z), 2)
 
     def get_risk_sq_func(self, x, y):
         def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(x, y, z)
+            return self.risk(x, y, z) - self.sq(z)
 
         return risk_sq
 
@@ -218,10 +253,8 @@ class PlannerGaussian(PlannerInterface):
 
         return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
 
-    def sq(self, x, y, z):
-        hyp_dist = z / math.cos(math.radians(
-            self.problem.camera_angle
-        ))
+    def sq(self, z, phi):
+        hyp_dist = z / math.cos(math.radians(phi))
         norm_dist = scipy.stats.norm(
             self.problem.sq_height,
             self.problem.sq_std
@@ -229,14 +262,14 @@ class PlannerGaussian(PlannerInterface):
 
         return norm_dist.pdf(hyp_dist) / norm_dist.pdf(self.problem.sq_height)
 
-    def get_risk_sq_func(self, x, y):
+    def get_risk_sq_func(self, x, y, phi):
         def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(x, y, z)
+            return self.risk(x, y, z) - self.sq(z, phi)
 
         return risk_sq
 
     def determine_height(self, quad):
-        risk_sq_func = self.get_risk_sq_func(quad.x, quad.y)
+        risk_sq_func = self.get_risk_sq_func(quad.x, quad.y, quad.phi)
 
         sample_eps = 5
 

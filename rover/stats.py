@@ -69,7 +69,7 @@ class SensorQualityAverage(object):
     def update_average_sq(self, quads):
         sub_total = 0.0
         for quad in quads:
-            sub_total += self.planner.sq(quad.x, quad.y, quad.z)
+            sub_total += self.planner.sq(quad.z, quad.phi)
 
         self.moving_average = (1 - self.learning_rate) *\
             self.moving_average + self.learning_rate *\

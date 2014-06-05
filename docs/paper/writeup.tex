@@ -266,12 +266,14 @@ experiments, two different independent variables were used; the number of risk
 points and the number of quadrotors. The risk points were randomly placed into
 the search space however, the random generator was seeded so the experiments
 would be deterministic and repeatable. Also, all of the risk points used were
-assigned an associated of 1 and a sensor range of the width of the search space
-divided by two. The quadrotors all started in a square formation at the top
-left of the search space. Experiments were carried out by varying the number of
-risk points and the number of quadrotors such that each number or quadrotors
-run on every configuration of risk points. The number of risk points varied
-from 1 to 21 with a step of 2 and the number of quads varied from 1 to 26 with
-a step of 5.
+assigned an associated hostility and sensor range of 1 and the width of the
+search space divided by two respectively. The quadrotors all started in a
+square formation at the top left of the search space. Experiments were carried
+out by varying the number of risk points and the number of quadrotors such that
+each number or quadrotors run on every configuration of risk points. The number
+of risk points varied from 1 to 21 with a step of 2 and the number of quads
+varied from 1 to 26 with a step of 5. Each configuration was run for 1000
+iterations and each configuration only needed to be tested once because the
+process is deterministic. 
 
 \end{document}

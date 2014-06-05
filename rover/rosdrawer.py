@@ -21,6 +21,7 @@ class Drawer(object):
 
         self.clear_all().update()
         self.markers = collections.deque(list(), 100)
+        self.duration = 3
 
     def hash32(self, value):
         return hash(value) & 0xffffffff
@@ -63,7 +64,7 @@ class Drawer(object):
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
-            marker.lifetime = rospy.Duration(1)
+            marker.lifetime = rospy.Duration(self.duration)
             marker.type = marker.SPHERE
             marker.action = marker.ADD
             marker.scale.x = 10
@@ -87,7 +88,7 @@ class Drawer(object):
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
-            marker.lifetime = rospy.Duration(1)
+            marker.lifetime = rospy.Duration(self.duration)
             marker.type = marker.CYLINDER
             marker.action = marker.ADD
             marker.scale.x = 2 * quad.get_ellipse_major()
@@ -118,7 +119,7 @@ class Drawer(object):
             if not rospy.is_shutdown():
                 marker = Marker()
                 marker.header.frame_id = "/my_frame"
-                marker.lifetime = rospy.Duration(1)
+                marker.lifetime = rospy.Duration(self.duration)
                 marker.type = marker.CYLINDER
                 marker.action = marker.ADD
                 marker.scale.x = 20
