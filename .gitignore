@@ -61,3 +61,6 @@ docs/_build/
 
 # Ctags
 tags
+
+#Chutsu stuff
+run.sh

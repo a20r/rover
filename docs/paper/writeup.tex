@@ -233,21 +233,116 @@ $$ J(x, y, z) = SQ(z) - R(x, y, z) $$
 and therefore to determine the optimal altitude, we must find the $z$ value
 that maximizes $J$ for a given $x, y$. This is shown in the equation,
 
-$$ H(x, y) = \argmax{z \in [z_{min}, z_{max}]} J(x, y, z) $$
+$$ \Function{DetermineHeight}(x, y) = \argmax{z \in [z_{min}, z_{max}]} J(x, y,
+z) $$
 
-where $H$ takes the current $x, y$ position as parameters and returns the $z$
-value that minimizes the risk whilst maximizing the sensor quality. This can be
-solved with many open source non-linear optimizers.  The package being used in
-this implementation is SciPy.  Once the altitude needed for the quad has been
-determined, the new height is set and the time grid is updated.  Since the time
-grid is updated and it is shared within the swarm, the change in altitude (and
-therefore a change in the sensor radii) will have reactive side effects by the
-swarm. If a quad, $q$, increases it's height, the swarm will move away from it,
-and if $q$ decreases it's height, there will be more unfilled space around it
-and the swarm will move to fill the new space.  These properties are what allow
-us to break the planning into two parts, one algorithm determining the new $x,
-y$ position and orientation and another algorithm determining the new height of
-the quadrotor.
+where $\Function{DetermineHeight}$ takes the current $x, y$ position as
+parameters and returns the $z$ value that minimizes the risk whilst maximizing
+the sensor quality.  This can be solved with many open source non-linear
+optimizers.  The package being used in this implementation is SciPy.  Once the
+altitude needed for the quad has been determined, the new height is set and the
+time grid is updated.  Since the time grid is updated and it is shared within
+the swarm, the change in altitude (and therefore a change in the sensor radii)
+will have reactive side effects by the swarm.  If a quad, $q$, increases it's
+height, the swarm will move away from it, and if $q$ decreases it's height,
+there will be more unfilled space around it and the swarm will move to fill the
+new space.  These properties are what allow us to break the planning into two
+parts, one algorithm determining the new $x, y$ position and orientation and
+another algorithm determining the new height of the quadrotor.
+
+The complete algorithm is shown in \textbf{Algorithm} \ref{algo:planning}. In
+the pseudocode, $\phi$ is the camera angle, $\alpha$ is the viewing angle of
+the camera, and $A_{M}$ and $A_{m}$ are the respective semi-major and
+semi-minor axes.
+
+
+\begin{algorithm}[ht]
+
+\caption{Pseudocode for Rover}
+
+\label{algo:planning}
+
+\begin{algorithmic}[1]
+
+\setcounter{ALC@line}{0}
+
+\vspace*{1mm}
+
+\STATE $\mathcal{Q} \leftarrow \Function{GetQuadrotorList()}$
+\STATE $\mathcal{T} \leftarrow \Function{InitTimeGrid()}$
+
+\WHILE \True
+
+\FOR{$q \in \mathcal{Q}$}
+
+\STATE $t_{min}, v, \beta', \phi' \leftarrow \Function{InitDynamicVars()}$
+\STATE $S_{\phi} \leftarrow \Function{GetRandomSamples}(\phi_{min}, \phi_{max})$
+\STATE $S_{\beta} \leftarrow \Function{GetRandomSamples}(\beta_{min}, \beta_{max})$
+
+\FOR{$\phi \in S_{\phi}$}
+
+\FOR{$\beta \in S_{\beta}$} 
+
+\STATE $S_{\theta} \leftarrow \Function{GetUniformSamples}(0, 2 \pi)$
+
+\FOR{$\theta \in S_{\theta}$}
+
+\STATE $A_{M} \leftarrow q.\Var{z} \cdot (\tan{(\phi + \alpha)} - \tan{\phi}) + \epsilon$
+\STATE $A_{m} \leftarrow q.\Var{z} \cdot \frac{\tan{\alpha}}{\cos{\phi}} + \epsilon$
+
+\STATE $x \leftarrow q.\Var{z} \cdot \tan{(\phi - \alpha)} + A_{M} \cdot (1 + \cos{\theta})$
+\STATE $y \leftarrow A_{m} \cdot \sin{\theta}$
+
+\STATE $\begin{bmatrix}
+    x' \\[0.2em]
+    y'
+\end{bmatrix} \leftarrow \begin{bmatrix}
+    x \\[0.2em]
+    y
+\end{bmatrix} \cdot \begin{bmatrix}
+    \cos{\beta} & -\sin{\beta} \\[0.2em]
+    \sin{\beta} & \cos{\beta}
+\end{bmatrix} + \begin{bmatrix}
+    q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix}$
+
+\STATE
+
+\IF{$\mathcal{T}[x_r, y_r] < t_{min}$}
+
+\STATE $t_{min} \leftarrow \mathcal{T}[x', y']$
+\STATE $\beta' \leftarrow \beta$
+\STATE $\phi' \leftarrow \phi$
+\STATE $v \leftarrow \begin{bmatrix}
+    x_r - q.\Var{x} \\[0.2em]
+    y_r - q.\Var{y}
+\end{bmatrix}$
+
+\ENDIF
+
+\ENDFOR
+
+\ENDFOR
+
+\ENDFOR
+
+\STATE
+
+\STATE $(x', y') \leftarrow \Function{Translate}(\begin{bmatrix}
+    q.\Var{x} &
+    q.\Var{y}
+\end{bmatrix}^T, \hat{v})$
+\STATE $z' \leftarrow \Function{DetermineHeight}(x', y')$
+\STATE $q.\Var{SetPosition}(x', y', z', \beta', \phi')$
+
+\ENDFOR
+
+\ENDWHILE
+
+\end{algorithmic}
+\end{algorithm}
+
 
 \section{Experimental Setup}
 
