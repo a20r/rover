@@ -34,3 +34,32 @@ results are stored. Below is some code that shows how the graphs can be generate
 
     cd experiments/[date of the experiment]-[algorithm name]
     octave ../../scripts/generate_graphs.m
+
+## Experiment instance descriptions
+- Mon June 2 6:59:11 Rover Gaussian
+    - Experiments without changing orientation
+    - Down facing camera
+
+- Mon June 2 6:59:21 Lawnmower
+    - Lawnmower experiments without changing orientation
+
+- Tue June 3 11:17:54 Rover Gaussian
+    - Experiments that plan for changes in orientation
+    - Camera is at an angle
+
+- Thu June 5 10:33:31 Rover Gaussian
+    - Experiments that plan for orientation and camera angle
+    - Camera is set at a variable angle.
+
+- Thu June 5 15:23:19 Rover Gaussian
+    - Experiments that were run on a larger area (2000x2000) to show
+    that the algorithm scales for different sized environments
+    - Camera is set at a variable angle and therefore the planner plans
+    for *x, y, z*, the camera angle, and the orientation
+
+- Thu June 5 15:27:37 Rover Gaussian
+    - Experiments that were run on a smaller area (600x600) to show
+    that the algorithm scales down
+    - Camera is set at a variable angle and therefore the planner plans
+    for *x, y, z*, the camera angle, and the orientation
+
