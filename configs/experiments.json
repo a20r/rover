@@ -23,6 +23,6 @@
     "min_quads": 1,
     "max_quads": 25,
     "quads_step": 5,
-    "planner": "rover_guassian",
+    "planner": "rover_gaussian",
     "seed": 0
 }

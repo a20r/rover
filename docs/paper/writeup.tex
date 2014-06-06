@@ -251,9 +251,9 @@ parts, one algorithm determining the new $x, y$ position and orientation and
 another algorithm determining the new height of the quadrotor.
 
 The complete algorithm is shown in \textbf{Algorithm} \ref{algo:planning}. In
-the pseudocode, $\phi$ is the camera angle, $\alpha$ is the viewing angle of
-the camera, and $A_{M}$ and $A_{m}$ are the respective semi-major and
-semi-minor axes.
+the algorithm, $\phi$ is the camera angle, $\alpha$ is the viewing angle of the
+camera, $k$ is the step size, and $A_{M}$, $A_{m}$ are the respective
+semi-major and semi-minor axes.
 
 
 \begin{algorithm}[ht]
@@ -328,10 +328,13 @@ semi-minor axes.
 
 \STATE
 
-\STATE $(x', y') \leftarrow \Function{Translate}(\begin{bmatrix}
-    q.\Var{x} &
+\STATE $\begin{bmatrix}
+    x' \\[0.2em]
+    y' 
+\end{bmatrix} \leftarrow \begin{bmatrix}
+    q.\Var{x} \\[0.2em]
     q.\Var{y}
-\end{bmatrix}^T, \hat{v})$
+\end{bmatrix} + k \cdot \mathlarger{\frac{v}{||v||}}$
 \STATE $z' \leftarrow \Function{DetermineHeight}(x', y')$
 \STATE $q.\Var{SetPosition}(x', y', z', \beta', \phi')$
 \STATE $\mathcal{T}.\Var{Update}(q)$
