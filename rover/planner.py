@@ -14,7 +14,7 @@ class PlannerInterface(object):
         self.problem = problem
         self.quad_list = self.init_quads()
         self.risk_grid = risk_grid
-        self.num_samples = 30
+        self.num_samples = 100
         self.radius_ext = 8
         self.angle_range = math.pi / 8
         self.angle_step = 2 * math.pi / self.num_samples
@@ -286,6 +286,6 @@ class PlannerGaussian(PlannerInterface):
 
 planners = {
     "rover_monotonic": PlannerMonotonic,
-    "rover_guassian": PlannerGaussian,
+    "rover_gaussian": PlannerGaussian,
     "lawnmower": lawnmower.LawnMower
 }
