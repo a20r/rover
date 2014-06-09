@@ -111,14 +111,86 @@ goes too long without being surveyed. This is done by discretizing the space
 into a grid. Whenever a box in the grid has been covered by a sensor on any
 quadcopter in the group, the current time is stored in that box.  For the
 quadcopters to move in the $xy$ plane, each quad will sample a given number
-points along its sensor radius. It will then move in the direction of the box
-in the grid that has the lowest time (in seconds) recorded. This simple rule
-has extreme emergent properties for the swarm. Since the swarm shares the same
-grid, the quads will act cooperatively to fill the space without having to
-provide much guidance. This is shown in \fig{cover}. Also, this planning is not
-dependent on how many quads there are in the swarm. If a quad leaves the swarm,
-it would simply no longer update the time grid. The other quads would have no
-knowledge that it left and would still be able to plan accordingly. 
+segments along the sensing ellipse and move towards the segment whose average
+time is the least. This is shown in \textbf{Algorithm} \ref{2dplanning}. This
+simple rule has extreme emergent properties for the swarm. Since the swarm
+shares the same grid, the quads will act cooperatively to fill the space
+without having to provide much guidance.  This is shown in
+\fig{cover}.  Also, this planning is not dependent on how many quads there are
+in the swarm.  If a quad leaves the swarm, it would simply no longer update the
+time grid. The other quads would have no knowledge that it left and would still
+be able to plan accordingly. 
+
+\begin{algorithm}[ht]
+
+\caption{$\Function{GetDirection}(q, \beta, \phi, \mathcal{T})$}
+
+\label{algo:2dplanning}
+
+\begin{algorithmic}[1]
+
+\setcounter{ALC@line}{0}
+
+\vspace*{1mm}
+
+
+\STATE $t_{s} \leftarrow 0$
+\STATE $\mathcal{P} \leftarrow \Function{Set()}$
+\STATE $\zeta \leftarrow \Function{GetInnerSearchRange}()$
+\STATE $S_{\theta} \leftarrow \Function{GetUniformSamples}(0, 2 \pi)$
+
+\FOR{$\theta \in S_{\theta}$}
+
+\STATE $S_{\omega} \leftarrow \Function{GetUniformSamples}(\theta - \zeta, \theta + \zeta)$
+
+\FOR{$\omega \in S_{\omega}$}
+
+\STATE $A_{M} \leftarrow q.\Var{z} \cdot (\tan{(\phi + q.\alpha)} - \tan{\phi}) + \epsilon$
+\STATE $A_{m} \leftarrow q.\Var{z} \cdot \frac{\tan{q.\alpha}}{\cos{\phi}} + \epsilon$
+
+\STATE $x \leftarrow q.\Var{z} \cdot \tan{(\phi - q.\alpha)} + A_{M} \cdot (1 + \cos{\omega})$
+\STATE $y \leftarrow A_{m} \cdot \sin{\omega}$
+
+\STATE $\begin{bmatrix}
+    \dot{x} \\[0.2em]
+    \dot{y}
+\end{bmatrix} \leftarrow \begin{bmatrix}
+    \cos{\beta} & -\sin{\beta} \\[0.2em]
+    \sin{\beta} & \cos{\beta}
+\end{bmatrix} \cdot \begin{bmatrix}
+    x \\[0.2em]
+    y
+\end{bmatrix} + \begin{bmatrix}
+    q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix}$
+
+\STATE $t_{s} \leftarrow t_{s} + \mathcal{T}[\dot{x}, \dot{y}]$
+\STATE $\mathcal{P}.\Var{add}(\dot{x}, \dot{y})$
+
+\ENDFOR
+
+\ENDFOR
+
+\STATE $\bar{x} \leftarrow 0$
+\STATE $\bar{y} \leftarrow 0$
+
+\FOR{$(x, y) \in \mathcal{P}$}
+
+\STATE $w \leftarrow \frac{\mathcal{T}[x, y]}{t_{s}}$
+\STATE $\bar{x} \leftarrow \bar{x} + w \cdot x$
+\STATE $\bar{y} \leftarrow \bar{y} + w \cdot y$
+
+\ENDFOR
+
+\RETURN $\begin{bmatrix}
+    \bar{x} - q.\Var{x} & \bar{y} - q.\Var{y}
+\end{bmatrix} ^ T, \mathlarger{\frac{t_s}{|\mathcal{P}|}}$
+
+\end{algorithmic}
+\end{algorithm}
+
+
 
 The quadrotors used in simulation have a variable camera angle. This means that
 instead of simply having a down facing camera, the quadrotor can have the

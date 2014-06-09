@@ -183,6 +183,7 @@ class PlannerInterface(object):
             quad.beta + self.problem.orientation_freedom + 1,
             num_samples_beta
         )
+
         for n_p in sample_phis:
             quad.set_camera_angle(n_p)
             for n_b in sample_betas:

@@ -21,6 +21,7 @@ class Simulation(object):
         self.sqa = stats.SensorQualityAverage(self.pl)
         self.ra = stats.RiskAverage(self.pl)
         self.surface_list = list()
+
         if self.show_time_grid:
             self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
 

@@ -2,6 +2,7 @@
 import pygame.color as color
 import collections
 from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point
 import rospy
 import random
 import math
@@ -20,7 +21,7 @@ class Drawer(object):
         self.color_dict = color.THECOLORS
 
         self.clear_all().update()
-        self.markers = collections.deque(list(), 100)
+        self.markers = collections.deque(list(), 1000)
         self.duration = 3
 
     def hash32(self, value):
@@ -35,56 +36,61 @@ class Drawer(object):
     def add_coverage(self, quad):
         return self
 
-    def angle2quat(self, bank, heading, attitude):
-        #Assuming the angles are in radians.
-        c1 = math.cos(heading/2)
-        s1 = math.sin(heading/2)
-        c2 = math.cos(attitude/2)
-        s2 = math.sin(attitude/2)
-        c3 = math.cos(bank/2)
-        s3 = math.sin(bank/2)
-        c1c2 = c1*c2
-        s1s2 = s1*s2
-        w = c1c2*c3 - s1s2*s3
-        x = c1c2*s3 + s1s2*c3
-        y = s1*c2*c3 + c1*s2*s3
-        z = c1*s2*c3 - s1*c2*s3
-        n = math.sqrt(pow(w, 2) + pow(w, 2) + pow(w, 2) + pow(w, 2))
-        w_n = w / n
-        x_n = x / n
-        y_n = y / n
-        z_n = z / n
-        return (w_n, x_n, y_n, z_n)
-
-
-    def draw_quad(self, quad):
-
+    def draw_line(self, quad, x, y, z, hash_val):
         quad_id = self.hash32(quad)
-
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
             marker.lifetime = rospy.Duration(self.duration)
-            marker.type = marker.SPHERE
+            marker.type = marker.LINE_STRIP
             marker.action = marker.ADD
-            marker.scale.x = 10
-            marker.scale.y = 10
-            marker.scale.z = 10
+            marker.scale.x = 4
+            marker.color.b = 1.0
             marker.color.a = 1.0
-            marker.color.r = 1.0
+
+            p1 = Point()
+            p1.x = quad.get_x()
+            p1.y = quad.get_y()
+            p1.z = quad.get_z()
+
+            p2 = Point()
+            p2.x = x
+            p2.y = y
+            p2.z = z
+
+            marker.points.append(p1)
+            marker.points.append(p2)
+            marker.pose.orientation.w = 1.0
+            marker.id = hash_val
+            self.markers.append(marker)
+
+        return self
+
+    def draw_prop(self, x, y, z, hash_val):
+        if not rospy.is_shutdown():
+            marker = Marker()
+            marker.header.frame_id = "/my_frame"
+            marker.lifetime = rospy.Duration(self.duration)
+            marker.type = marker.CYLINDER
+            marker.action = marker.ADD
+            marker.scale.x = 15
+            marker.scale.y = 15
+            marker.scale.z = 1
+            marker.color.a = 1.0
+            marker.color.r = 0.0
             marker.color.g = 1.0
             marker.color.b = 0.0
             marker.pose.orientation.w = 1.0
-            marker.pose.position.x = quad.get_x()
-            marker.pose.position.y = quad.get_y()
-            marker.pose.position.z = quad.get_z()
-            marker.id = quad_id
+            marker.pose.position.x = x
+            marker.pose.position.y = y
+            marker.pose.position.z = z
+            marker.id = hash_val
             self.markers.append(marker)
 
-        rotation = self.angle2quat(
-            0, 0, quad.get_orientation()
-        )
+        return self
 
+    def draw_quad_sensor_coverage(self, quad):
+        quad_id = self.hash32(quad)
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"
@@ -111,6 +117,30 @@ class Drawer(object):
             marker.pose.position.z = 0
             marker.id = quad_id + self.problem.num_quads
             self.markers.append(marker)
+
+        return self
+
+    def draw_quad(self, quad):
+        dist = 10
+        self.draw_prop(
+            quad.x - dist, quad.y - dist, quad.z, self.hash32(quad) + 1
+        )
+        self.draw_prop(
+            quad.x - dist, quad.y + dist, quad.z, self.hash32(quad) + 2
+        )
+        self.draw_prop(
+            quad.x + dist, quad.y - dist, quad.z, self.hash32(quad) + 3
+        )
+        self.draw_prop(
+            quad.x + dist, quad.y + dist, quad.z, self.hash32(quad) + 4
+        )
+
+        self.draw_quad_sensor_coverage(quad)
+        self.draw_line(
+            quad, quad.get_ellipse_center()[0],
+            quad.get_ellipse_center()[1], 0,
+            self.hash32(quad) - self.problem.num_quads
+        )
 
         return self
 

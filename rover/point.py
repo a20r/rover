@@ -49,6 +49,9 @@ class Point(object):
     def __hash__(self):
         return hash(str(self))
 
+    def __sub__(self, other):
+        return Point(self.x - other.x, self.y - other.y)
+
     def __eq__(self, val):
         try:
             return val.x == self.x and val.y == self.y
