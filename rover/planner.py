@@ -7,6 +7,8 @@ import lawnmower
 import scipy.stats
 import numpy as np
 
+import time
+
 
 class PlannerInterface(object):
 

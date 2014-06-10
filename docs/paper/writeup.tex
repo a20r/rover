@@ -52,14 +52,14 @@
 
 \section{Introduction}
 
-Unmanned aerial vehicles, such as quadcopters, are becoming a cheap and
+Unmanned aerial vehicles, such as quadrotors, are becoming a cheap and
 feasible way to provide persistent monitoring of an area even when monitoring
-that area comes with a risk of the quadcopter being detected by possibly
-hostile parties. These quadcopters are left unattended and need to be able to
+that area comes with a risk of the quadrotor being detected by possibly
+hostile parties. These quadrotors are left unattended and need to be able to
 plan their movements autonomously such that they maximize the quality of their
 sensors and maintain as much sensor coverage as possible, whilst minimizing the
 risk of being apprehended. The autonomous planning also needs to take into
-account that some quadcopters will be dispatched from the swarm to follow
+account that some quadrotors will be dispatched from the swarm to follow
 certain targets of interest. The planning algorithm should be able to
 organically readjust the swarm such that maximum sensor quality and minimum
 risk are preserved.
@@ -72,8 +72,8 @@ dynamic potential fields and non-linear optimization techniques.
 \section{Rover}
 
 Rover is an planning algorithm that seeks to maximize the sensor quality and
-sensor coverage for a group of quadcopters, whilst minimizing the risk of a
-quadcopter being detected by a possibly hostile enemy. This is done by
+sensor coverage for a group of quadrotors, whilst minimizing the risk of a
+quadrotor being detected by a possibly hostile enemy. This is done by
 splitting the planning into two different parts, planning for the 2-D plane to
 promote sensor coverage and planning for the altitude by minimizing risk and
 maximizing sensor quality.
@@ -104,18 +104,19 @@ $$ \begin{array}{cc}
 
 \end{figure}
 
-
-For the 2-dimensional planning, Rover needs to make sure that the group of
-quadcopters fills the search space and guarantee that no one part of the space
+For 2-dimensional planning, Rover needs to make sure that the group of
+quadrotors fills the search space and guarantee that no one part of the space
 goes too long without being surveyed. This is done by discretizing the space
-into a grid. Whenever a box in the grid has been covered by a sensor on any
-quadcopter in the group, the current time is stored in that box.  For the
-quadcopters to move in the $xy$ plane, each quad will sample a given number
-segments along the sensing ellipse and move towards the segment whose average
-time is the least. This is shown in \textbf{Algorithm} \ref{2dplanning}. This
-simple rule has extreme emergent properties for the swarm. Since the swarm
-shares the same grid, the quads will act cooperatively to fill the space
-without having to provide much guidance.  This is shown in
+into a grid (in this paper called a time grid and referred to as $\mathcal{T}$.
+Whenever a box in the grid has been covered by a sensor on any quadrotor in the
+group, the current time is stored in that box.  For the quadrotors to move in
+the $xy$ plane, each quad will sample a given number of segments along the
+sensing ellipse and move towards the segment whose average time is the least.
+This is shown in
+\textbf{Algorithm} \ref{algo:2dplanning}. This simple rule has extreme emergent
+properties for the swarm. Since the swarm shares the same grid, the quads will
+act cooperatively to fill the space without having to provide much guidance.
+This is shown in
 \fig{cover}.  Also, this planning is not dependent on how many quads there are
 in the swarm.  If a quad leaves the swarm, it would simply no longer update the
 time grid. The other quads would have no knowledge that it left and would still
@@ -183,9 +184,9 @@ be able to plan accordingly.
 
 \ENDFOR
 
-\RETURN $\begin{bmatrix}
+\RETURN $(\begin{bmatrix}
     \bar{x} - q.\Var{x} & \bar{y} - q.\Var{y}
-\end{bmatrix} ^ T, \mathlarger{\frac{t_s}{|\mathcal{P}|}}$
+\end{bmatrix} ^ T, \mathlarger{\frac{t_s}{|\mathcal{P}|}})$
 
 \end{algorithmic}
 \end{algorithm}
@@ -195,19 +196,33 @@ be able to plan accordingly.
 The quadrotors used in simulation have a variable camera angle. This means that
 instead of simply having a down facing camera, the quadrotor can have the
 camera at an angle, $\phi$. This means that the camera's projection onto the
-time grid is not a circle but an ellipse. The major and minor axis of the
+$xy$ plane is not a circle but an ellipse. The major and minor axis of the
 ellipse are, $ z \cdot \tan{(\phi + \alpha)} - z \cdot \tan{\phi} $ and $
 \frac{z \cdot \tan{\alpha}}{\cos{\phi}} $ where $z$ is the height of the
 quadrotor, $\phi$ is the camera angle and $\alpha$ is the viewing angle.
 
 Since an ellipse is not symmetrical for every angle, orientation cannot be
 ignored.  This means that the 2-D planner must plan for not only $x$ and $y$
-but also an orientation, $\beta$. In order to plan the movements, we sample
-viable new orientations, each time determining the new $x$ and $y$ direction to
-go in.  Then once the sampling has completed, we choose a $(x', y',
-\beta')$ that would lead the quadrotor to a configuration that not has been
-sensed in the largest amount of time. An instance of the time grid with a
-non-zero camera angle is shown in \fig{timegrid}.
+but also an orientation, $\beta$. Also, for completeness, we assume that the
+camera angle, $\phi$, is also dynamic and can be set by the planner. In order
+to plan the movements, we sample viable new orientations and camera angles,
+each time determining the new $x$ and $y$ direction to go in.  Then once the
+sampling has completed, we choose a $(x', y',
+\beta', \phi')$ that would lead the quadrotor to a configuration that not has
+been sensed in the largest amount of time. More formally, we would like to
+minimize,
+
+$$ E(\theta) = \mathlarger{\frac{\mathlarger{\sum_{s \in
+S(\theta)}{\mathcal{T}[s.x, s.y]}}}{|S(\theta)|}} $$
+
+where $S$ is the set of points on the current line segment on the sensing
+ellipse that we are checking for a given $\theta$. More formally $S$ is defined
+as,
+
+$$ S(\theta) = $$
+
+An instance of the time grid with a non-zero camera angle is shown in
+\fig{timegrid}.
 
 \begin{figure}[ht]
 
@@ -347,48 +362,22 @@ semi-major and semi-minor axes.
 
 \FOR{$q \in \mathcal{Q}$}
 
-\STATE $t_{min}, v, \beta', \phi' \leftarrow \Function{InitDynamicVars()}$
+\STATE $t_{min}, v', \beta', \phi' \leftarrow \Function{InitDynamicVars()}$
 \STATE $S_{\phi} \leftarrow \Function{GetRandomSamples}(\phi_{min}, \phi_{max})$
 \STATE $S_{\beta} \leftarrow \Function{GetRandomSamples}(\beta_{min}, \beta_{max})$
-\STATE $S_{\theta} \leftarrow \Function{GetUniformSamples}(0, 2 \pi)$
 
 \FOR{$\phi \in S_{\phi}$}
 
 \FOR{$\beta \in S_{\beta}$} 
 
-\FOR{$\theta \in S_{\theta}$}
+\STATE $(v, \bar{t}) \leftarrow \Function{GetDirection}(q, \beta, \phi, \mathcal{T})$
 
-\STATE $A_{M} \leftarrow q.\Var{z} \cdot (\tan{(\phi + \alpha)} - \tan{\phi}) + \epsilon$
-\STATE $A_{m} \leftarrow q.\Var{z} \cdot \frac{\tan{\alpha}}{\cos{\phi}} + \epsilon$
+\IF{$\bar{t} < t_{min}$}
 
-\STATE $x \leftarrow q.\Var{z} \cdot \tan{(\phi - \alpha)} + A_{M} \cdot (1 + \cos{\theta})$
-\STATE $y \leftarrow A_{m} \cdot \sin{\theta}$
-
-\STATE $\begin{bmatrix}
-    \dot{x} \\[0.2em]
-    \dot{y}
-\end{bmatrix} \leftarrow \begin{bmatrix}
-    \cos{\beta} & -\sin{\beta} \\[0.2em]
-    \sin{\beta} & \cos{\beta}
-\end{bmatrix} \cdot \begin{bmatrix}
-    x \\[0.2em]
-    y
-\end{bmatrix} + \begin{bmatrix}
-    q.\Var{x} \\[0.2em]
-    q.\Var{y}
-\end{bmatrix}$
-
-\STATE
-
-\IF{$\mathcal{T}[\dot{x}, \dot{y}] < t_{min}$}
-
-\STATE $t_{min} \leftarrow \mathcal{T}[\dot{x}, \dot{y}]$
+\STATE $t_{min} \leftarrow \bar{t}$
 \STATE $\beta' \leftarrow \beta$
 \STATE $\phi' \leftarrow \phi$
-\STATE $v \leftarrow \begin{bmatrix}
-    \dot{x} - q.\Var{x} \\[0.2em]
-    \dot{y} - q.\Var{y}
-\end{bmatrix}$
+\STATE $v' \leftarrow v$
 
 \ENDIF
 
@@ -396,17 +385,13 @@ semi-major and semi-minor axes.
 
 \ENDFOR
 
-\ENDFOR
-
-\STATE
-
 \STATE $\begin{bmatrix}
     x' \\[0.2em]
     y' 
 \end{bmatrix} \leftarrow \begin{bmatrix}
     q.\Var{x} \\[0.2em]
     q.\Var{y}
-\end{bmatrix} + k \cdot \mathlarger{\frac{v}{||v||}}$
+\end{bmatrix} + k \cdot \mathlarger{\frac{v'}{||v'||}}$
 \STATE $z' \leftarrow \Function{DetermineHeight}(x', y')$
 \STATE $q.\Var{SetPosition}(x', y', z', \beta', \phi')$
 \STATE $\mathcal{T}.\Var{Update}(q)$
