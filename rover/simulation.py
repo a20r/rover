@@ -71,6 +71,9 @@ class Simulation(object):
                 self.drawer.clear_all()
                 self.drawer.draw_coverage()
 
+                # This is for testing dude
+                self.drawer.draw_sim_target()
+
                 for droid in self.droid_list:
                     self.drawer.draw_evader(droid.x, droid.y)
 

@@ -22,3 +22,6 @@ Related Work Survey
   parameter space.
 
 
+### Path Planning of Autonomous Underwater Vehicles for Adaptive Sampling Using Mixed Integer Linear Programming
+
+

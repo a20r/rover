@@ -30,6 +30,27 @@ class Drawer(object):
     def draw_evader(self, e_x, e_y):
         return self
 
+    def draw_sim_target(self):
+        if not rospy.is_shutdown():
+            marker = Marker()
+            marker.header.frame_id = "/my_frame"
+            marker.lifetime = rospy.Duration(self.duration)
+            marker.type = marker.SPHERE
+            marker.action = marker.ADD
+            marker.scale.x = 15
+            marker.scale.y = 15
+            marker.scale.z = 15
+            marker.color.a = 1.0
+            marker.color.r = 0.0
+            marker.color.g = 0.5
+            marker.color.b = 0.5
+            marker.pose.orientation.w = 1.0
+            marker.pose.position.x = self.problem.grid.lx
+            marker.pose.position.y = self.problem.grid.ly
+            marker.pose.position.z = 0
+            marker.id = -30
+            self.markers.append(marker)
+
     def draw_coverage(self):
         return self
 
@@ -115,7 +136,7 @@ class Drawer(object):
             marker.pose.position.x = quad.get_ellipse_center()[0]
             marker.pose.position.y = quad.get_ellipse_center()[1]
             marker.pose.position.z = 0
-            marker.id = quad_id + self.problem.num_quads
+            marker.id = quad_id + 100
             self.markers.append(marker)
 
         return self
@@ -139,7 +160,7 @@ class Drawer(object):
         self.draw_line(
             quad, quad.get_ellipse_center()[0],
             quad.get_ellipse_center()[1], 0,
-            self.hash32(quad) - self.problem.num_quads
+            -self.hash32(quad)
         )
 
         return self

@@ -203,9 +203,8 @@ sampling has completed, we choose a $(x', y',
 been sensed in the largest amount of time. More formally, we would like to
 minimize,
 
-$$ E(z, \theta, \beta, \phi) = \mathlarger{\frac{\mathlarger{\sum_{(x, y) \in
-                S(z, \theta,
-\beta, \phi)}{\mathcal{T}[x, y]}}}{|S(z, \theta, \beta, \phi)|}} $$
+$$ E(z, \theta, \beta, \phi) = \mathlarger{\sum_{(x, y) \in S(z,
+            \theta, beta, \phi)}{\mathcal{T}[x, y]}}$$
 
 where $S$ is the set of points on the current line segment on the sensing
 ellipse that we are checking for a given $\theta$. More formally $S$ is defined
