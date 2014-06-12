@@ -211,7 +211,8 @@ where $S$ is the set of points on the current line segment on the sensing
 ellipse that we are checking for a given $\theta$. More formally $S$ is defined
 as,
 
-$$ S(z, \theta, \beta, \phi) = \left\{ R \cdot \begin{bmatrix} z \cdot \tan(\phi - \alpha) + A_M(z, \phi)
+$$ S(z, \theta, \beta, \phi) = \left\{ R(\beta) \cdot \begin{bmatrix} z \cdot
+        \tan(\phi - \alpha) + A_M(z, \phi)
             \cdot (1 + \cos{\omega}) \\[0.2em]
     A_m(z, \phi) \cdot \sin{\omega} \end{bmatrix} : \omega \in [\theta - \zeta, \theta + \zeta] \right\}$$
 
@@ -420,7 +421,9 @@ semi-major and semi-minor axes.
 \end{algorithm}
 
 
-\section{Experimental Setup}
+\section{Results}
+
+\subsection{Experimental Setup}
 
 The experiments seeked to show that the proposed algorithm minimizes the risk,
 maximizes the sensor quality, and provides sensor coverage to a designated
