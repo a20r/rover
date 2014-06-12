@@ -35,7 +35,7 @@
 \newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg}\,\operatorname{max}}\;}
 \newcommand{\Max}[1]{\underset{#1}{\operatorname{max}}\;}
 \newcommand{\grad}[1]{\underset{#1}{\operatorname{\Function{GradientDecent}}}\;}
-
+\newcommand{\s}{\textbf{s}}
 \newcommand{\fig}[1]{\textbf{Figure \ref{fig:#1}}}
 
 \usepackage{fancyvrb}
@@ -203,29 +203,46 @@ sampling has completed, we choose a $(x', y',
 been sensed in the largest amount of time. More formally, we would like to
 minimize,
 
-$$ E(z, \theta, \beta, \phi) = \int_{\theta - \zeta}^{\theta + \zeta}
-\mathcal{T}(e_x(\omega), e_y(\omega)) \cdot \mathlarger{\sqrt{}}$$
+$$ E(\s) = \int_{\s_{\theta} - \zeta}^{\s_{\theta} + \zeta}
+\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{\dot{e}_x ^ 2 +
+\dot{e}_y ^ 2} \;d\omega$$
 
-$$ E(z, \theta, \beta, \phi) = \mathlarger{\sum_{(x, y) \in S(z,
-            \theta, beta, \phi)}{\mathcal{T}[x, y]}}$$
+where $E$ is the line integral on the curvature of the sensing ellipse within a
+range centered at the currently sampled heading, $\theta$ in which the surface
+being integrated upon is the time grid, $\mathcal{T}$. The vector $\s$ in the
+equation holds the current state of the altitude, heading, orientation, and
+camera angle (respectively, $z, \theta, \beta,$ and $\phi$). The equations,
 
-where $S$ is the set of points on the current line segment on the sensing
-ellipse that we are checking for a given $\theta$. More formally $S$ is defined
-as,
+$$
+\begin{bmatrix}
+    e_x(\s, \omega) \\[0.2em] e_y(\s, \omega)
+\end{bmatrix} = \begin{bmatrix} \cos{\beta} & -\sin{\beta} \\[0.2em]
+    \sin{\beta}
+& \cos{\beta} \end{bmatrix}\cdot \begin{bmatrix} \s_z \cdot 
+    \tan(\s_{\phi} - \alpha) +
+    A_M(\s_z, \s_{\phi}) \cdot (1 + \cos{\omega}) + \epsilon \\[0.2em]
+    A_m(z, \s_{\phi}) \cdot
+\sin{\omega} + \epsilon \end{bmatrix} $$
 
-$$ S(z, \theta, \beta, \phi) = \left\{ R(\beta) \cdot \begin{bmatrix} z \cdot
-        \tan(\phi - \alpha) + A_M(z, \phi)
-            \cdot (1 + \cos{\omega}) \\[0.2em]
-    A_m(z, \phi) \cdot \sin{\omega} \end{bmatrix} : \omega \in [\theta - \zeta, \theta + \zeta] \right\}$$
+%$$ E(z, \theta, \beta, \phi) = \mathlarger{\sum_{(x, y) \in S(z,
+%            \theta, beta, \phi)}{\mathcal{T}[x, y]}}$$
 
-where
+%where $S$ is the set of points on the current line segment on the sensing
+%ellipse that we are checking for a given $\theta$. More formally $S$ is defined
+%as,
+%
+%$$ S(z, \theta, \beta, \phi) = \left\{ R(\beta) \cdot \begin{bmatrix} z \cdot
+%       \tan(\phi - \alpha) + A_M(z, \phi)
+%           \cdot (1 + \cos{\omega}) \\[0.2em]
+%  A_m(z, \phi) \cdot \sin{\omega} \end{bmatrix} : \omega \in [\theta - \zeta, \theta + \zeta] \right\}$$
 
-$$R(\beta) = \begin{bmatrix}
-\cos{\beta} & -\sin{\beta} \\[0.2em] \sin{\beta} & \cos{\beta} \end{bmatrix}$$
+% where
+%$$R(\beta) = \begin{bmatrix}
+%\cos{\beta} & -\sin{\beta} \\[0.2em] \sin{\beta} & \cos{\beta} \end{bmatrix}$$
 
 Therefore to determine the direction, $\theta$, the orientation, $\beta$, and
 the camera angle, $\phi$, that the quadrotor should travel in for a given
-height, $z$.  We have to minimize $E$ with respect to $\theta, \beta,$ and
+height, $z$, we have to minimize $E$ with respect to $\theta, \beta,$ and
 $\phi$. This function is minimized using an iterative sampling approach in
 which a uniform or random sample depending on the variable is taken such that
 every element in that sample leads to a feasible configuration. Every
