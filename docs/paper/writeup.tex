@@ -80,29 +80,21 @@ maximizing sensor quality.
 
 \subsection{2-D Planning}
 
-\begin{figure}
+\begin{figure}[ht]
 
-\begin{center}
+    \begin{center}
 
-$$ \begin{array}{cc}
+        \includegraphics[width=\linewidth]{figs/timegrid_map.png}
 
-\includegraphics[width=2.5in]{figs/rover1.png} &
+    \end{center}
 
-\includegraphics[width=2.5in]{figs/rover2.png} \\
+    \caption{An instance of the time grid where blue represents locations that
+        have not been visited in a large amount of time and where red
+    represents locations that have just been visited}
+    
+    \label{fig:timegrid}
 
-\includegraphics[width=2.5in]{figs/rover3.png} &
-
-\includegraphics[width=2.5in]{figs/rover4.png}
-
-\end{array} $$
-
-\end{center}
-
-\caption{The quadrotors filling up the search space}
-
-\label{fig:cover}
-
-\end{figure}
+\end{figure} 
 
 For 2-dimensional planning, Rover needs to make sure that the group of
 quadrotors fills the search space and guarantee that no one part of the space
@@ -112,15 +104,13 @@ Whenever a box in the grid has been covered by a sensor on any quadrotor in the
 group, the current time is stored in that box.  For the quadrotors to move in
 the $xy$ plane, each quad will sample a given number of segments along the
 sensing ellipse and move towards the segment whose average time is the least.
-This is shown in
-\textbf{Algorithm} \ref{algo:2dplanning}. This simple rule has extreme emergent
-properties for the swarm. Since the swarm shares the same grid, the quads will
-act cooperatively to fill the space without having to provide much guidance.
-This is shown in
-\fig{cover}.  Also, this planning is not dependent on how many quads there are
-in the swarm.  If a quad leaves the swarm, it would simply no longer update the
-time grid. The other quads would have no knowledge that it left and would still
-be able to plan accordingly. 
+This simple rule has extreme emergent properties for the swarm.  Since the
+swarm shares the same grid, the quads will act cooperatively to fill the space
+without having to provide much guidance.  An instance of the time grid for a
+given instance in time is shown in \fig{timegrid}.  Also, this planning is not
+dependent on how many quads there are in the swarm.  If a quad leaves the
+swarm, it would simply no longer update the time grid. The other quads would
+have no knowledge that it left and would still be able to plan accordingly. 
 
 \begin{algorithm}[ht]
 
@@ -197,9 +187,10 @@ The quadrotors used in simulation have a variable camera angle. This means that
 instead of simply having a down facing camera, the quadrotor can have the
 camera at an angle, $\phi$. This means that the camera's projection onto the
 $xy$ plane is not a circle but an ellipse. The major and minor axis of the
-ellipse are, $ z \cdot \tan{(\phi + \alpha)} - z \cdot \tan{\phi} $ and $
-\frac{z \cdot \tan{\alpha}}{\cos{\phi}} $ where $z$ is the height of the
-quadrotor, $\phi$ is the camera angle and $\alpha$ is the viewing angle.
+ellipse are, $ A_M(z, \phi) = z \cdot \tan{(\phi + \alpha)} - z \cdot
+\tan{\phi} $ and $ A_m(z, \phi) = \frac{z \cdot \tan{\alpha}}{\cos{\phi}} $
+where $z$ is the height of the quadrotor, $\phi$ is the camera angle and
+$\alpha$ is the viewing angle.
 
 Since an ellipse is not symmetrical for every angle, orientation cannot be
 ignored.  This means that the 2-D planner must plan for not only $x$ and $y$
@@ -212,33 +203,58 @@ sampling has completed, we choose a $(x', y',
 been sensed in the largest amount of time. More formally, we would like to
 minimize,
 
-$$ E(\theta) = \mathlarger{\frac{\mathlarger{\sum_{s \in
-S(\theta)}{\mathcal{T}[s.x, s.y]}}}{|S(\theta)|}} $$
+$$ E(z, \theta, \beta, \phi) = \mathlarger{\frac{\mathlarger{\sum_{(x, y) \in
+                S(z, \theta,
+\beta, \phi)}{\mathcal{T}[x, y]}}}{|S(z, \theta, \beta, \phi)|}} $$
 
 where $S$ is the set of points on the current line segment on the sensing
 ellipse that we are checking for a given $\theta$. More formally $S$ is defined
 as,
 
-$$ S(\theta) = $$
+$$ S(z, \theta, \beta, \phi) = \left\{ R \cdot \begin{bmatrix} z \cdot \tan(\phi - \alpha) + A_M(z, \phi)
+            \cdot (1 + \cos{\omega}) \\[0.2em]
+    A_m(z, \phi) \cdot \sin{\omega} \end{bmatrix} : \omega \in [\theta - \zeta, \theta + \zeta] \right\}$$
 
-An instance of the time grid with a non-zero camera angle is shown in
-\fig{timegrid}.
+where
 
-\begin{figure}[ht]
+$$R(\beta) = \begin{bmatrix}
+\cos{\beta} & -\sin{\beta} \\[0.2em] \sin{\beta} & \cos{\beta} \end{bmatrix}$$
 
-    \begin{center}
+Therefore to determine the direction, $\theta$, the orientation, $\beta$, and
+the camera angle, $\phi$, that the quadrotor should travel in for a given
+height, $z$.  We have to minimize $E$ with respect to $\theta, \beta,$ and
+$\phi$. This function is minimized using an iterative sampling approach in
+which a uniform or random sample depending on the variable is taken such that
+every element in that sample leads to a feasible configuration. Every
+combination of these two sets is taken iteratively in order to find the
+combination that minimizes the objective function, $E$. This is shown in both
+\textbf{Algorithm} \ref{algo:2dplanning} and \textbf{Algorithm}
+\ref{algo:planning}. \fig{cover} shows the planning algorithm fill the space
+whilst optimizing the heading, orientation, and camera angle.
 
-        \includegraphics[width=\linewidth]{figs/timegrid_map.png}
+\begin{figure}
 
-    \end{center}
+\begin{center}
 
-    \caption{An instance of the time grid where blue represents locations that
-        have not been visited in a large amount of time and where red
-    represents locations that have just been visited}
-    
-    \label{fig:timegrid}
+$$ \begin{array}{cc}
 
-\end{figure} 
+\includegraphics[width=2.5in]{figs/rover1.png} &
+
+\includegraphics[width=2.5in]{figs/rover2.png} \\
+
+\includegraphics[width=2.5in]{figs/rover3.png} &
+
+\includegraphics[width=2.5in]{figs/rover4.png}
+
+\end{array} $$
+
+\end{center}
+
+\caption{The quadrotors filling up the search space}
+
+\label{fig:cover}
+
+\end{figure}
 
 \subsection{Determining the altitude}
 
