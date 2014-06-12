@@ -2,7 +2,7 @@
 Related Work Survey
 -------------------
 
-# 3D Path Planning for UAVs for Maximum Information Collection 
+### 3D Path Planning for UAVs for Maximum Information Collection 
 
 - Plans the paths of UAVs in 3 dimensions that avoids forbidden regions and
   maximizes information collection from desired regions
