@@ -143,8 +143,8 @@ have no knowledge that it left and would still be able to plan accordingly.
 \STATE $y \leftarrow A_{m} \cdot \sin{\omega}$
 
 \STATE $\begin{bmatrix}
-    \dot{x} \\[0.2em]
-    \dot{y}
+    \hat{x} \\[0.2em]
+    \hat{y}
 \end{bmatrix} \leftarrow \begin{bmatrix}
     \cos{\beta} & -\sin{\beta} \\[0.2em]
     \sin{\beta} & \cos{\beta}
@@ -156,8 +156,8 @@ have no knowledge that it left and would still be able to plan accordingly.
     q.\Var{y}
 \end{bmatrix}$
 
-\STATE $t_{s} \leftarrow t_{s} + \mathcal{T}[\dot{x}, \dot{y}]$
-\STATE $\mathcal{P}.\Var{add}(\dot{x}, \dot{y})$
+\STATE $t_{s} \leftarrow t_{s} + \mathcal{T}[\hat{x}, \hat{y}]$
+\STATE $\mathcal{P}.\Var{add}(\hat{x}, \hat{y})$
 
 \ENDFOR
 
@@ -202,6 +202,9 @@ sampling has completed, we choose a $(x', y',
 \beta', \phi')$ that would lead the quadrotor to a configuration that not has
 been sensed in the largest amount of time. More formally, we would like to
 minimize,
+
+$$ E(z, \theta, \beta, \phi) = \int_{\theta - \zeta}^{\theta + \zeta}
+\mathcal{T}(e_x(\omega), e_y(\omega)) \cdot \mathlarger{\sqrt{}}$$
 
 $$ E(z, \theta, \beta, \phi) = \mathlarger{\sum_{(x, y) \in S(z,
             \theta, beta, \phi)}{\mathcal{T}[x, y]}}$$
