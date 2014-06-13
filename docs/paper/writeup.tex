@@ -340,11 +340,12 @@ the risk as height increases to decay more slowly because the quadrotor would
 need to obtain a higher altitude to have less risk. However, if there is a low
 initial risk, the risk as altitude increases will decay rapidly allowing the
 quadrotor to fly closer to the ground. The initial risks are determined by a
-set of risk points on a 2-D grid. These points are coupled with a constant
-between 0 to 1 which indicates how hostile this risk point is and a constant
-which indicates the range of this threat. These points are then represented as
-the centres of 3-D normal distributions which are then combined to determine
-the initial risk in a 2-D plane. The equation,
+set of risk points on a 2-D grid. These risk points are known \emph{a priori}.
+These points are coupled with a constant between 0 to 1 which indicates how
+hostile this risk point is and a constant which indicates the range of this
+threat. These points are then represented as the centres of 3-D normal
+distributions which are then combined to determine the initial risk in a 2-D
+plane. The equation,
 
 $$ R_0(x, y) = \Max{r_p \in \Var{RiskPoints}} r_p.\Var{hostility} \cdot
 \exp{(-\frac{\sqrt{(r_p.\Var{x} - x)^2 + (r_p.\Var{y} - y)^2}}{
