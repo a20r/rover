@@ -24,4 +24,6 @@ Related Work Survey
 
 ### Path Planning of Autonomous Underwater Vehicles for Adaptive Sampling Using Mixed Integer Linear Programming
 
+- URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4768634
+
 
