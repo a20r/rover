@@ -185,6 +185,7 @@ function [num json] = parse_number(json)
         end
     end
 end
+
 function [avg_ta, avg_sq, avg_risk] = getAverages(rn, qn)
     data = load(strcat("data/out_", num2str(rn), "_", num2str(qn), ".txt"));
     avg_ta = mean(data(:, 1));

@@ -50,4 +50,4 @@ class Problem(object):
         self.orientation_freedom = kwargs.get("orientation_freedom", 10)
         self.camera_angle_freedom = kwargs.get("camera_angle_freedom", 10)
         self.initial_camera_angle = kwargs.get("initial_camera_angle", 15)
-        self.grid = targetgrid.TargetGrid(self.width, self.height, self)
+        self.grid = timegrid.TimeGrid(self.width, self.height, self)
