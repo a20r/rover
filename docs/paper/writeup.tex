@@ -204,21 +204,25 @@ been sensed in the largest amount of time. More formally, we would like to
 minimize,
 
 $$ E(\s) = \int_{\s_{\theta} - \zeta}^{\s_{\theta} + \zeta}
-\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{\dot{e}_x ^ 2 +
-\dot{e}_y ^ 2} \;d\omega$$
+\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{
+    \Big(\frac{\partial e_x}{\partial \omega}\Big) ^ 2 +
+\Big(\frac{\partial e_x}{\partial \omega}\Big) ^ 2} \;d\omega$$
 
 where $E$ is the line integral on the curvature of the sensing ellipse within a
 range centered at the currently sampled heading, $\theta$ in which the surface
-being integrated upon is the time grid, $\mathcal{T}$. The vector $\s$ in the
-equation holds the current state of the altitude, heading, orientation, and
-camera angle (respectively, $z, \theta, \beta,$ and $\phi$). The equations,
+being integrated upon is the time grid, $\mathcal{T}$. The variable $\zeta$
+represents the interval of the integral and governs the size of the line
+segment sampled when determining the new heading. The vector, $\s =
+\langle z, \theta, \beta, \phi \rangle$ in $E$ holds the current state
+of the altitude, heading, orientation, and camera angle respectively. The
+equations,
 
 $$
 \begin{bmatrix}
     e_x(\s, \omega) \\[0.2em] e_y(\s, \omega)
-\end{bmatrix} = \begin{bmatrix} \cos{\beta} & -\sin{\beta} \\[0.2em]
-    \sin{\beta}
-& \cos{\beta} \end{bmatrix}\cdot \begin{bmatrix} \s_z \cdot 
+\end{bmatrix} = \begin{bmatrix} \cos{\s_{\beta}} & -\sin{\s_{\beta}} \\[0.2em]
+    \sin{\s_{\beta}}
+& \cos{\s_{\beta}} \end{bmatrix}\cdot \begin{bmatrix} \s_z \cdot 
     \tan(\s_{\phi} - \alpha) +
     A_M(\s_z, \s_{\phi}) \cdot (1 + \cos{\omega}) + \epsilon \\[0.2em]
     A_m(z, \s_{\phi}) \cdot
@@ -240,17 +244,35 @@ $$
 %$$R(\beta) = \begin{bmatrix}
 %\cos{\beta} & -\sin{\beta} \\[0.2em] \sin{\beta} & \cos{\beta} \end{bmatrix}$$
 
+are parametric equations representing points on the sensing ellipse given a
+quadrotor state, $\s$, along with an angle parameter, $\omega \in [0, 2\pi]$.
+
 Therefore to determine the direction, $\theta$, the orientation, $\beta$, and
 the camera angle, $\phi$, that the quadrotor should travel in for a given
 height, $z$, we have to minimize $E$ with respect to $\theta, \beta,$ and
 $\phi$. This function is minimized using an iterative sampling approach in
 which a uniform or random sample depending on the variable is taken such that
 every element in that sample leads to a feasible configuration. Every
-combination of these two sets is taken iteratively in order to find the
-combination that minimizes the objective function, $E$. This is shown in both
-\textbf{Algorithm} \ref{algo:2dplanning} and \textbf{Algorithm}
-\ref{algo:planning}. \fig{cover} shows the planning algorithm fill the space
-whilst optimizing the heading, orientation, and camera angle.
+combination of these sets is taken iteratively in order to find the combination
+that minimizes the objective function, $E$. Once a suitable $\s = \langle
+\theta, \beta, \phi \rangle$ has been determined using the iterative approach,
+the quadrotor's orientation and camera angle are set and the current position
+of the quadrotor is  updated to,
+
+$$
+\begin{bmatrix} q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix} = \begin{bmatrix}
+    q.\Var{x} \\[0.2em] q.\Var{y}
+\end{bmatrix} + k \cdot \begin{bmatrix} \cos{\theta} \\[0.2em] \sin{\theta}
+\end{bmatrix}
+$$
+
+where $k$ is the step size of the quadrotors and $q$ is the quadrotor whose
+position is being updated. This is shown in both \textbf{Algorithm}
+\ref{algo:2dplanning} and \textbf{Algorithm} \ref{algo:planning}. \fig{cover}
+shows the planning algorithm filling the space whilst optimizing the heading,
+orientation, and camera angle.
 
 \begin{figure}
 
@@ -318,11 +340,12 @@ the risk as height increases to decay more slowly because the quadrotor would
 need to obtain a higher altitude to have less risk. However, if there is a low
 initial risk, the risk as altitude increases will decay rapidly allowing the
 quadrotor to fly closer to the ground. The initial risks are determined by a
-set of risk points on a 2-D grid. These points are coupled with a constant
-between 0 to 1 which indicates how hostile this risk point is and a constant
-which indicates the range of this threat. These points are then represented as
-the centres of 3-D normal distributions which are then combined to determine
-the initial risk in a 2-D plane. The equation,
+set of risk points on a 2-D grid. These risk points are known \emph{a priori}.
+These points are coupled with a constant between 0 to 1 which indicates how
+hostile this risk point is and a constant which indicates the range of this
+threat. These points are then represented as the centres of 3-D normal
+distributions which are then combined to determine the initial risk in a 2-D
+plane. The equation,
 
 $$ R_0(x, y) = \Max{r_p \in \Var{RiskPoints}} r_p.\Var{hostility} \cdot
 \exp{(-\frac{\sqrt{(r_p.\Var{x} - x)^2 + (r_p.\Var{y} - y)^2}}{

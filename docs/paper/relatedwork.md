@@ -4,7 +4,7 @@ Related Work Survey
 
 ### 3D Path Planning for UAVs for Maximum Information Collection 
 
-- URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6564676
+- **URL**: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6564676
 
 - Plans the paths of UAVs in 3 dimensions that avoids forbidden regions and
   maximizes information collection from desired regions
@@ -24,4 +24,66 @@ Related Work Survey
 
 ### Path Planning of Autonomous Underwater Vehicles for Adaptive Sampling Using Mixed Integer Linear Programming
 
+- **URL**: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4768634
 
+- Path planning algorithm that optimizes an objective function to move around
+  the ocean to collect information about desired regions
+
+- It is assumed that the desired regions are known *a priori*
+
+- The objective is to sample the regions of greatest uncertainty and to
+  maximize the information gain
+
+- It plans using a constraint programming based on motion constraints
+
+- I have no idea what their results are supposed to mean
+
+### Physics-Inspired Robotic Motion Planning for Cooperative Bayesian Target Detection
+
+- **In press. N. Sydney et al. 2014**
+
+- Uses a states of matter approach for area coverage and target detection /
+  tracking.
+
+- At gas state, the quads move down a surface gradient w/ random walk
+
+- At liquid state, quads move down a potential surface
+
+- At solid state, quads move down a potential gradient and have a spring force
+  between other quads
+
+- The surface simulates the temperature and is governed by an inverse log
+  likelihood ratio w/ temperature diffusion.
+
+- When target is "seen", the area within a certain radius of the target on the
+  surface gets its value decremented and the heat is diffused.
+
+- Has inherent potential field issues (i.e. valleys, riveras, local minima)
+
+- Non simulation testing has only been performed with one quadrotor.
+
+- Does NOT perform well for coverage, but does very well for tracking.
+
+### Physics-Aware Informative Coverage Planning for Autonomous Vehicles
+
+- **In press. M. Kuhlman et al. ICRA 2014.**
+
+- Tries to solve the problem of informed single vehicle persistent monitoring
+  of a given area.
+
+- Given a closed set of way points, *t*, update the waypoints in *t* to
+  minimize path cost and maximize the information gained.
+
+- Uses a Markov Decision Process (MDP) to generate collision free way points.
+  These MDPs take into account the uncertainty of being blown off course.
+
+- The results show that the collision free paths are developed almost all of
+  the time (> 88%). There is no mention about coverage or about how the planner
+  optimizes the objective function.
+
+- This algorithm is for static desired regions and static obstacles so the path
+  is pre-generated. The generation takes a few minutes to make the path and is
+  therefore not scalable and cannot be used in a real-time situation.
+
+- Lastly, the approach is only feasible for a single vehicle, for multiple
+  vehicles the solution would scale exponentially.

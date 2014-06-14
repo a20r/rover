@@ -56,7 +56,9 @@ class TargetGrid(object):
             sig = self.lam(abs(t - t_0))
             X = math.sqrt(pow(x - sim_x, 2) + pow(y - sim_y, 2))
             a = self.phi_0(sig, X)
-            s += a
+            if a > s:
+                s = a
+            #s += a
             count += 1
 
         return s / float(count) + 1
