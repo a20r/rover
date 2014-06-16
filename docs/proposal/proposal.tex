@@ -32,9 +32,10 @@
 \newcommand{\Symbol}[1]{\ensuremath{\mathcal{#1}}}
 \newcommand{\Function}[1]{\ensuremath{{\small \textsc{#1}}}}
 \newcommand{\Var}[1]{\ensuremath{{\small{\textsl{#1}}}}}
-\newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg}\,\operatorname{min}}\;}
+\newcommand{\argmax}[1]{\underset{#1}{\operatorname{arg}\,\operatorname{max}}\;}
+\newcommand{\Max}[1]{\underset{#1}{\operatorname{max}}\;}
 \newcommand{\grad}[1]{\underset{#1}{\operatorname{\Function{GradientDecent}}}\;}
-
+\newcommand{\s}{\textbf{s}}
 \newcommand{\fig}[1]{\textbf{Figure \ref{fig:#1}}}
 
 \usepackage{fancyvrb}
@@ -51,53 +52,227 @@
 
 \section{Introduction}
 
-Unmanned aerial vehicles, such as quadcopters, are becoming a cheap and
+Unmanned aerial vehicles, such as quadrotors, are becoming a cheap and
 feasible way to provide persistent monitoring of an area even when monitoring
-that area comes with a risk of the quadcopter being detected by possibly
-hostile parties. These quadcopters are left unattended and need to be able to
+that area comes with a risk of the quadrotor being detected by possibly
+hostile parties. These quadrotors are left unattended and need to be able to
 plan their movements autonomously such that they maximize the quality of their
 sensors and maintain as much sensor coverage as possible, whilst minimizing the
 risk of being apprehended. The autonomous planning also needs to take into
-account that some quadcopters will be dispatched from the swarm to follow
+account that some quadrotors will be dispatched from the swarm to follow
 certain targets of interest. The planning algorithm should be able to
 organically readjust the swarm such that maximum sensor quality and minimum
-risk are preserved and should provide a method of tracking the targets of
-interest by a sub-swarm.
+risk are preserved.
 
 The proposed solution, Rover, provides a method of organically readjusting the
 swarm to fill the search space whilst maximizing sensor quality and sensor
-coverage while minimizing the risk by combining dynamic potential fields and
-convex optimization.
+coverage while minimizing the risk of detection by hostile targets by combining
+dynamic potential fields and non-linear optimization techniques.
 
 \section{Rover}
 
 Rover is an planning algorithm that seeks to maximize the sensor quality and
-sensor coverage for a group of quadcopters, whilst minimizing the risk of a
-quadcopter being detected by a possibly hostile enemy. This is done by
-splitting the planning into two different parts, planning for the 2D plane to
+sensor coverage for a group of quadrotors, whilst minimizing the risk of a
+quadrotor being detected by a possibly hostile enemy. This is done by
+splitting the planning into two different parts, planning for the 2-D plane to
 promote sensor coverage and planning for the altitude by minimizing risk and
 maximizing sensor quality.
 
-\subsection{2D Planning}
+\subsection{2-D Planning}
 
-For the 2-dimensional planning, Rover needs to make sure that the group of
-quadcopters fills the search space and guarantee that no one part of the space
+\begin{figure}[ht]
+
+    \begin{center}
+
+        \includegraphics[width=\linewidth]{figs/timegrid_map.png}
+
+    \end{center}
+
+    \caption{An instance of the time grid where blue represents locations that
+        have not been visited in a large amount of time and where red
+    represents locations that have just been visited}
+    
+    \label{fig:timegrid}
+
+\end{figure} 
+
+For 2-dimensional planning, Rover needs to make sure that the group of
+quadrotors fills the search space and guarantee that no one part of the space
 goes too long without being surveyed. This is done by discretizing the space
-into a grid. Whenever a box in the grid has been covered by a sensor on any
-quadcopter in the group, the current time is stored in that box.  For the
-quadcopters to move in the $xy$ plane, each quad will sample a given number
-points along its sensor radius. It will then move in the direction of the box
-in the grid that has the lowest time (in seconds) recorded. This simple rule
-has extreme emergent properties for the swarm. Since the swarm shares the same
-grid, the quads will act cooperatively to fill the space without having to
-provide much guidance. This is shown in \fig{cover}. Also, this planning is not
-dependent on how many quads there are in the swarm. If a quad leaves the swarm,
-it would simply no longer update the time grid. The other quads would have no
-knowledge that it left and would still be able to plan accordingly. Also this
-style of planning inherently follows the rules of a swarm; distance is
-maintained between boids, boids tend towards their neighbours headings, and
-boids that are two far away will get closer together.
+into a grid (in this paper called a time grid and referred to as $\mathcal{T}$.
+Whenever a box in the grid has been covered by a sensor on any quadrotor in the
+group, the current time is stored in that box.  For the quadrotors to move in
+the $xy$ plane, each quad will sample a given number of segments along the
+sensing ellipse and move towards the segment whose average time is the least.
+This simple rule has extreme emergent properties for the swarm.  Since the
+swarm shares the same grid, the quads will act cooperatively to fill the space
+without having to provide much guidance.  An instance of the time grid for a
+given instance in time is shown in \fig{timegrid}.  Also, this planning is not
+dependent on how many quads there are in the swarm.  If a quad leaves the
+swarm, it would simply no longer update the time grid. The other quads would
+have no knowledge that it left and would still be able to plan accordingly. 
 
+\begin{algorithm}[ht]
+
+\caption{$\Function{GetDirection}(q, \beta, \phi, \mathcal{T})$}
+
+\label{algo:2dplanning}
+
+\begin{algorithmic}[1]
+
+\setcounter{ALC@line}{0}
+
+\vspace*{1mm}
+
+
+\STATE $t_{s} \leftarrow 0$
+\STATE $\mathcal{P} \leftarrow \Function{Set()}$
+\STATE $\zeta \leftarrow \Function{GetInnerSearchRange}()$
+\STATE $S_{\theta} \leftarrow \Function{GetUniformSamples}(0, 2 \pi)$
+
+\FOR{$\theta \in S_{\theta}$}
+
+\STATE $S_{\omega} \leftarrow \Function{GetUniformSamples}(\theta - \zeta, \theta + \zeta)$
+
+\FOR{$\omega \in S_{\omega}$}
+
+\STATE $A_{M} \leftarrow q.\Var{z} \cdot (\tan{(\phi + q.\alpha)} - \tan{\phi}) + \epsilon$
+\STATE $A_{m} \leftarrow q.\Var{z} \cdot \frac{\tan{q.\alpha}}{\cos{\phi}} + \epsilon$
+
+\STATE $x \leftarrow q.\Var{z} \cdot \tan{(\phi - q.\alpha)} + A_{M} \cdot (1 + \cos{\omega})$
+\STATE $y \leftarrow A_{m} \cdot \sin{\omega}$
+
+\STATE $\begin{bmatrix}
+    \hat{x} \\[0.2em]
+    \hat{y}
+\end{bmatrix} \leftarrow \begin{bmatrix}
+    \cos{\beta} & -\sin{\beta} \\[0.2em]
+    \sin{\beta} & \cos{\beta}
+\end{bmatrix} \cdot \begin{bmatrix}
+    x \\[0.2em]
+    y
+\end{bmatrix} + \begin{bmatrix}
+    q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix}$
+
+\STATE $t_{s} \leftarrow t_{s} + \mathcal{T}[\hat{x}, \hat{y}]$
+\STATE $\mathcal{P}.\Var{add}(\hat{x}, \hat{y})$
+
+\ENDFOR
+
+\ENDFOR
+
+\STATE $\bar{x} \leftarrow 0$
+\STATE $\bar{y} \leftarrow 0$
+
+\FOR{$(x, y) \in \mathcal{P}$}
+
+\STATE $w \leftarrow \frac{\mathcal{T}[x, y]}{t_{s}}$
+\STATE $\bar{x} \leftarrow \bar{x} + w \cdot x$
+\STATE $\bar{y} \leftarrow \bar{y} + w \cdot y$
+
+\ENDFOR
+
+\RETURN $(\begin{bmatrix}
+    \bar{x} - q.\Var{x} & \bar{y} - q.\Var{y}
+\end{bmatrix} ^ T, \mathlarger{\frac{t_s}{|\mathcal{P}|}})$
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+The quadrotors used in simulation have a variable camera angle. This means that
+instead of simply having a down facing camera, the quadrotor can have the
+camera at an angle, $\phi$. This means that the camera's projection onto the
+$xy$ plane is not a circle but an ellipse. The major and minor axis of the
+ellipse are, $ A_M(z, \phi) = z \cdot \tan{(\phi + \alpha)} - z \cdot
+\tan{\phi} $ and $ A_m(z, \phi) = \frac{z \cdot \tan{\alpha}}{\cos{\phi}} $
+where $z$ is the height of the quadrotor, $\phi$ is the camera angle and
+$\alpha$ is the viewing angle.
+
+Since an ellipse is not symmetrical for every angle, orientation cannot be
+ignored.  This means that the 2-D planner must plan for not only $x$ and $y$
+but also an orientation, $\beta$. Also, for completeness, we assume that the
+camera angle, $\phi$, is also dynamic and can be set by the planner. In order
+to plan the movements, we sample viable new orientations and camera angles,
+each time determining the new $x$ and $y$ direction to go in.  Then once the
+sampling has completed, we choose a $(x', y',
+\beta', \phi')$ that would lead the quadrotor to a configuration that not has
+been sensed in the largest amount of time. More formally, we would like to
+minimize,
+
+$$ E(\s) = \int_{\s_{\theta} - \zeta}^{\s_{\theta} + \zeta}
+\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{ \Big(\frac{\partial
+    e_x}{\partial \omega}\Big) ^ 2 + \Big(\frac{\partial e_y}{\partial
+\omega}\Big) ^ 2} \;d\omega$$
+
+where $E$ is the line integral on the curvature of the sensing ellipse within a
+range centered at the currently sampled heading, $\theta$ in which the surface
+being integrated upon is the time grid, $\mathcal{T}$. The variable $\zeta$
+represents the interval of the integral and governs the size of the line
+segment sampled when determining the new heading. The vector, $\s =
+\langle z, \theta, \beta, \phi \rangle$ in $E$ holds the current state
+of the altitude, heading, orientation, and camera angle respectively. The
+equations,
+
+$$
+\begin{bmatrix}
+    e_x(\s, \omega) \\[0.2em] e_y(\s, \omega)
+\end{bmatrix} = \begin{bmatrix} \cos{\s_{\beta}} & -\sin{\s_{\beta}} \\[0.2em]
+    \sin{\s_{\beta}}
+& \cos{\s_{\beta}} \end{bmatrix}\cdot \begin{bmatrix} \s_z \cdot 
+    \tan(\s_{\phi} - \alpha) +
+    A_M(\s_z, \s_{\phi}) \cdot (1 + \cos{\omega}) + \epsilon \\[0.2em]
+    A_m(z, \s_{\phi}) \cdot
+\sin{\omega} + \epsilon \end{bmatrix} $$
+
+%$$ E(z, \theta, \beta, \phi) = \mathlarger{\sum_{(x, y) \in S(z,
+%            \theta, beta, \phi)}{\mathcal{T}[x, y]}}$$
+
+%where $S$ is the set of points on the current line segment on the sensing
+%ellipse that we are checking for a given $\theta$. More formally $S$ is defined
+%as,
+%
+%$$ S(z, \theta, \beta, \phi) = \left\{ R(\beta) \cdot \begin{bmatrix} z \cdot
+%       \tan(\phi - \alpha) + A_M(z, \phi)
+%           \cdot (1 + \cos{\omega}) \\[0.2em]
+%  A_m(z, \phi) \cdot \sin{\omega} \end{bmatrix} : \omega \in [\theta - \zeta, \theta + \zeta] \right\}$$
+
+% where
+%$$R(\beta) = \begin{bmatrix}
+%\cos{\beta} & -\sin{\beta} \\[0.2em] \sin{\beta} & \cos{\beta} \end{bmatrix}$$
+
+are parametric equations representing points on the sensing ellipse given a
+quadrotor state, $\s$, along with an angle parameter, $\omega \in [0, 2\pi]$.
+
+Therefore to determine the direction, $\theta$, the orientation, $\beta$, and
+the camera angle, $\phi$, that the quadrotor should travel in for a given
+height, $z$, we have to minimize $E$ with respect to $\theta, \beta,$ and
+$\phi$. This function is minimized using an iterative sampling approach in
+which a uniform or random sample depending on the variable is taken such that
+every element in that sample leads to a feasible configuration. Every
+combination of these sets is taken iteratively in order to find the combination
+that minimizes the objective function, $E$. Once a suitable $\s = \langle
+\theta, \beta, \phi \rangle$ has been determined using the iterative approach,
+the quadrotor's orientation and camera angle are set and the current position
+of the quadrotor is  updated to,
+
+$$
+\begin{bmatrix} q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix} = \begin{bmatrix}
+    q.\Var{x} \\[0.2em] q.\Var{y}
+\end{bmatrix} + k \cdot \begin{bmatrix} \cos{\theta} \\[0.2em] \sin{\theta}
+\end{bmatrix}
+$$
+
+where $k$ is the step size of the quadrotors and $q$ is the quadrotor whose
+position is being updated. This is shown in both \textbf{Algorithm}
+\ref{algo:2dplanning} and \textbf{Algorithm} \ref{algo:planning}. \fig{cover}
+shows the planning algorithm filling the space whilst optimizing the heading,
+orientation, and c4mera angle.
 
 \begin{figure}
 
@@ -117,7 +292,7 @@ $$ \begin{array}{cc}
 
 \end{center}
 
-\caption{2D Coverage}
+\caption{The quadrotors filling up the search space}
 
 \label{fig:cover}
 
@@ -125,68 +300,228 @@ $$ \begin{array}{cc}
 
 \subsection{Determining the altitude}
 
-To determine the altitude, one must solve a convex optimization problem that
-tries to optimize the height of the quad by maximizing the sensor quality and
-minimizing the risk. This is done by modeling the sensor quality and the risk
-as concave functions. This solution works given the assumption that as the quad
-increases altitude, the sensor quality will degrade however the sensor radius
-will increase. The "thought" sensor so to speak used in development was a
-camera.
+To determine the altitude, one must solve a non-linear optimization problem
+that tries to optimize the height of the quad by maximizing the sensor quality
+and minimizing the risk.  This is done by modelling the sensor quality and the
+risk as functions parametrized by the altitude, and combining them together
+into an objective function that is then maximized.
 
-\paragraph{Sensor Quality} The function for sensor quality is fairly straight
-forward.  Imagine a down facing camera on a quadcopter with a strict viewing
-angle. The sensor quality will be a relative measurement comparing how much
-data is represented by the image captured at the minimum height and how much
-data is represented at some given height. This is done by mapping the size of
-the viewing circle at the minimum height to the given height. After reducing
-the equations, sensor quality is modeled by an elegant inverse square function
-shown below.
+\paragraph{Sensor Quality}
 
-$$ SQ(z) = \frac{z_{min} ^ 2}{z ^ 2} $$
+To model the sensor quality, a few assumptions were made. Firstly, that there
+is an optimal distance away from a tracked object such that the sensor would
+have the highest quality. For example if one was tracking a person and a tank,
+the optimal distance to track a person is much less than that of a tank because
+the tank is larger and moves faster. It is assumed that this optimal height is
+passed into the algorithm as an argument and changed for each situation. The
+second assumption that is made is that the sensor quality decreases
+exponentially as the distance increases. This depends on the type of sensor
+that is being used and that is why this fall off can be determined the user as
+well. Below is the function used to model the sensor quality. It is a normal
+distribution centred at the optimal height set by the user and has a standard
+deviation representative of the range of the sensor,
 
-\paragraph{Risk} The function for risk is more complicated and is based on
-empirical observation. This function (like that of sensor quality) can be
-substituted for another one that meets the user's need. Risk is measured based
-on two things, the initial risk at an $x, y$ position, and the height of the
-quad. The initial risk is the risk at the minimum altitude. This is measured by
-dispersing points of high risk within the space (the red dots in \fig{cover})
-and using a Gaussian distribution to model the risk. Using this initial risk, a
-secondary function is created that models how the risk decreases as the height
-increases. Please note that the convex optimization does not occur with risk,
-but however the percentage of initial risk. This is to make the sensor quality
-function and risk model have a nice intersection point. To determine the actual
-risk at a given spot, one simply multiplies the initial risk to the percentage
-of initial risk function. Given an initial risk, the risk model describes the
-risk as the percentage of initial risk. By changing the initial risk at a
-point, one changes this function, which leads to a different solution from the
-convex optimization. The function for risk is shown below.
+$$ SQ(z) = \exp{(-\frac{(\frac{z}{ cos{\phi}} -
+\mu_{sq})^2}{2\sigma_{sq}^2})} $$
 
-$$ R(z) = 1 - (\frac{z - z_{min}}{r_0 \cdot (z_{max} - z_{min})}) ^ 2 $$
+where $z$ is the height of the quadrotor, $\phi$ is the angle of the camera,
+$\mu_{sq}$ is the optimal height for the sensor, and $\sigma_{sq}$ is a
+variable indicative of the range of the sensor.
+
+\paragraph{Risk} 
+
+The risk is modelled in two parts. Firstly there is an initial risk, $R_0$,
+which when given an $x$ and $y$ position, returns the risk as a value from 0 to
+1 inclusively. This initial risk is basically the risk of the quadrotor being
+detected at the ground level. This initial risk is used to scale the risk
+function as altitude increases. For instance, if a quadrotor is over a very
+hostile environment, there will be a very high initial risk. This would cause
+the risk as height increases to decay more slowly because the quadrotor would
+need to obtain a higher altitude to have less risk. However, if there is a low
+initial risk, the risk as altitude increases will decay rapidly allowing the
+quadrotor to fly closer to the ground. The initial risks are determined by a
+set of risk points on a 2-D grid. These risk points are known \emph{a priori}.
+These points are coupled with a constant between 0 to 1 which indicates how
+hostile this risk point is and a constant which indicates the range of this
+threat. These points are then represented as the centres of 3-D normal
+distributions which are then combined to determine the initial risk in a 2-D
+plane. The equation,
+
+$$ R_0(x, y) = \Max{r_p \in \Var{RiskPoints}} r_p.\Var{hostility} \cdot
+\exp{(-\frac{\sqrt{(r_p.\Var{x} - x)^2 + (r_p.\Var{y} - y)^2}}{
+2 \cdot r_p.\Var{range}^2})}$$
+
+where $x, y$ is the location of the quadrotor, $\Var{RiskPoints}$ is the list
+of risk points in the grid, $r_p.\Var{range}$ is the range of the sensor, and
+$r_p.\Var{hostility}$ is a measure of the hostility of the risk point from 0 to
+1 is the representation of the initial risk, or the risk at the ground level.
+
+Given a function for the initial risk, we are able to determine the risk at an
+altitude by scaling this initial risk with exponential decay as height
+increases. To achieve this functional behaviour, a normal distribution has been
+used with a mean of 0 and a standard deviation based on a scaling of the
+initial risk. The equation,
+
+$$ R(x, y, z) = R_0(x, y) \cdot \exp{(-\frac{z^2}{K \cdot R_0(x, y)^2})} $$
+
+is used to model the risk in three dimensions where $x, y, z$ is the position
+of the quadrotor, $K$ is a scaling constant, and $R_0(x, y)$ is the initial
+risk at $x, y$.
 
 \paragraph{Optimization}
 
-By solving for $z$ in $SQ(z) - R(z) = 0$, we are able to determine the height
-needed for the quadcopter such that sensor quality is maximized and risk is
-minimized. This can be solved with many open source solvers. The package being
-used in this implementation is SciPy. Once the altitude needed for the quad has
-been determined, the new height is set and the time grid is updated. This means
-that given the new height, and therefore a new sensor radius, neighbouring
-quads will move away if the height has increases so to not overlap sensing
-areas, and if the height has decreased, the neighbouring quads will move
-towards the given quad.
+In order to determine the height of the quadrotor, me must optimize an
+objective function parametrized by the altitude that maximizes the sensor
+quality and minimizes the risk. This can be modelled as,
 
-\subsection{Future Work}
+$$ J(x, y, z) = SQ(z) - R(x, y, z) $$
 
-Rover needs to be ported to ROS and to be tested with real quadcopters in a
-practical, real world setting. Once Rover has been ported to ROS, more
-algorithms can be developed using the data that has been collected by the
-quadcopters. Using the data collected by the quads, realtime 2D collaborative
-mapping could be achieved. This would give vital information to groups of
-robots on the ground about their surroundings. Also, creating a suite of
-classifiers that can be used to determine the position of a critical target and
-use Keeper to interpolate its movement throughout the space. Moreover using
-these classifiers, Rover could build risk maps in realtime and relay them back
-to the groups of robots on the ground.  This could provide vital information
-that could limit the risk exposure of troops on the ground.
+and therefore to determine the optimal altitude, we must find the $z$ value
+that maximizes $J$ for a given $x, y$. This is shown in the equation,
+
+$$ \Function{DetermineHeight}(x, y) = \argmax{z \in [z_{min}, z_{max}]} J(x, y,
+z) $$
+
+where $\Function{DetermineHeight}$ takes the current $x, y$ position as
+parameters and returns the $z$ value that minimizes the risk whilst maximizing
+the sensor quality.  This can be solved with many open source non-linear
+optimizers.  The package being used in this implementation is SciPy.  Once the
+altitude needed for the quad has been determined, the new height is set and the
+time grid is updated.  Since the time grid is updated and it is shared within
+the swarm, the change in altitude (and therefore a change in the sensor radii)
+will have reactive side effects by the swarm.  If a quad, $q$, increases it's
+height, the swarm will move away from it, and if $q$ decreases it's height,
+there will be more unfilled space around it and the swarm will move to fill the
+new space.  These properties are what allow us to break the planning into two
+parts, one algorithm determining the new $x, y$ position and orientation and
+another algorithm determining the new height of the quadrotor.
+
+The complete algorithm is shown in \textbf{Algorithm} \ref{algo:planning}. In
+the algorithm, $\phi$ is the camera angle, $\alpha$ is the viewing angle of the
+camera, $k$ is the step size, and $A_{M}$, $A_{m}$ are the respective
+semi-major and semi-minor axes.
+
+
+\begin{algorithm}[ht]
+
+\caption{Pseudocode for Rover}
+
+\label{algo:planning}
+
+\begin{algorithmic}[1]
+
+\setcounter{ALC@line}{0}
+
+\vspace*{1mm}
+
+\STATE $\mathcal{Q} \leftarrow \Function{GetQuadrotorList()}$
+\STATE $\mathcal{T} \leftarrow \Function{InitTimeGrid()}$
+
+\WHILE{$\Function{TrackingFinished()} = \False$}
+
+\FOR{$q \in \mathcal{Q}$}
+
+\STATE $t_{min}, v', \beta', \phi' \leftarrow \Function{InitDynamicVars()}$
+\STATE $S_{\phi} \leftarrow \Function{GetRandomSamples}(\phi_{min}, \phi_{max})$
+\STATE $S_{\beta} \leftarrow \Function{GetRandomSamples}(\beta_{min}, \beta_{max})$
+
+\FOR{$\phi \in S_{\phi}$}
+
+\FOR{$\beta \in S_{\beta}$} 
+
+\STATE $(v, \bar{t}) \leftarrow \Function{GetDirection}(q, \beta, \phi, \mathcal{T})$
+
+\IF{$\bar{t} < t_{min}$}
+
+\STATE $t_{min} \leftarrow \bar{t}$
+\STATE $\beta' \leftarrow \beta$
+\STATE $\phi' \leftarrow \phi$
+\STATE $v' \leftarrow v$
+
+\ENDIF
+
+\ENDFOR
+
+\ENDFOR
+
+\STATE $\begin{bmatrix}
+    x' \\[0.2em]
+    y' 
+\end{bmatrix} \leftarrow \begin{bmatrix}
+    q.\Var{x} \\[0.2em]
+    q.\Var{y}
+\end{bmatrix} + k \cdot \mathlarger{\frac{v'}{||v'||}}$
+\STATE $z' \leftarrow \Function{DetermineHeight}(x', y')$
+\STATE $q.\Var{SetPosition}(x', y', z', \beta', \phi')$
+\STATE $\mathcal{T}.\Var{Update}(q)$
+
+\ENDFOR
+
+\ENDWHILE
+
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Experimental Setup}
+
+The experiments seeked to show that the proposed algorithm minimizes the risk,
+maximizes the sensor quality, and provides sensor coverage to a designated
+area. The statistics recorded were comprised of the average percent of the
+total area coverage, the average sensor quality, and the average risk. The
+sensor quality and risk metrics were determined using the same functions as in
+the optimization process. The percent of the total area coverage was determined
+using a Monte Carlo process where a large number of random points (1000) with
+$x$ and $y$ values within the search area were checked to be within any of the
+sensing ellipse at each iteration. The ratio of the number of points sampled
+which are within any of the sensing ellipse to the total number of points
+sampled is what determines the percent total area coverage metric. For the
+experiments, two different independent variables were used; the number of risk
+points and the number of quadrotors. The risk points were randomly placed into
+the search space however, the random generator was seeded so the experiments
+would be deterministic and repeatable. Also, all of the risk points used were
+assigned an associated hostility and sensor range of 1 and the width of the
+search space divided by two respectively. The quadrotors all started in a
+square formation at the top left of the search space. Experiments were carried
+out by varying the number of risk points and the number of quadrotors such that
+each number or quadrotors run on every configuration of risk points. The number
+of risk points varied from 1 to 21 with a step of 2 and the number of quads
+varied from 1 to 26 with a step of 5. Each configuration was run for 1000
+iterations and each configuration only needed to be tested once because the
+process is deterministic. 
+
+\section{Future Work}
+
+Over the summer, my goal is to port Rover to the ROS platform to be able to run
+tests on real quadrotors not in simulation. Once it has been ported, I would
+like to experiment with different types of sensed risk instead of simply
+modelling it \emph{a priori}. One way that this will be possible would be to
+put a temperature sensor on the robot and use heat as the risk function. This
+is applicable in a fire evacuation when having risk aware coverage of an area
+minimizes damage to the quadrotors and maximizes the amount of information
+gained about the disaster. I would also like to extend Rover to use different
+potential surfaces than simply the time grid. In particular, I would like to
+use a multimodal probability density function that models the probability of a
+target being at a certain location at a given point in time. This probability
+density function will assume that the object being tracked is not moving
+randomly but rather, is cohering to a certain parametric model of movement. By
+observing the object's previous states, we are able to use several techniques
+to predict its model of motion. Once the target's model of motion is known, we
+can generate a more informed probability density function about its future
+movements. This probability density function can be used to replace the current
+time grid being used. The time line for the internship is shown in
+Table~\ref{tab:timeline}
+
+\begin{table}
+    \begin{tabular}{p{30mm}p{100mm}}
+    Dates        & Description \\ \hline
+    Jun 16 - 30  & Finish paper for Rover for simple persistent risk and sensor quality aware coverage. Submitting to ROBIO 2014 \\ \hline
+    Jul 1 - 29   & Develop algorithms for informative target tracking using a predictive potential surface. Add the developed algorithms to Rover. Work on the paper for submission to ICAART 2015. Also, get the project to work on the quadrotors for the capstone project. \\ \hline
+    Jul 30 - End & Write any needed documentation. \\ 
+    \end{tabular}
+
+    \caption{Time line for the NREIP internship}
+    \label{tab:timeline}
+\end{table}
 
 \end{document}

@@ -5,25 +5,21 @@ import stats
 import evader
 import json
 import plot
+import random
 
 
 class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
         self.problem = problem
-        self.planner_obj = kwargs.get("algorithm", planner.PlannerMonotonic)
+        self.planner_obj = kwargs.get("algorithm", planner.PlannerGaussian)
         self.pl = self.planner_obj(problem, risk_grid)
         self.drawer = kwargs.get("drawer", None)
         self.show_time_grid = kwargs.get("show_time_grid", True)
         self.risk_grid = risk_grid
-        self.droid_list = self.init_droids()
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(self.pl)
         self.ra = stats.RiskAverage(self.pl)
-        self.surface_list = list()
-
-        if self.show_time_grid:
-            self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
 
         if not kwargs.get("out_file", None) is None:
             self.out_file = open(kwargs.get("out_file", None), "w")
@@ -35,47 +31,35 @@ class Simulation(object):
         else:
             self.position_file = None
 
-    def init_droids(self):
-        droid_pos_list = [
-            (0, 0), (self.problem.width, 0), (0, self.problem.height),
-            (self.problem.width, self.problem.height)
-        ]
+        if self.show_time_grid:
+            self.t_plotter = plot.TimeGridPlotter(self.problem.grid)
 
-        droid_list = [
-            evader.Evader(
-                x, y, 0, 0, self.problem, self.risk_grid
-            ) for x, y in droid_pos_list
-        ]
+    def publish_position(self, quad):
+        return self
 
-        return droid_list
+    def get_actual_position(self, quad):
+        return (
+            quad.x + random.gauss(0, 10),
+            quad.y + random.gauss(0, 10),
+            quad.z + random.gauss(0, 10)
+        )
 
     def run(self):
-        self.render()
-
-        if not self.drawer is None:
-            self.play()
-
-    def render(self):
         for i in xrange(self.problem.num_steps):
-            quads = self.pl.step()
+            quads = self.pl.get_quads()
+
+            for quad in quads:
+                rpx, rpy, rpz = self.get_actual_position(quad)
+                quad.set_position(rpx, rpy, rpz)
+                self.problem.grid.update_grid(quad)
+                self.pl.update_quad(quad)
+                self.publish_position(quad)
+
             if self.show_time_grid:
                 self.t_plotter.update()
 
-            for droid in self.droid_list:
-                droid.step(quads)
-
             if not self.drawer is None:
-                for quad in quads:
-                    self.drawer.add_coverage(quad)
-
                 self.drawer.clear_all()
-                self.drawer.draw_coverage()
-
-                # This is for testing dude
-                # self.drawer.draw_sim_target()
-
-                for droid in self.droid_list:
-                    self.drawer.draw_evader(droid.x, droid.y)
 
                 self.drawer.draw_risk_grid(self.risk_grid)
 
@@ -83,7 +67,6 @@ class Simulation(object):
                     self.drawer.draw_quad(quad)
 
                 frame = self.drawer.update()
-                self.surface_list.append(frame)
 
             self.mca.update_average_efficiency(quads)
             self.sqa.update_average_sq(quads)
@@ -106,28 +89,3 @@ class Simulation(object):
                         quad.get_sensor_radius()
                     )
                 )
-
-    def play(self):
-        if not self.drawer.can_play():
-            return
-
-        done = False
-        counter = 0
-        while not done:
-
-            self.drawer.update_with_frame(self.surface_list[counter])
-
-            key = self.drawer.get_key_pressed()
-            if key[self.drawer.constants.K_LEFT]:
-                counter -= 1
-                time.sleep(0.04)
-            elif key[self.drawer.constants.K_RIGHT]:
-                counter += 1
-                time.sleep(0.04)
-            elif key[self.drawer.constants.K_ESCAPE]:
-                done = True
-
-            if counter >= len(self.surface_list):
-                counter = len(self.surface_list) - 1
-            elif counter < 0:
-                counter = 0

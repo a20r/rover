@@ -204,9 +204,9 @@ been sensed in the largest amount of time. More formally, we would like to
 minimize,
 
 $$ E(\s) = \int_{\s_{\theta} - \zeta}^{\s_{\theta} + \zeta}
-\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{
-    \Big(\frac{\partial e_x}{\partial \omega}\Big) ^ 2 +
-\Big(\frac{\partial e_x}{\partial \omega}\Big) ^ 2} \;d\omega$$
+\mathcal{T}(e_x(\s, \omega), e_y(\s, \omega)) \cdot \sqrt{ \Big(\frac{\partial
+    e_x}{\partial \omega}\Big) ^ 2 + \Big(\frac{\partial e_y}{\partial
+\omega}\Big) ^ 2} \;d\omega$$
 
 where $E$ is the line integral on the curvature of the sensing ellipse within a
 range centered at the currently sampled heading, $\theta$ in which the surface
@@ -272,7 +272,7 @@ where $k$ is the step size of the quadrotors and $q$ is the quadrotor whose
 position is being updated. This is shown in both \textbf{Algorithm}
 \ref{algo:2dplanning} and \textbf{Algorithm} \ref{algo:planning}. \fig{cover}
 shows the planning algorithm filling the space whilst optimizing the heading,
-orientation, and camera angle.
+orientation, and c4mera angle.
 
 \begin{figure}
 

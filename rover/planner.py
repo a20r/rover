@@ -18,7 +18,7 @@ class PlannerInterface(object):
         self.risk_grid = risk_grid
         self.num_samples = 100
         self.radius_ext = 8
-        self.angle_range = math.pi / 8
+        self.angle_range = math.pi / 4
         self.angle_step = 2 * math.pi / self.num_samples
 
         for quad in self.quad_list:
@@ -199,6 +199,8 @@ class PlannerInterface(object):
                     min_beta = n_b
                     min_phi = n_p
 
+        if time.time() - min_time < 0.3:
+            return point.Point(0, 0)
         quad.set_camera_angle(min_phi)
         quad.set_orientation(min_beta)
         return min_direction
@@ -207,7 +209,9 @@ class PlannerInterface(object):
         uv = self.get_new_direction(quad)
         quad.move_2d(uv)
         quad.set_z(self.determine_height(quad))
-        self.problem.grid.update_grid(quad)
+
+    def get_quads(self):
+        return self.quad_list
 
     def step(self):
         for quad in self.quad_list:

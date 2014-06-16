@@ -10,15 +10,13 @@ import math
 
 class Drawer(object):
 
-    def __init__(self, problem, colors):
+    def __init__(self, problem):
         rospy.init_node("rover_drawer", anonymous=True)
         self.pub = rospy.Publisher(
             "visualization_marker", Marker, queue_size=1000
         )
 
         self.problem = problem
-        self.colors = colors
-        self.color_dict = color.THECOLORS
 
         self.clear_all().update()
         self.markers = collections.deque(list(), 1000)
