@@ -11,7 +11,7 @@ import math
 class Drawer(object):
 
     def __init__(self, problem):
-        rospy.init_node("rover_drawer", anonymous=True)
+        rospy.init_node("rover", anonymous=True)
         self.pub = rospy.Publisher(
             "visualization_marker", Marker, queue_size=1000
         )
@@ -56,7 +56,6 @@ class Drawer(object):
         return self
 
     def draw_line(self, quad, x, y, z, hash_val):
-        quad_id = self.hash32(quad)
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"

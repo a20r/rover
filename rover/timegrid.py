@@ -2,18 +2,22 @@
 import time
 import math
 import numpy as np
-import target
 
 
 class TimeGrid(object):
 
     def __init__(self, width, height, problem):
-        self.scaling_factor = 8
-        self.width = width // self.scaling_factor
-        self.height = height // self.scaling_factor
+        if width * height > 10000:
+            self.scaling_factor = 8
+            self.width = width / self.scaling_factor
+            self.height = height / self.scaling_factor
+        else:
+            self.scaling_factor = 1.0
+            self.width = width
+            self.height = height
+
         self.grid = np.zeros((self.height, self.width))
         self.init_grid(self.grid)
-        # self.targ = target.Target(problem)
 
     def init_grid(self, grid):
         current_time = time.time()
@@ -22,7 +26,6 @@ class TimeGrid(object):
                 self.grid[h, w] = current_time
 
     def update_grid(self, quad):
-        # self.targ.step()
         x = quad.x // self.scaling_factor
         y = quad.y // self.scaling_factor
         r_ma = int(quad.get_ellipse_major() // self.scaling_factor)
@@ -70,18 +73,9 @@ class TimeGrid(object):
         self.grid[y, x] = value
 
     def get_raw(self, x, y):
-        # return self.targ.get_weight(
-        #    x * self.scaling_factor,
-        #    y * self.scaling_factor
-        # ) + self.grid[y, x]
         return self.grid[y, x]
 
     def __getitem__(self, index):
-        # return self.targ.get_weight(
-        #    index[0], index[1]) + self.grid[
-        #    index[1] // self.scaling_factor,
-        #    index[0] // self.scaling_factor
-        # ]
         return self.grid[
             index[1] // self.scaling_factor,
             index[0] // self.scaling_factor

@@ -34,7 +34,9 @@ def run(**kwargs):
         sim = simulation.Simulation(
             problem, risk_grid, drawer=dr,
             out_file=kwargs.get("out_file", "data/all.txt"),
-            algorithm=pl
+            algorithm=pl, practical=kwargs.get("practical", False),
+            show_time_grid=kwargs.get("show_time_grid", False),
+            names=kwargs.get("names", dict())
         )
 
         try:

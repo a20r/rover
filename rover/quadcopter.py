@@ -8,14 +8,15 @@ import numpy as np
 
 class Quadcopter(object):
 
-    def __init__(self, x, y, z, beta, phi, problem):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.beta = beta
-        self.phi = phi
+    def __init__(self, problem, name=None):
+        self.x = 0
+        self.y = 0
+        self.z = problem.min_height
+        self.beta = 0
+        self.phi = problem.initial_camera_angle
         self.problem = problem
         self.hash_val = int(100000 * random.random())
+        self.name = name
 
         # in degrees
         self.viewing_angle = problem.viewing_angle
@@ -87,6 +88,8 @@ class Quadcopter(object):
         Y = old_y * math.cos(beta_r) + old_x * math.sin(beta_r)
         return self.x + X, self.y + Y
 
+    def get_name(self):
+        return self.name
 
     def set_position(self, x, y, z):
         self.x = x
