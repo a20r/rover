@@ -140,7 +140,7 @@ class Simulation(object):
                 trans[0],
                 trans[1],
                 trans[2],
-                beta
+                math.degrees(beta)
             )
 
         else:
