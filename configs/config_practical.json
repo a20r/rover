@@ -4,10 +4,10 @@
     "num_quads": 1,
     "min_height": 100,
     "max_height": 250,
-    "step_size": 4,
+    "step_size": 30,
     "quad_size": 10,
     "viewing_angle": 40,
-    "num_steps": 1000,
+    "num_steps": 100000,
     "sq_height": 100,
     "sq_std": 120,
     "risk_constant": 100,
@@ -18,7 +18,7 @@
     "drawer": "ros",
     "practical": true,
     "names": {
-        "rowlf": "waypoint"
+        "95": "waypoint"
     },
     "planner": "rover_gaussian",
 

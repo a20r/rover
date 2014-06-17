@@ -1,5 +1,6 @@
 
 import planner
+import point
 import time
 import stats
 import json
@@ -19,6 +20,7 @@ class Simulation(object):
         self.planner_obj = kwargs.get("algorithm", planner.PlannerGaussian)
         self.practical = kwargs.get("practical", False)
         names = kwargs.get("names", dict())
+        self.listener = tf.TransformListener()
         self.pubs = self.init_pubs(names)
         self.quad_list = self.init_quads()
         self.pl = self.planner_obj(problem, risk_grid, self.quad_list)
@@ -29,8 +31,6 @@ class Simulation(object):
         self.sqa = stats.SensorQualityAverage(self.pl)
         self.ra = stats.RiskAverage(self.pl)
         self.init_stats(**kwargs)
-
-        self.listener = tf.TransformListener()
 
     def init_pubs(self, names):
         pub_dict = dict()
@@ -61,8 +61,9 @@ class Simulation(object):
             for name, _ in self.pubs.iteritems():
                 quad = quadcopter.Quadcopter(self.problem, name)
                 x, y, z, b = self.get_actual_configuration(quad)
+                print x, y, z, b
                 quad.set_position(x, y, z)
-                quad.set_orientation(b)
+                quad.set_orientation(math.degrees(b))
                 quad_list.append(quad)
         else:
             # Puts the quads into a grid if it is not a practical experiment
@@ -107,7 +108,7 @@ class Simulation(object):
 
             pose.position.z = (
                 quad.z + heading.get_z() *
-                self.problem.step_size * 3
+                self.problem.step_size
             ) / 100
 
             self.pubs[quad.get_name()].publish(pose)
@@ -119,29 +120,52 @@ class Simulation(object):
             )
         return self
 
+    def is_safe(self, quad, conf):
+        if quad.x + conf[0].x * self.problem.step_size > self.problem.width:
+            return False
+
+        if quad.y + conf[0].y * self.problem.step_size > self.problem.height:
+            return False
+
+        #if quad.z + conf[0].z * self.problem.step_size > self.problem.max_height:
+        #    return False
+
+        if quad.x + conf[0].x * self.problem.step_size < 0:
+            return False
+
+        if quad.y + conf[0].y * self.problem.step_size < 0:
+            return False
+
+        #if quad.z + conf[0].z * self.problem.step_size < self.problem.min_height:
+        #    return False
+
+        return True
+
     def get_actual_configuration(self, quad):
         if self.practical:
             now = rospy.Time.now()
             tf_world = "/world"
-            our_obj = "/" + quad.get_name() + "/base_link",
+            our_obj = "/" + quad.get_name() + "/base_link"
 
-            listener.waitForTransform(
+            self.listener.waitForTransform(
                 tf_world, our_obj,
-                now, rospy.Duration(0.1)
+                rospy.Time(0), rospy.Duration(0.1)
             )
 
-            trans, rot = listener.lookupTransform(
-                tf_world, our_obj, now
+            trans, rot = self.listener.lookupTransform(
+                tf_world, our_obj, rospy.Time(0)
             )
 
-            _, _, beta = tf.transforms.euler_from_quaternion(rot)
+            _, _, beta = tf.transformations.euler_from_quaternion(rot)
 
-            return (
-                trans[0],
-                trans[1],
-                trans[2],
+            actual_conf = (
+                trans[0] * 100 + self.problem.width / 2,
+                trans[1] * 100 + self.problem.height / 2,
+                trans[2] * 100,
                 math.degrees(beta)
             )
+
+            return actual_conf
 
         else:
             return quad.x, quad.y, quad.z, quad.beta
@@ -155,11 +179,23 @@ class Simulation(object):
                     quad.set_orientation(rb)
                     self.problem.grid.update_grid(quad)
                     heading, beta, phi = self.pl.get_next_configuration(quad)
-                    self.publish_configuration(quad, heading, beta, phi)
+                    if self.is_safe(quad, (heading, beta, phi)):
+                        self.publish_configuration(
+                            quad, heading, beta, phi
+                        )
+                    else:
+                        self.publish_configuration(
+                            quad,
+                            point.Point(0, 0, 0),
+                            beta, phi
+                        )
+
                 except tf.Exception as e:
                     print e
                     self.publish_configuration(
-                        quad, 0, 0, quad.beta, quad.phi
+                        quad,
+                        point.Point(0, 0, 0),
+                        quad.beta, quad.phi
                     )
 
             if self.show_time_grid:
