@@ -56,6 +56,7 @@ class Simulation(object):
 
     def init_quads(self):
         quad_list = list()
+        current_time = time.time()
         if self.practical:
             # Gets quad positions from Vicon
             for name, _ in self.pubs.iteritems():
@@ -82,6 +83,9 @@ class Simulation(object):
                 quad.set_orientation(0)
                 quad.set_camera_angle(self.problem.initial_camera_angle)
                 quad_list.append(quad)
+
+        for quad in quad_list:
+            self.problem.grid.update_grid(quad, current_time)
 
         return quad_list
 
@@ -117,6 +121,8 @@ class Simulation(object):
                 quad.y + heading.get_y() * self.problem.step_size,
                 quad.z + heading.get_z() * self.problem.step_size
             )
+            quad.set_orientation(beta)
+            quad.set_camera_angle(phi)
         return self
 
     def is_safe(self, quad, conf):
@@ -127,8 +133,8 @@ class Simulation(object):
         if quad.y + conf[0].y * self.problem.step_size > self.problem.height:
             return False
 
-        #if quad.z + conf[0].z * self.problem.step_size > self.problem.max_height:
-        #    return False
+        if quad.z + conf[0].z * self.problem.step_size > self.problem.max_height:
+            return False
 
         if quad.x + conf[0].x * self.problem.step_size < 0:
             return False
@@ -136,14 +142,13 @@ class Simulation(object):
         if quad.y + conf[0].y * self.problem.step_size < 0:
             return False
 
-        #if quad.z + conf[0].z * self.problem.step_size < self.problem.min_height:
-        #    return False
+        if quad.z + conf[0].z * self.problem.step_size < self.problem.min_height:
+            return False
 
         return True
 
     def get_actual_configuration(self, quad):
         if self.practical:
-            now = rospy.Time.now()
             tf_world = "/world"
             our_obj = "/" + quad.get_name() + "/base_link"
 
@@ -171,15 +176,16 @@ class Simulation(object):
 
     def run(self):
         for i in xrange(self.problem.num_steps):
+            current_time = time.time()
             for quad in self.quad_list:
                 try:
                     rpx, rpy, rpz, rb = self.get_actual_configuration(quad)
                     quad.set_position(rpx, rpy, rpz)
                     quad.set_orientation(rb)
-                    self.problem.grid.update_grid(quad)
                     heading, beta, phi = self.pl.get_next_configuration(quad)
-                    # print heading, beta, phi
-                    if self.is_safe(quad, (heading, beta, phi)):
+                    self.problem.grid.update_grid(quad, time.time())
+
+                    if True or self.is_safe(quad, (heading, beta, phi)):
                         self.publish_configuration(
                             quad, heading, beta, phi
                         )

@@ -7,15 +7,9 @@ import numpy as np
 class TimeGrid(object):
 
     def __init__(self, width, height, problem):
-        if width * height > 10000:
-            self.scaling_factor = 8
-            self.width = width / self.scaling_factor
-            self.height = height / self.scaling_factor
-        else:
-            self.scaling_factor = 1.0
-            self.width = width
-            self.height = height
-
+        self.scaling_factor = 8
+        self.width = width / self.scaling_factor
+        self.height = height / self.scaling_factor
         self.grid = np.zeros((self.height, self.width))
         self.init_grid(self.grid)
 
@@ -25,7 +19,7 @@ class TimeGrid(object):
             for w in xrange(self.width):
                 self.grid[h, w] = current_time
 
-    def update_grid(self, quad):
+    def update_grid(self, quad, ct):
         x = quad.x // self.scaling_factor
         y = quad.y // self.scaling_factor
         r_ma = int(quad.get_ellipse_major() // self.scaling_factor)
@@ -37,8 +31,6 @@ class TimeGrid(object):
         top_left_y = int(k - r_mi)
         bottom_right_x = int(h + r_ma)
         bottom_right_y = int(k + r_mi)
-
-        current_time = time.time()
 
         for x_i in xrange(top_left_x, bottom_right_x + 1):
             for y_i in xrange(top_left_y, bottom_right_y + 1):
@@ -57,7 +49,7 @@ class TimeGrid(object):
                     new_x = x_i_n + x
                     new_y = y_i_n + y
 
-                    self.raw_set_item(new_x, new_y, current_time)
+                    self.raw_set_item(new_x, new_y, ct)
 
     def raw_set_item(self, x, y, value):
         if x >= self.width:

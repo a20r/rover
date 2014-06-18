@@ -17,10 +17,10 @@ class PlannerInterface(object):
         self.risk_grid = risk_grid
         self.num_samples = 100
         self.radius_ext = 8
-        self.angle_range = math.pi / 4
+        self.angle_range = math.pi / 8
         self.angle_step = 2 * math.pi / self.num_samples
-        self.time_threshold = 0.3 # seconds
         self.quad_list = quads
+        self.time_threshold = 1
 
     def constrain(self, x, y):
         ret_x = x
@@ -174,6 +174,9 @@ class PlannerInterface(object):
                     min_direction = new_direction
                     min_beta = n_b
                     min_phi = n_p
+
+        if time.time() - min_time < self.time_threshold:
+            return point.Point(0, 0), min_beta, min_phi
 
         return min_direction, min_beta, min_phi
 
