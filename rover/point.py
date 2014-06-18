@@ -5,15 +5,19 @@ import random
 
 class Point(object):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, z=0):
         self.x = x
         self.y = y
+        self.z = z
 
     def get_x(self):
         return self.x
 
     def get_y(self):
         return self.y
+
+    def get_z(self):
+        return self.z
 
     def set_x(self, x):
         self.x = x
@@ -23,38 +27,47 @@ class Point(object):
         self.y = y
         return self
 
+    def set_z(self, z):
+        self.z = z
+        return self
+
     def dist_to(self, other_point):
         return math.sqrt(
             pow(self.x - other_point.x, 2) +
-            pow(self.y - other_point.y, 2)
+            pow(self.y - other_point.y, 2) +
+            pow(self.z - other_point.z, 2)
         )
 
     def to_unit_vector(self):
-        mag = self.dist_to(Point(0, 0))
+        mag = self.dist_to(Point(0, 0, 0))
 
         if mag == 0:
-            return Point(0, 0)
+            return Point(0, 0, 0)
         else:
-            return Point(self.x / mag, self.y / mag)
+            return Point(self.x / mag, self.y / mag, self.z / mag)
 
     def to_list(self):
-        return [self.x, self.y]
+        return [self.x, self.y, self.z]
 
     def __str__(self):
-        return "X: {0}, Y: {1}".format(self.x, self.y)
+        return "X: {0}, Y: {1}, Z: {2}".format(self.x, self.y, self.z)
 
     def __repr__(self):
-        return "Point({0}, {1})".format(self.x, self.y)
+        return "Point({0}, {1}, z={2})".format(self.x, self.y, self.z)
 
     def __hash__(self):
         return hash(str(self))
 
     def __sub__(self, other):
-        return Point(self.x - other.x, self.y - other.y)
+        return Point(
+            self.x - other.x,
+            self.y - other.y,
+            self.z - other.z
+        )
 
     def __eq__(self, val):
         try:
-            return val.x == self.x and val.y == self.y
+            return val.x == self.x and val.y == self.y and val.z == self.z
         except:
             return False
 
@@ -64,3 +77,9 @@ def get_random_point(width, height):
     y = random.randint(0, height)
 
     return Point(x, y)
+
+
+def get_random_point_3d(width, height, depth):
+    p = get_random_point(width, height)
+    p.set_z(random.randint(0, depth))
+    return p

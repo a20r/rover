@@ -14,31 +14,29 @@ def run(**kwargs):
     experimental = kwargs.get("experimental", False)
 
     if not experimental:
-        colors = config.Colors(**kwargs)
         problem = config.Problem(**kwargs)
 
-        dr_type = kwargs.get("drawer", "ros")
-
-        if dr_type == "pygame":
-            dr = drawer.Drawer(problem, colors)
-        elif dr_type == "ros":
-            dr = rosdrawer.Drawer(problem, colors)
+        dr = rosdrawer.Drawer(problem)
 
         risk_grid = riskgrid.RiskGrid(problem)
         risk_grid.add_random_points(kwargs.get("num_risk_points", 4))
 
         plot.plot_risk_grid(
-            risk_grid, kwargs.get("img_file", "imgs/test_heatmap.png")
+            risk_grid,
+            kwargs.get("img_file", "imgs/test_heatmap.png")
         )
 
         pl = planner.planners.get(
-            kwargs.get("planner", "rover_gaussian"), planner.PlannerGaussian
+            kwargs.get("planner", "rover_gaussian"),
+            planner.PlannerGaussian
         )
 
         sim = simulation.Simulation(
             problem, risk_grid, drawer=dr,
             out_file=kwargs.get("out_file", "data/all.txt"),
-            algorithm=pl, show_time_grid=kwargs.get("show_time_grid", True)
+            algorithm=pl, practical=kwargs.get("practical", False),
+            show_time_grid=kwargs.get("show_time_grid", False),
+            names=kwargs.get("names", dict())
         )
 
         try:

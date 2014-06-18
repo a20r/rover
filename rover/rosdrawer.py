@@ -10,15 +10,13 @@ import math
 
 class Drawer(object):
 
-    def __init__(self, problem, colors):
-        rospy.init_node("rover_drawer", anonymous=True)
+    def __init__(self, problem):
+        rospy.init_node("rover", anonymous=True)
         self.pub = rospy.Publisher(
             "visualization_marker", Marker, queue_size=1000
         )
 
         self.problem = problem
-        self.colors = colors
-        self.color_dict = color.THECOLORS
 
         self.clear_all().update()
         self.markers = collections.deque(list(), 1000)
@@ -58,7 +56,6 @@ class Drawer(object):
         return self
 
     def draw_line(self, quad, x, y, z, hash_val):
-        quad_id = self.hash32(quad)
         if not rospy.is_shutdown():
             marker = Marker()
             marker.header.frame_id = "/my_frame"

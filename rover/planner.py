@@ -1,48 +1,26 @@
 
-import quadcopter
 import math
 import scipy.optimize as opt
 import point
 import lawnmower
 import scipy.stats
 import numpy as np
-
 import time
 
 
 class PlannerInterface(object):
 
-    def __init__(self, problem, risk_grid):
+    def __init__(self, problem, risk_grid, quads):
         self.problem = problem
-        self.quad_list = self.init_quads()
+        self.quad_spacing = 20
+        self.initial_orientation = 0
         self.risk_grid = risk_grid
         self.num_samples = 100
         self.radius_ext = 8
-        self.angle_range = math.pi / 8
+        self.angle_range = math.pi / 4
         self.angle_step = 2 * math.pi / self.num_samples
-
-        for quad in self.quad_list:
-            self.problem.grid.update_grid(quad)
-
-    def init_quads(self):
-        quad_list = list()
-        init_length = math.ceil(math.sqrt(self.problem.num_quads))
-        for i in xrange(self.problem.num_quads):
-            down = int(i // init_length)
-            accross = int(i % init_length)
-
-            s_x, s_y = (
-                20 * self.problem.quad_size * accross,
-                20 * self.problem.quad_size * down
-            )
-
-            quad_list.append(quadcopter.Quadcopter(
-                s_x, s_y, self.problem.min_height, 0,
-                self.problem.initial_camera_angle,
-                self.problem
-            ))
-
-        return quad_list
+        self.time_threshold = 0.3 # seconds
+        self.quad_list = quads
 
     def constrain(self, x, y):
         ret_x = x
@@ -93,7 +71,8 @@ class PlannerInterface(object):
             x, y, out = self.constrain(x, y)
 
             if out:
-                raise ValueError("Exists an unvaible point")
+                inner_angle += self.angle_step
+                continue
 
             time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
             total_time += self.problem.grid[x, y]
@@ -127,10 +106,7 @@ class PlannerInterface(object):
                 x, y, i_angle, avg_time = self.get_sample_direction(
                     angle, quad, beta
                 )
-
-                if math.isnan(x) or math.isnan(y):
-                    continue
-            except ValueError:
+            except ZeroDivisionError:
                 continue
             finally:
                 angle += self.angle_range
@@ -145,7 +121,7 @@ class PlannerInterface(object):
                 min_time = avg_time
                 min_x_y = vec_x_y
 
-        return min_x_y.to_unit_vector(), min_time
+        return min_x_y, min_time
 
     def get_new_direction(self, quad):
         min_time = None
@@ -199,15 +175,13 @@ class PlannerInterface(object):
                     min_beta = n_b
                     min_phi = n_p
 
-        quad.set_camera_angle(min_phi)
-        quad.set_orientation(min_beta)
-        return min_direction
+        return min_direction, min_beta, min_phi
 
-    def update_quad(self, quad):
-        uv = self.get_new_direction(quad)
-        quad.move_2d(uv)
-        quad.set_z(self.determine_height(quad))
-        self.problem.grid.update_grid(quad)
+    def get_next_configuration(self, quad):
+        heading, beta, phi  = self.get_new_direction(quad)
+        new_z = self.determine_height(quad)
+        heading.set_z(new_z - quad.get_z())
+        return heading.to_unit_vector(), beta, phi
 
     def step(self):
         for quad in self.quad_list:
@@ -240,6 +214,7 @@ class PlannerMonotonic(PlannerInterface):
         return risk_sq
 
     def determine_height(self, quad):
+        quad.intify()
         x, y = quad.x, quad.y
         risk_sq_func = self.get_risk_sq_func(x, y)
         res = opt.fsolve(risk_sq_func, self.problem.max_height)
@@ -272,19 +247,19 @@ class PlannerGaussian(PlannerInterface):
         return risk_sq
 
     def determine_height(self, quad):
+        quad.intify()
         risk_sq_func = self.get_risk_sq_func(quad.x, quad.y, quad.phi)
 
-        sample_eps = 5
+        num_samples = 20
+        height_sample = np.linspace(
+            self.problem.sq_height, self.problem.max_height, num_samples
+        )
 
-        sample_min = quad.z - sample_eps
-        sample_max = quad.z + sample_eps
-        sample_range = range(sample_min, sample_max + 1)
-
-        j_list = map(risk_sq_func, sample_range)
+        j_list = map(risk_sq_func, height_sample)
 
         opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
 
-        return opt_val[0] - sample_eps + quad.z
+        return height_sample[opt_val[0]]
 
 
 planners = {
