@@ -2,27 +2,27 @@
     "width": 600,
     "height": 600,
     "num_quads": 1,
-    "min_height": 100,
+    "min_height": 90,
     "max_height": 250,
     "step_size": 30,
     "quad_size": 10,
     "viewing_angle": 40,
-    "num_steps": 100000,
-    "sq_height": 100,
+    "num_steps": 1000000,
+    "sq_height": 90,
     "sq_std": 120,
     "risk_constant": 100,
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,
     "show_time_grid": false,
-    "drawer": "ros",
     "practical": true,
     "names": {
         "95": "waypoint"
     },
     "planner": "rover_gaussian",
 
-    "num_risk_points": 10,
+    "num_risk_points": 3,
     "img_file": "sandbox/test_heatmap.png",
-    "out_file": "sandbox/all.txt"
+    "out_file": "sandbox/all.txt",
+    "verification_file": "sandbox/all_verify.txt"
 }

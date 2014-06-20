@@ -12,10 +12,10 @@ class Directions(object):
 
 class LawnMower(object):
 
-    def __init__(self, problem, risk_grid):
+    def __init__(self, problem, risk_grid, quads):
         self.problem = problem
         self.risk_grid = risk_grid
-        self.quad_list = self.init_quads()
+        self.quad_list = quads
         self.current_heading = [0, 1]
         self.right = [1, 0]
         self.left = [-1, 0]

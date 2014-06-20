@@ -3,7 +3,6 @@ import math
 import point
 import time
 import random
-import numpy as np
 
 
 class Quadcopter(object):

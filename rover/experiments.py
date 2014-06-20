@@ -39,9 +39,6 @@ class Experiments(object):
         self.data_file_output = self.experiments_folder +\
             "data/out_{0}_{1}.txt"
 
-        self.positions_file_output = self.experiments_folder +\
-            "positions/pos_{0}_{1}.csv"
-
         self.status_output = "Num Risk Points -> {} :: Num Quads -> {} ==="
 
     def init_experiments_folder(self):
@@ -54,7 +51,6 @@ class Experiments(object):
         os.mkdir(self.experiments_folder)
         os.mkdir(self.experiments_folder + "imgs")
         os.mkdir(self.experiments_folder + "data")
-        os.mkdir(self.experiments_folder + "positions")
         with open(self.experiments_folder + "config.json", "w") as f:
             config_str = json.dumps(self.kwargs)
             f.write(config_str)
@@ -88,7 +84,6 @@ class Experiments(object):
                 sim = simulation.Simulation(
                     problem, risk_grid,
                     out_file=self.data_file_output.format(nrp, nq),
-                    position_file=self.positions_file_output.format(nrp, nq),
                     algorithm=self.pl, show_time_grid=self.show_time_grid
                 )
 

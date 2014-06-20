@@ -17,7 +17,7 @@ class TimeGrid(object):
         current_time = time.time()
         for h in xrange(self.height):
             for w in xrange(self.width):
-                self.grid[h, w] = current_time
+                self.grid[h, w] = 1
 
     def update_grid(self, quad, ct):
         x = quad.x // self.scaling_factor

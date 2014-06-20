@@ -63,3 +63,19 @@ results are stored. Below is some code that shows how the graphs can be generate
     - Camera is set at a variable angle and therefore the planner plans
     for *x, y, z*, the camera angle, and the orientation
 
+- Fri June 20 14:20:21 Rover Gaussian
+    - Experiments with a fixed camera angle of 15 degrees
+    - Also gathering time difference data in the time grid
+
+- Fri June 20 14:20:34 Rover Gaussian
+    - Experiments with a fixed camera angle of 10 degrees
+    - Also gathering time difference data in the time grid
+
+- Fri June 20 14:20:45 Rover Gaussian
+    - Experiments with a fixed camera angle of 20 degrees
+    - Also gathering the time difference data in the time grid
+
+- Fri June 20 14:20:55 Rover Gaussian
+    - Experiments with a fixed camera angle of 0 degrees
+    - Also gathering the time difference data in the time grid
+

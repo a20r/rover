@@ -24,7 +24,6 @@ class RiskGrid(object):
 
         return self
 
-
     def remove_risk_point(self, x, y):
         for sr, ir, p in self.risk_points:
             if p.get_x() == x and p.get_y() == y:

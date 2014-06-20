@@ -65,6 +65,13 @@ class Point(object):
             self.z - other.z
         )
 
+    def __mul__(self, scalar):
+        return Point(
+            scalar * self.x,
+            scalar * self.y,
+            scalar * self.z
+        )
+
     def __eq__(self, val):
         try:
             return val.x == self.x and val.y == self.y and val.z == self.z

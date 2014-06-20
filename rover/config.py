@@ -1,7 +1,5 @@
 
 import timegrid
-import targetgrid
-import pygame.color as color
 
 
 class Problem(object):

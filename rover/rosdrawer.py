@@ -11,7 +11,6 @@ import math
 class Drawer(object):
 
     def __init__(self, problem):
-        rospy.init_node("rover", anonymous=True)
         self.pub = rospy.Publisher(
             "visualization_marker", Marker, queue_size=1000
         )
@@ -24,36 +23,6 @@ class Drawer(object):
 
     def hash32(self, value):
         return hash(value) & 0xffffffff
-
-    def draw_evader(self, e_x, e_y):
-        return self
-
-    def draw_sim_target(self):
-        if not rospy.is_shutdown():
-            marker = Marker()
-            marker.header.frame_id = "/my_frame"
-            marker.lifetime = rospy.Duration(self.duration)
-            marker.type = marker.SPHERE
-            marker.action = marker.ADD
-            marker.scale.x = 15
-            marker.scale.y = 15
-            marker.scale.z = 15
-            marker.color.a = 1.0
-            marker.color.r = 0.0
-            marker.color.g = 0.5
-            marker.color.b = 0.5
-            marker.pose.orientation.w = 1.0
-            marker.pose.position.x = self.problem.grid.lx
-            marker.pose.position.y = self.problem.grid.ly
-            marker.pose.position.z = 0
-            marker.id = -30
-            self.markers.append(marker)
-
-    def draw_coverage(self):
-        return self
-
-    def add_coverage(self, quad):
-        return self
 
     def draw_line(self, quad, x, y, z, hash_val):
         if not rospy.is_shutdown():
@@ -191,15 +160,6 @@ class Drawer(object):
 
         return None
 
-    def update_with_frame(self, frame):
-        return self
-
-    def get_key_pressed(self):
-        return self
-
     def clear_all(self):
         self.markers = collections.deque(list(), 100)
         return self
-
-    def can_play(self):
-        return False

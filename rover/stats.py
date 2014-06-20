@@ -101,3 +101,22 @@ class RiskAverage(object):
 
     def get_moving_average(self):
         return self.moving_average
+
+
+class AverageTimeDifference(object):
+
+    def __init__(self, grid):
+        self.avg = 0.0
+        self.grid = grid
+
+    def update_average_time_difference(self, current_time):
+        inner_sum = 0.0
+        for x in xrange(self.grid.width):
+            for y in xrange(self.grid.height):
+                t = self.grid.get_raw(x, y)
+                inner_sum += (current_time - t)
+
+        self.avg = inner_sum / (self.grid.width * self.grid.height)
+
+    def get_average(self):
+        return self.avg

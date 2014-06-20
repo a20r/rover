@@ -62,5 +62,7 @@ docs/_build/
 # Ctags
 tags
 
+sandbox
+
 #Chutsu stuff
 run.sh

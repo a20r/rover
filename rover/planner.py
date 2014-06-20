@@ -1,10 +1,10 @@
 
+import random
 import math
 import scipy.optimize as opt
 import point
 import lawnmower
 import scipy.stats
-import numpy as np
 import time
 
 
@@ -71,8 +71,7 @@ class PlannerInterface(object):
             x, y, out = self.constrain(x, y)
 
             if out:
-                inner_angle += self.angle_step
-                continue
+                raise ValueError()
 
             time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
             total_time += self.problem.grid[x, y]
@@ -106,7 +105,7 @@ class PlannerInterface(object):
                 x, y, i_angle, avg_time = self.get_sample_direction(
                     angle, quad, beta
                 )
-            except ZeroDivisionError:
+            except ValueError:
                 continue
             finally:
                 angle += self.angle_range
@@ -149,14 +148,14 @@ class PlannerInterface(object):
             initial_sample_phi = self.problem.initial_camera_angle -\
                     self.problem.camera_angle_freedom
 
-        sample_phis = np.random.randint(
+        sample_phis = self.get_random_list(
             initial_sample_phi,
             self.problem.initial_camera_angle +
             self.problem.camera_angle_freedom + 1,
             num_samples_phi
         )
 
-        sample_betas = np.random.randint(
+        sample_betas = self.get_random_list(
             quad.beta - self.problem.orientation_freedom,
             quad.beta + self.problem.orientation_freedom + 1,
             num_samples_beta
@@ -183,14 +182,22 @@ class PlannerInterface(object):
     def get_next_configuration(self, quad):
         heading, beta, phi  = self.get_new_direction(quad)
         new_z = self.determine_height(quad)
-        heading.set_z(new_z - quad.get_z())
-        return heading.to_unit_vector(), beta, phi
+        uheading = heading.to_unit_vector()
+        uheading.set_z(new_z - quad.get_z())
+        return uheading, beta, phi
 
     def step(self):
         for quad in self.quad_list:
             self.update_quad(quad)
 
         return self.quad_list
+
+    def get_random_list(self, nmin, nmax, num):
+        ret_list = list()
+        for _ in xrange(num):
+            ret_list.append(random.randint(nmin, nmax))
+
+        return ret_list
 
 
 class PlannerMonotonic(PlannerInterface):
@@ -253,16 +260,16 @@ class PlannerGaussian(PlannerInterface):
         quad.intify()
         risk_sq_func = self.get_risk_sq_func(quad.x, quad.y, quad.phi)
 
-        num_samples = 20
-        height_sample = np.linspace(
-            self.problem.sq_height, self.problem.max_height, num_samples
-        )
+        sample_eps = 5
+        sample_min = quad.z - sample_eps
+        sample_max = quad.z + sample_eps
+        sample_range = range(sample_min, sample_max + 1)
 
-        j_list = map(risk_sq_func, height_sample)
+        j_list = map(risk_sq_func, sample_range)
 
         opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
 
-        return height_sample[opt_val[0]]
+        return opt_val[0] - sample_eps + quad.z
 
 
 planners = {

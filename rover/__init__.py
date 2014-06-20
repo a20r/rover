@@ -6,7 +6,6 @@ import riskgrid
 import plot
 import experiments
 import planner
-import drawer
 import rospy
 
 
@@ -32,11 +31,8 @@ def run(**kwargs):
         )
 
         sim = simulation.Simulation(
-            problem, risk_grid, drawer=dr,
-            out_file=kwargs.get("out_file", "data/all.txt"),
-            algorithm=pl, practical=kwargs.get("practical", False),
-            show_time_grid=kwargs.get("show_time_grid", False),
-            names=kwargs.get("names", dict())
+            problem, risk_grid, drawer=dr, algorithm=pl,
+            **kwargs
         )
 
         try:
