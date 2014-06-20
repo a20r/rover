@@ -13,7 +13,7 @@
     "sq_std": 120,
     "risk_constant": 100,
     "camera_angle_freedom": 0,
-    "initial_camera_angle": 0,
+    "initial_camera_angle": 15,
     "orientation_freedom": 20,
     "show_time_grid": false,
 
