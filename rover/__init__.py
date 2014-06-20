@@ -7,6 +7,7 @@ import plot
 import experiments
 import planner
 import rospy
+import plannergauss
 
 
 def run(**kwargs):
@@ -27,7 +28,7 @@ def run(**kwargs):
 
         pl = planner.planners.get(
             kwargs.get("planner", "rover_gaussian"),
-            planner.PlannerGaussian
+            plannergauss.PlannerGaussian
         )
 
         sim = simulation.Simulation(

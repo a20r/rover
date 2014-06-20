@@ -1,10 +1,8 @@
 
 import random
 import math
-import scipy.optimize as opt
 import point
 import lawnmower
-import scipy.stats
 import time
 
 
@@ -22,28 +20,21 @@ class PlannerInterface(object):
         self.quad_list = quads
         self.time_threshold = 1
 
-    def constrain(self, x, y):
-        ret_x = x
-        ret_y = y
-
-        b_x = False
-        b_y = False
+    def inside_workspace(self, x, y):
+        b_x = True
+        b_y = True
 
         if x < 0:
-            ret_x = 0
-            b_x = True
+            b_x = False
         elif x >= self.problem.width:
-            ret_x = self.problem.width - 1
-            b_x = True
+            b_x = False
 
         if y < 0:
-            ret_y = 0
-            b_y = True
-        elif ret_y >= self.problem.height:
-            ret_y = self.problem.height - 1
-            b_y = True
+            b_y = False
+        elif y >= self.problem.height:
+            b_y = False
 
-        return ret_x, ret_y, b_x or b_y
+        return b_x and b_y
 
     def get_sample_direction(self, angle, quad, beta):
         beta = math.radians(beta)
@@ -68,9 +59,8 @@ class PlannerInterface(object):
 
             x = old_x * math.cos(beta) - old_y * math.sin(beta) + quad.x
             y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
-            x, y, out = self.constrain(x, y)
 
-            if out:
+            if not self.inside_workspace(x, y):
                 raise ValueError()
 
             time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
@@ -129,37 +119,8 @@ class PlannerInterface(object):
         min_phi = None
         num_samples = 10
 
-        if self.problem.camera_angle_freedom < num_samples:
-            num_samples_phi = self.problem.camera_angle_freedom + 1
-        else:
-            num_samples_phi = num_samples
-
-        if 2 * self.problem.orientation_freedom < num_samples:
-            num_samples_beta = 2 * self.problem.orientation_freedom
-        else:
-            num_samples_beta = num_samples
-
-        if (
-                self.problem.initial_camera_angle -
-                self.problem.camera_angle_freedom < 0
-        ):
-            initial_sample_phi = 0
-        else:
-            initial_sample_phi = self.problem.initial_camera_angle -\
-                    self.problem.camera_angle_freedom
-
-        sample_phis = self.get_random_list(
-            initial_sample_phi,
-            self.problem.initial_camera_angle +
-            self.problem.camera_angle_freedom + 1,
-            num_samples_phi
-        )
-
-        sample_betas = self.get_random_list(
-            quad.beta - self.problem.orientation_freedom,
-            quad.beta + self.problem.orientation_freedom + 1,
-            num_samples_beta
-        )
+        sample_phis = self.get_camera_angle_samples()
+        sample_betas = self.get_orientation_samples(quad)
 
         for n_p in sample_phis:
             quad.set_camera_angle(n_p)
@@ -174,10 +135,46 @@ class PlannerInterface(object):
                     min_beta = n_b
                     min_phi = n_p
 
-        if time.time() - min_time < self.time_threshold:
-            return point.Point(0, 0), min_beta, min_phi
-
         return min_direction, min_beta, min_phi
+
+    def get_camera_angle_samples(self):
+        num_samples = 10
+        phi_sub_phi_free = self.problem.initial_camera_angle\
+                - self.problem.camera_angle_freedom
+
+        if self.problem.camera_angle_freedom < num_samples:
+            num_samples_phi = self.problem.camera_angle_freedom + 1
+        else:
+            num_samples_phi = num_samples
+
+        if phi_sub_phi_free < 0:
+            initial_sample_phi = 0
+        else:
+            initial_sample_phi = phi_sub_phi_free
+
+        sample_phis = self.get_random_list(
+            initial_sample_phi,
+            self.problem.initial_camera_angle +
+            self.problem.camera_angle_freedom + 1,
+            num_samples_phi
+        )
+
+        return sample_phis
+
+    def get_orientation_samples(self, quad):
+        num_samples = 10
+        if 2 * self.problem.orientation_freedom < num_samples:
+            num_samples_beta = 2 * self.problem.orientation_freedom
+        else:
+            num_samples_beta = num_samples
+
+        sample_betas = self.get_random_list(
+            quad.beta - self.problem.orientation_freedom,
+            quad.beta + self.problem.orientation_freedom + 1,
+            num_samples_beta
+        )
+
+        return sample_betas
 
     def get_next_configuration(self, quad):
         heading, beta, phi  = self.get_new_direction(quad)
@@ -200,80 +197,14 @@ class PlannerInterface(object):
         return ret_list
 
 
-class PlannerMonotonic(PlannerInterface):
+""" For higher order functionality """
 
-    def risk(self, x, y, z):
-        init_risk = float(self.risk_grid.get_risk(x, y))
-        risk_val = (1 - math.pow(
-            float(z - self.problem.min_height) /
-            (
-                init_risk *
-                (self.problem.max_height - self.problem.min_height)
-            ), 2
-        ))
-
-        return risk_val
-
-    def sq(self, z):
-        return math.pow(self.problem.min_height / float(z), 2)
-
-    def get_risk_sq_func(self, x, y):
-        def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(z)
-
-        return risk_sq
-
-    def determine_height(self, quad):
-        quad.intify()
-        x, y = quad.x, quad.y
-        risk_sq_func = self.get_risk_sq_func(x, y)
-        res = opt.fsolve(risk_sq_func, self.problem.max_height)
-        return int(max(res))
-
-
-class PlannerGaussian(PlannerInterface):
-
-    def risk(self, x, y, z):
-        init_risk = float(self.risk_grid.get_risk(x, y))
-        norm_dist = scipy.stats.norm(
-            0, init_risk * self.problem.risk_constant
-        )
-
-        return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
-
-    def sq(self, z, phi):
-        hyp_dist = z / math.cos(math.radians(phi))
-        norm_dist = scipy.stats.norm(
-            self.problem.sq_height,
-            self.problem.sq_std
-        )
-
-        return norm_dist.pdf(hyp_dist) / norm_dist.pdf(self.problem.sq_height)
-
-    def get_risk_sq_func(self, x, y, phi):
-        def risk_sq(z):
-            return self.risk(x, y, z) - self.sq(z, phi)
-
-        return risk_sq
-
-    def determine_height(self, quad):
-        quad.intify()
-        risk_sq_func = self.get_risk_sq_func(quad.x, quad.y, quad.phi)
-
-        sample_eps = 5
-        sample_min = quad.z - sample_eps
-        sample_max = quad.z + sample_eps
-        sample_range = range(sample_min, sample_max + 1)
-
-        j_list = map(risk_sq_func, sample_range)
-
-        opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
-
-        return opt_val[0] - sample_eps + quad.z
+import plannergauss
+import plannermono
 
 
 planners = {
-    "rover_monotonic": PlannerMonotonic,
-    "rover_gaussian": PlannerGaussian,
+    "rover_monotonic": plannermono.PlannerMonotonic,
+    "rover_gaussian": plannergauss.PlannerGaussian,
     "lawnmower": lawnmower.LawnMower
 }

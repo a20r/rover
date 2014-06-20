@@ -10,6 +10,7 @@ import quadcopter
 import rospy
 import tf
 import violations
+import plannergauss
 from geometry_msgs.msg import Twist
 
 
@@ -21,7 +22,7 @@ class Simulation(object):
         # problem instance setup
         self.problem = problem
         self.risk_grid = risk_grid
-        self.planner_obj = kwargs.get("algorithm", planner.PlannerGaussian)
+        self.planner_obj = kwargs.get("algorithm", plannergauss.PlannerGaussian)
         self.prev_waypoints = dict()
         self.practical = kwargs.get("practical", False)
         names = kwargs.get("names", dict())
