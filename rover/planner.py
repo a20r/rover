@@ -47,15 +47,9 @@ class PlannerInterface(object):
         counter = 0
 
         while inner_angle < angle + self.angle_range / 2:
-            old_x = int(
-                quad.get_ellipse_center_dist() +
-                sample_radius_ma *
-                math.cos(inner_angle)
-            )
-            old_y = int(
-                sample_radius_mi *
-                math.sin(inner_angle)
-            )
+            x_off = quad.get_ellipse_center_dist()
+            old_x = int(x_off + sample_radius_ma * math.cos(inner_angle))
+            old_y = int(sample_radius_mi * math.sin(inner_angle))
 
             x = old_x * math.cos(beta) - old_y * math.sin(beta) + quad.x
             y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
@@ -72,7 +66,6 @@ class PlannerInterface(object):
         avg_x = 0.0
         avg_y = 0.0
         avg_angle = 0.0
-
         for (x, y, i_angle), t in time_dict.iteritems():
             weight = t / total_time
             avg_x += x * weight
@@ -125,9 +118,7 @@ class PlannerInterface(object):
         for n_p in sample_phis:
             quad.set_camera_angle(n_p)
             for n_b in sample_betas:
-                new_direction, n_time = self.get_instance_direction(
-                    quad, n_b
-                )
+                new_direction, n_time = self.get_instance_direction(quad, n_b)
 
                 if min_time is None or n_time < min_time:
                     min_time = n_time
@@ -182,12 +173,6 @@ class PlannerInterface(object):
         uheading = heading.to_unit_vector()
         uheading.set_z(new_z - quad.get_z())
         return uheading, beta, phi
-
-    def step(self):
-        for quad in self.quad_list:
-            self.update_quad(quad)
-
-        return self.quad_list
 
     def get_random_list(self, nmin, nmax, num):
         ret_list = list()
