@@ -108,14 +108,13 @@ class Simulation(object):
         return quad_list
 
     def init_quads(self):
-        current_time = time.time()
         if self.practical:
             quad_list = self.init_quads_practical()
         else:
             quad_list = self.init_quads_simulation()
 
         for quad in quad_list:
-            self.problem.grid.update_grid(quad, current_time)
+            self.problem.grid.update_grid(quad, 1)
             self.prev_waypoints[quad] = (quad.x, quad.y, quad.z, quad.beta)
 
         return quad_list
@@ -226,7 +225,6 @@ class Simulation(object):
 
     def run(self):
         for i in xrange(self.problem.num_steps):
-            current_time = time.time()
             for quad in self.quad_list:
                 try:
                     rpx, rpy, rpz, rb = self.get_configuration(quad)
