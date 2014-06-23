@@ -4,7 +4,7 @@
     "num_quads": 1,
     "min_height": 90,
     "max_height": 250,
-    "step_size": 30,
+    "step_size": 50,
     "quad_size": 10,
     "viewing_angle": 40,
     "num_steps": 1000000,

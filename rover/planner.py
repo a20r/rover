@@ -172,6 +172,9 @@ class PlannerInterface(object):
         return uheading, beta, phi
 
     def get_random_list(self, nmin, nmax, num):
+        nmin = int(nmin)
+        nmax = int(nmax)
+        num = int(num)
         ret_list = list()
         for _ in xrange(num):
             ret_list.append(random.randint(nmin, nmax))
