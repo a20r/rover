@@ -470,26 +470,33 @@ semi-major and semi-minor axes.
 The experiments seeked to show that the proposed algorithm minimizes the risk,
 maximizes the sensor quality, and provides sensor coverage to a designated
 area. The statistics recorded were comprised of the average percent of the
-total area coverage, the average sensor quality, and the average risk. The
-sensor quality and risk metrics were determined using the same functions as in
-the optimization process. The percent of the total area coverage was determined
-using a Monte Carlo process where a large number of random points (1000) with
-$x$ and $y$ values within the search area were checked to be within any of the
-sensing ellipse at each iteration. The ratio of the number of points sampled
-which are within any of the sensing ellipse to the total number of points
-sampled is what determines the percent total area coverage metric. For the
-experiments, two different independent variables were used; the number of risk
-points and the number of quadrotors. The risk points were randomly placed into
-the search space however, the random generator was seeded so the experiments
-would be deterministic and repeatable. Also, all of the risk points used were
-assigned an associated hostility and sensor range of 1 and the width of the
-search space divided by two respectively. The quadrotors all started in a
-square formation at the top left of the search space. Experiments were carried
-out by varying the number of risk points and the number of quadrotors such that
-each number or quadrotors run on every configuration of risk points. The number
-of risk points varied from 1 to 21 with a step of 2 and the number of quads
-varied from 1 to 26 with a step of 5. Each configuration was run for 1000
-iterations and each configuration only needed to be tested once because the
-process is deterministic. 
+total area coverage, the average sensor quality, the average risk, and average
+time difference within the time grid. The sensor quality and risk metrics were
+determined using the same functions as in the optimization process. The percent
+of the total area coverage was determined using a Monte Carlo process where a
+large number of random points (1000) with $x$ and $y$ values within the search
+area were checked to be within any of the sensing ellipses at each iteration.
+The ratio of the number of points sampled which are within any of the sensing
+ellipses to the total number of points sampled is what determines the percent
+of total area coverage metric. The average time difference within the time grid
+was determined by iterating through the grid and subtracting the current time
+from the time retrieved from the grid. This statistic is used to show that no
+area in the grid goes for too long a time without being sensed. As the number
+of quadrotors increases, we expect that the average time difference to decrease
+because the quadrotors are spreading through the space cooperatively and
+therefore cover the space more quickly. For the experiments, two different
+independent variables were used; the number of risk points and the number of
+quadrotors.  The risk points were randomly placed into the search space
+however, the random generator was seeded so the experiments would be
+deterministic and repeatable.  Also, all of the risk points used were assigned
+an associated hostility and sensor range of 1 and the width of the search space
+divided by two respectively. The quadrotors all started in a square formation
+at the top left of the search space.  Experiments were carried out by varying
+the number of risk points and the number of quadrotors such that each number or
+quadrotors run on every configuration of risk points.  The number of risk
+points varied from 1 to 21 with a step of 2 and the number of quads varied from
+1 to 26 with a step of 5.  Each configuration was run for 1000 iterations and
+each configuration only needed to be tested once because the process is
+deterministic. 
 
 \end{document}
