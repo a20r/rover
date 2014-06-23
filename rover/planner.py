@@ -94,10 +94,7 @@ class PlannerInterface(object):
                 angle += self.angle_range
 
             e_x, e_y = quad.get_ellipse_center()
-
-            vec_x_y = point.Point(
-                x - e_x, y - e_y
-            )
+            vec_x_y = point.Point(x - e_x, y - e_y)
 
             if min_time is None or min_time > avg_time:
                 min_time = avg_time

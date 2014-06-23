@@ -165,12 +165,14 @@ class Simulation(object):
         vc = point.Point(0, 0, 0)
         if vio == violations.X_OUT:
             vc.x = self.problem.width / 2 - quad.x
+            uvc = vc.to_unit_vector()
         elif vio == violations.Y_OUT:
             vc.y = self.problem.height / 2 - quad.y
+            uvc = vc.to_unit_vector()
         elif vio == violations.Z_OUT:
             vc.z = self.problem.sq_height - quad.z
+            uvc = vc
 
-        uvc = vc.to_unit_vector()
         expected = self.publish_configuration(
             quad, uvc, quad.beta, quad.phi, iteration
         )
