@@ -24,21 +24,21 @@ function plot_verification(data)
     hold on;
     plot(data(:, 1), data(:, x_e), 'b+', 'linewidth', 1);
     plot(data(:, 1), 100 .* data(:, x_r) + 300, 'r+', 'linewidth', 1);
-    ylim([-600 600]);
+    ylim([0 600]);
     title("X");
 
     subplot(2, 2, 2);
     hold on;
     plot(data(:, 1), data(:, y_e), 'b+', 'linewidth', 1);
     plot(data(:, 1), 100 .* data(:, y_r) + 300, 'r+', 'linewidth', 1);
-    ylim([-600 600]);
+    ylim([0 600]);
     title("Y");
 
     subplot(2, 2, 3);
     hold on;
     plot(data(:, 1), data(:, z_e), 'r+', 'linewidth', 1);
     plot(data(:, 1), 100 .* data(:, z_r), 'b+', 'linewidth', 1);
-    ylim([-600 600]);
+    ylim([0 600]);
     title("Z");
 
     subplot(2, 2, 4);
@@ -46,6 +46,14 @@ function plot_verification(data)
     plot(data(:, 1), data(:, b_e), 'b+-', 'linewidth', 4);
     plot(data(:, 1), data(:, b_r), 'r+-', 'linewidth', 4);
     title("Beta");
+
+    figure;
+    plot(data(:, x_e), data(:, y_e), 'b+', 'linewidth', 2);
+    hold on;
+    plot(100 .* data(:, x_r) + 300, 100 .* data(:, y_r) + 300, 'r+', 'linewidth', 2);
+    ylim([0, 600]);
+    xlim([0, 600]);
+
 endfunction
 
 function run()

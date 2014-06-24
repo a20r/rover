@@ -1,10 +1,10 @@
 
-import planner
+from planner import PlannerInterface
 import math
 import scipy.stats
 
 
-class PlannerGaussian(planner.PlannerInterface):
+class PlannerGaussian(PlannerInterface):
 
     def risk(self, x, y, z):
         init_risk = float(self.risk_grid.get_risk(x, y))

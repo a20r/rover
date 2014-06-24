@@ -72,6 +72,9 @@ Related Work Survey
 
 - **In press. M. Kuhlman et al. ICRA 2014.**
 
+- **URL**: http://www.nrl.navy.mil/itd/aic/sites/www.nrl.navy.mil.itd.aic/
+files/pdfs/Kuhlman_2014_ICRA_IP_MDP.pdf
+
 - Tries to solve the problem of informed single vehicle persistent monitoring
   of a given area.
 
@@ -117,6 +120,8 @@ Related Work Survey
 
 - **BibTeX**: Hover09
 
+- **URL**: http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=5354367
+
 - A path planning algorithm for continuous replanning based on predictions made
   by the assimilated data gathered during planner execution.
 
@@ -129,3 +134,11 @@ Related Work Survey
 
 - The planner does not scale well. The solution works for small to mid-scaled
   problems.
+
+### Cooperative Control of UAVs for Search and Coverage
+
+- **BibTex**: Pappas06
+
+- **URL**: http://wiki.grasp.upenn.edu/uploads/ICARUS/AUVSI_paper.pdf
+
+- 

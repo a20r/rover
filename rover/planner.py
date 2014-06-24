@@ -2,7 +2,6 @@
 import random
 import math
 import point
-import lawnmower
 
 
 class PlannerInterface(object):
@@ -184,6 +183,7 @@ class PlannerInterface(object):
 
 import plannergauss
 import plannermono
+import lawnmower
 
 
 planners = {

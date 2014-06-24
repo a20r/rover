@@ -233,10 +233,7 @@ class Simulation(object):
                 try:
                     rpx, rpy, rpz, rb = self.get_configuration(quad)
                 except tf.Exception as e:
-                    rpx = quad.x
-                    rpy = quad.y
-                    rpz = quad.z
-                    rb = quad.b
+                    rpx, rpy, rpz, rb = quad.x, quad.y, quad.z, quad.beta
                     print e
                 finally:
                     quad.set_position(rpx, rpy, rpz)
