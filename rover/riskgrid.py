@@ -19,7 +19,7 @@ class RiskGrid(object):
             x = random.randint(0, self.problem.width)
             y = random.randint(0, self.problem.height)
             sensor_range = min(self.problem.width, self.problem.height) / 2.0
-            init_risk = 1 # because of minimization
+            init_risk = 1  # because of minimization
             self.add_risk_point(x, y, sensor_range, init_risk)
 
         return self

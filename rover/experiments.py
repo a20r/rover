@@ -8,7 +8,6 @@ import time
 import os
 import json
 import planner
-import rosdrawer
 
 
 class Experiments(object):

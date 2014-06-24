@@ -1,10 +1,7 @@
 
-import planner
 import point
-import time
 import stats
 import plot
-import random
 import math
 import quadcopter
 import rospy
@@ -22,7 +19,9 @@ class Simulation(object):
         # problem instance setup
         self.problem = problem
         self.risk_grid = risk_grid
-        self.planner_obj = kwargs.get("algorithm", plannergauss.PlannerGaussian)
+        self.planner_obj = kwargs.get(
+            "algorithm", plannergauss.PlannerGaussian
+        )
         self.prev_waypoints = dict()
         self.practical = kwargs.get("practical", False)
         names = kwargs.get("names", dict())
@@ -128,8 +127,8 @@ class Simulation(object):
         waypoint.linear.x = quad.x + heading.x * self.problem.step_size
         waypoint.linear.y = quad.y + heading.y * self.problem.step_size
         waypoint.linear.z = quad.z + heading.z
-        pub_waypoint = self.convert_coordinates_vicon(waypoint)
 
+        pub_waypoint = self.convert_coordinates_vicon(waypoint)
         self.pubs[quad.get_name()].publish(pub_waypoint)
         return waypoint.linear.x, waypoint.linear.y, waypoint.linear.z, beta
 
@@ -220,7 +219,10 @@ class Simulation(object):
         if quad.y > self.problem.height or quad.y < 0:
             return False, violations.Y_OUT
 
-        if quad.z > self.problem.max_height or quad.z < self.problem.min_height:
+        too_high = quad.z > self.problem.max_height
+        too_low = quad.z < self.problem.min_height
+
+        if too_high or too_low:
             return False, violations.Z_OUT
 
         return True, violations.NONE
@@ -280,7 +282,7 @@ class Simulation(object):
             for quad in self.quad_list:
                 self.drawer.draw_quad(quad)
 
-            frame = self.drawer.update()
+            self.drawer.update()
 
     def update_stats(self, iteration):
         self.mca.update_average_efficiency(self.quad_list)

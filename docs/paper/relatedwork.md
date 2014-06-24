@@ -6,6 +6,8 @@ Related Work Survey
 
 - **URL**: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6564676
 
+- **BibTeX**: Ergezer14 
+
 - Plans the paths of UAVs in 3 dimensions that avoids forbidden regions and
   maximizes information collection from desired regions
 
@@ -25,6 +27,8 @@ Related Work Survey
 ### Path Planning of Autonomous Underwater Vehicles for Adaptive Sampling Using Mixed Integer Linear Programming
 
 - **URL**: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4768634
+
+- **BibTeX**: Yilmaz08 
 
 - Path planning algorithm that optimizes an objective function to move around
   the ocean to collect information about desired regions
@@ -87,3 +91,41 @@ Related Work Survey
 
 - Lastly, the approach is only feasible for a single vehicle, for multiple
   vehicles the solution would scale exponentially.
+
+### Application of Grazing-Inspired Guidance Laws to Autonomous Information Gathering
+
+- **In press. T. Apker et al. Accepted to IROS 2014**
+
+- Bio-inspired algorithm that uses simple laws derived from animal grazing
+  behaviour to guide a swarm of robots to cooperatively gather information
+  about the environment.
+
+- Uses fixed altitude quadrotors as the agent. Does not account for regions of
+  risk but does encode desired regions in the evidence grid used as the "food"
+  for grazing
+
+- Results have shown that the grazing behaviour converges more quickly to total
+  information coverage than traditional lawnmower approaches. 
+
+- Paper seems to care more about the practicality of the sensor fusion,
+  bandwidth, and control than the theoretic path planning
+
+- The work in its current form seems to only be concerned with static
+  information surfaces. 
+
+### Path planning for data assimilation in mobile environmental monitoring systems
+
+- **BibTeX**: Hover09
+
+- A path planning algorithm for continuous replanning based on predictions made
+  by the assimilated data gathered during planner execution.
+
+- Predictive models are made based on the sensor data assimilation. These
+  models are used to re-plan the motion of the autonomous aquatic surface
+  vehicle.
+
+- The current implementation does not take depth into account and only plans in
+  two dimensions.
+
+- The planner does not scale well. The solution works for small to mid-scaled
+  problems.

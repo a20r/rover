@@ -3,7 +3,6 @@ import random
 import math
 import point
 import lawnmower
-import time
 
 
 class PlannerInterface(object):
@@ -107,7 +106,6 @@ class PlannerInterface(object):
         min_direction = None
         min_beta = None
         min_phi = None
-        num_samples = 10
 
         sample_phis = self.get_camera_angle_samples()
         sample_betas = self.get_orientation_samples(quad)
@@ -128,7 +126,7 @@ class PlannerInterface(object):
     def get_camera_angle_samples(self):
         num_samples = 10
         phi_sub_phi_free = self.problem.initial_camera_angle\
-                - self.problem.camera_angle_freedom
+            - self.problem.camera_angle_freedom
 
         if self.problem.camera_angle_freedom < num_samples:
             num_samples_phi = self.problem.camera_angle_freedom + 1
@@ -165,7 +163,7 @@ class PlannerInterface(object):
         return sample_betas
 
     def get_next_configuration(self, quad):
-        heading, beta, phi  = self.get_new_direction(quad)
+        heading, beta, phi = self.get_new_direction(quad)
         new_z = self.determine_height(quad)
         uheading = heading.to_unit_vector()
         uheading.set_z(new_z - quad.get_z())

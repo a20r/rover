@@ -56,7 +56,7 @@ class TimeGridPlotter(object):
         self.y = np.arange(self.y_min, self.y_max, self.y_step)
         self.X, self.Y = np.meshgrid(self.x, self.y)
         plt.ion()
-        Z = self.get_zs()
+        self.get_zs()
         self.ax.set_xlim(self.x_min, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
 
@@ -114,4 +114,3 @@ def plot_time_grid(time_grid, filename):
 
     plt.savefig(filename)
     return plt
-
