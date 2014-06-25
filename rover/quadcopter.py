@@ -1,7 +1,6 @@
 
 import math
 import point
-import time
 import random
 
 
@@ -136,4 +135,3 @@ class Quadcopter(object):
 
     def __hash__(self):
         return self.hash_val
-

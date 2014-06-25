@@ -1,10 +1,10 @@
 
-import planner
+from planner import PlannerInterface
 import math
 import scipy.stats
 
 
-class PlannerGaussian(planner.PlannerInterface):
+class PlannerGaussian(PlannerInterface):
 
     def risk(self, x, y, z):
         init_risk = float(self.risk_grid.get_risk(x, y))
@@ -43,5 +43,3 @@ class PlannerGaussian(planner.PlannerInterface):
         opt_val = min(list(enumerate(j_list)), key=lambda v: v[1])
 
         return opt_val[0] - sample_eps + quad.z
-
-

@@ -1,5 +1,4 @@
 
-import time
 import math
 import numpy as np
 
@@ -14,7 +13,6 @@ class TimeGrid(object):
         self.init_grid(self.grid)
 
     def init_grid(self, grid):
-        current_time = time.time()
         for h in xrange(self.height):
             for w in xrange(self.width):
                 self.grid[h, w] = 1

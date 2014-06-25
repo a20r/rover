@@ -37,7 +37,6 @@ class MonteCarloArea(object):
                 el_eval_x = pow(X - h, 2) / float(pow(r_ma, 2))
                 el_eval_y = pow(Y - k, 2) / float(pow(r_mi, 2))
 
-
                 if el_eval_x + el_eval_y <= 1:
                     num_in += 1
                     break

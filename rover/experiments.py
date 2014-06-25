@@ -28,7 +28,7 @@ class Experiments(object):
         self.show_time_grid = kwargs.get("show_time_grid", False)
 
         self.pl = planner.planners.get(
-            self.planner_name, planner.PlannerGaussian
+            self.planner_name
         )
 
         self.init_experiments_folder()

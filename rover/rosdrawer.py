@@ -1,10 +1,8 @@
 
-import pygame.color as color
 import collections
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
 import rospy
-import random
 import math
 
 

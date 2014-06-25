@@ -22,27 +22,38 @@ function plot_verification(data)
     figure;
     subplot(2, 2, 1);
     hold on;
-    plot(data(:, 1), data(:, x_e), 'b+-', 'linewidth', 4);
-    plot(data(:, 1), data(:, x_r), 'r+-', 'linewidth', 4);
+    plot(data(:, 1), data(:, x_e), 'bo', 'linewidth', 1);
+    plot(data(:, 1), data(:, x_r), 'r+', 'linewidth', 1);
+    ylim([0 600]);
     title("X");
 
     subplot(2, 2, 2);
     hold on;
-    plot(data(:, 1), data(:, y_e), 'b+-', 'linewidth', 4);
-    plot(data(:, 1), data(:, y_r), 'r+-', 'linewidth', 4);
+    plot(data(:, 1), data(:, y_e), 'bo', 'linewidth', 1);
+    plot(data(:, 1), data(:, y_r), 'r+', 'linewidth', 1);
+    ylim([0 600]);
     title("Y");
 
     subplot(2, 2, 3);
     hold on;
-    plot(data(:, 1), data(:, z_e), 'b+-', 'linewidth', 4);
-    plot(data(:, 1), data(:, z_r), 'r+-', 'linewidth', 4);
+    plot(data(:, 1), data(:, z_e), 'r+', 'linewidth', 1);
+    plot(data(:, 1), data(:, z_r), 'bo', 'linewidth', 1);
+    ylim([0 300]);
     title("Z");
 
     subplot(2, 2, 4);
     hold on;
-    plot(data(:, 1), data(:, b_e), 'b+-', 'linewidth', 4);
-    plot(data(:, 1), data(:, b_r), 'r+-', 'linewidth', 4);
+    plot(data(:, 1), data(:, b_e), 'bo', 'linewidth', 4);
+    plot(data(:, 1), data(:, b_r), 'r+', 'linewidth', 4);
     title("Beta");
+
+    figure;
+    plot(data(:, x_e), data(:, y_e), 'bo', 'linewidth', 2);
+    hold on;
+    plot(data(:, x_r), data(:, y_r), 'r+', 'linewidth', 2);
+    ylim([0, 600]);
+    xlim([0, 600]);
+
 endfunction
 
 function run()

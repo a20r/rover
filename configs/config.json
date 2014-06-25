@@ -1,14 +1,12 @@
 {
     "width": 1000,
     "height": 1000,
-    "num_quads": 10,
+    "num_quads": 1,
     "min_height": 60,
     "max_height": 200,
     "step_size": 20,
-    "quad_size": 4,
-    "evader_size": 6,
     "viewing_angle": 50,
-    "num_steps": 100,
+    "num_steps": 1000,
     "sq_height": 90,
     "sq_std": 120,
     "risk_constant": 100,
@@ -21,5 +19,6 @@
 
     "num_risk_points": 10,
     "img_file": "sandbox/test_heatmap.png",
-    "out_file": "sandbox/all.txt"
+    "out_file": "sandbox/all.txt",
+    "verification_file": "sandbox/all_verify.txt"
 }
