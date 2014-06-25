@@ -90,3 +90,16 @@ def get_random_point_3d(width, height, depth):
     p = get_random_point(width, height)
     p.set_z(random.randint(0, depth))
     return p
+
+def get_noisy_point(std):
+    p = Point(0, 0, 0)
+    p.set_x(random.gauss(0, std))
+    p.set_y(random.gauss(0, std))
+    return p
+
+def get_noisy_point_3d(std):
+    p = Point(0, 0, 0)
+    p.set_x(random.gauss(0, std))
+    p.set_y(random.gauss(0, std))
+    p.set_z(random.gauss(0, std))
+    return p

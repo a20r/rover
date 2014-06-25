@@ -7,32 +7,42 @@ import quadcopter
 import rospy
 import tf
 import violations
+import controller
 from geometry_msgs.msg import Twist
 
 
 class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
-        rospy.init_node("rover", anonymous=True)
+        rospy.init_node("rover", anonymous=False)
+        self.init_problem_instance(problem, risk_grid, kwargs)
+        self.init_configurations(problem, risk_grid, kwargs)
+        self.init_visualizations(problem, risk_grid, kwargs)
+        self.init_statistics(problem, risk_grid, kwargs)
 
+    def init_problem_instance(self, problem, risk_grid, kwargs):
         # problem instance setup
         self.problem = problem
         self.risk_grid = risk_grid
         self.planner_obj = kwargs.get("algorithm")
         self.prev_waypoints = dict()
         self.practical = kwargs.get("practical", False)
-        names = kwargs.get("names", dict())
+        self.names = kwargs.get("names", dict())
 
+    def init_configurations(self, problem, risk_grid, kwargs):
         # ROS stuff
         self.listener = tf.TransformListener()
-        self.pubs = self.init_pubs(names)
+        self.pubs = self.init_pubs(self.names)
         self.quad_list = self.init_quads()
+        self.controllers = self.init_controllers()
         self.pl = self.planner_obj(problem, risk_grid, self.quad_list)
 
+    def init_visualizations(self, problem, risk_grid, kwargs):
         # visualization variables
         self.drawer = kwargs.get("drawer", None)
         self.show_time_grid = kwargs.get("show_time_grid", True)
 
+    def init_statistics(self,problem, risk_grid, kwargs):
         # statistics gathering classes
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(self.pl)
@@ -103,6 +113,14 @@ class Simulation(object):
 
         return quad_list
 
+    def init_controllers(self):
+        controllers = dict()
+        for quad in self.quad_list:
+            clr = controller.PID(quad, 1, 0.07, 0.5)
+            controllers[quad] = clr
+
+        return controllers
+
     def init_quads(self):
         if self.practical:
             quad_list = self.init_quads_practical()
@@ -130,14 +148,19 @@ class Simulation(object):
         return waypoint.linear.x, waypoint.linear.y, waypoint.linear.z, beta
 
     def publish_simulated_configuration(self, quad, heading, beta, phi):
-        quad.set_position(
+        # Add control theory stuff here
+        waypoint = point.Point(
             quad.x + heading.get_x() * self.problem.step_size,
             quad.y + heading.get_y() * self.problem.step_size,
             quad.z + heading.get_z()
         )
+
+        self.controllers[quad].publish_waypoint(waypoint)
+
+        # quad.set_position(waypoint.x, waypoint.y, waypoint.z)
         quad.set_orientation(beta)
         quad.set_camera_angle(phi)
-        return quad.x, quad.y, quad.z, quad.beta
+        return waypoint.x, waypoint.y, waypoint.z, quad.beta
 
     def publish_configuration(self, quad, heading, beta, phi, iteration):
         if self.practical:
