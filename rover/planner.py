@@ -17,6 +17,11 @@ class PlannerInterface(object):
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
         self.time_threshold = 1
+        self.init_num_samples()
+
+    def init_num_samples(self):
+        self.num_surf_samples = 10
+        self.num_pos_samples = 10
 
     def inside_workspace(self, x, y):
         b_x = True
@@ -34,93 +39,45 @@ class PlannerInterface(object):
 
         return b_x and b_y
 
-    def get_sample_direction(self, angle, quad, beta):
-        beta = math.radians(beta)
-        sample_radius_ma = quad.get_ellipse_major() + self.radius_ext
-        sample_radius_mi = quad.get_ellipse_minor() + self.radius_ext
-        inner_angle = angle - self.angle_range / 2
-
-        time_dict = dict()
-        total_time = 0.0
-        counter = 0
-
-        while inner_angle < angle + self.angle_range / 2:
-            x_off = quad.get_ellipse_center_dist()
-            old_x = int(x_off + sample_radius_ma * math.cos(inner_angle))
-            old_y = int(sample_radius_mi * math.sin(inner_angle))
-
-            x = old_x * math.cos(beta) - old_y * math.sin(beta) + quad.x
-            y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
-
-            if not self.inside_workspace(x, y):
-                raise ValueError()
-
-            time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
-            total_time += self.problem.grid[x, y]
-            counter += 1
-
-            inner_angle += self.angle_step
-
-        avg_x = 0.0
-        avg_y = 0.0
-        avg_angle = 0.0
-        for (x, y, i_angle), t in time_dict.iteritems():
-            weight = t / total_time
-            avg_x += x * weight
-            avg_y += y * weight
-            avg_angle += i_angle * weight
-
-        return avg_x, avg_y, avg_angle, total_time / counter
-
-    def get_instance_direction(self, quad, beta):
-        """
-        Returns the unit vector of the direction the quad should go
-        """
-
-        angle = float(0)
-        min_time = None
-        min_x_y = None
-
-        while angle < 2 * math.pi + self.angle_range:
-            try:
-                x, y, i_angle, avg_time = self.get_sample_direction(
-                    angle, quad, beta
-                )
-            except ValueError:
-                continue
-            finally:
-                angle += self.angle_range
-
-            e_x, e_y = quad.get_ellipse_center()
-            vec_x_y = point.Point(x - e_x, y - e_y)
-
-            if min_time is None or min_time > avg_time:
-                min_time = avg_time
-                min_x_y = vec_x_y
-
-        return min_x_y, min_time
-
     def get_new_direction(self, quad):
-        min_time = None
-        min_direction = None
-        min_beta = None
-        min_phi = None
-
-        sample_phis = self.get_camera_angle_samples()
-        sample_betas = self.get_orientation_samples(quad)
-
-        for n_p in sample_phis:
-            quad.set_camera_angle(n_p)
-            for n_b in sample_betas:
-                new_direction, n_time = self.get_instance_direction(quad, n_b)
-
-                if min_time is None or n_time < min_time:
-                    min_time = n_time
-                    min_direction = new_direction
-                    min_beta = n_b
-                    min_phi = n_p
-
+        # work on this shit dude
         return min_direction, min_beta, min_phi
+
+    def rotate(self, x, y, x0, y0, angle):
+        xn = x * math.cos(angle) - y * math.sin(angle) + x0
+        yn = y * math.cos(angle) + x * math.sin(angle) + y0
+        return xn, yn
+
+    def get_surface_samples(self, quad, beta):
+        ps = list()
+        r_ma = int(quad.get_ellipse_major())
+        r_mi = int(quad.get_ellipse_minor())
+        h = quad.get_ellipse_center_dist()
+        k = 0
+
+        xs_o = self.get_random_list(h - r_ma, h + r_ma, self.num_surf_samples)
+        ys_o = self.get_random_list(k - r_mi, k + r_mi, self.num_surf_samples)
+
+        for x, y in zip(xs_o, ys_o):
+            el_eval_x = math.pow(x - h, 2) / math.pow(r_ma, 2)
+            el_eval_y = math.pow(y - k, 2) / math.pow(r_mi, 2)
+
+            if el_eval_x + el_eval_y <= 1:
+                xr, yr = self.rotate(x, y, quad.x, quad.y, beta)
+                if self.inside_workspace(xr, yr):
+                    ps.append(point.Point(xr, yr))
+        return ps
+
+    def get_position_samples(self, quad):
+        angles = np.linspace(0, 2 * math.pi, self.num_pos_samples)
+        ps = list()
+        for angle in angles:
+            r = random.random() * self.problem.step_size
+            x = r * math.cos(angle)
+            y = r * math.sin(angle)
+            ps.append(point.Point(x, y))
+
+        return ps
 
     def get_camera_angle_samples(self):
         num_samples = 10
