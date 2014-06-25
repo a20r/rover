@@ -38,7 +38,7 @@ function plot_verification(data)
     hold on;
     plot(data(:, 1), data(:, z_e), 'r+', 'linewidth', 1);
     plot(data(:, 1), data(:, z_r), 'bo', 'linewidth', 1);
-    ylim([0 600]);
+    ylim([0 300]);
     title("Z");
 
     subplot(2, 2, 4);
