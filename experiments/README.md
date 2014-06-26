@@ -79,3 +79,8 @@ results are stored. Below is some code that shows how the graphs can be generate
     - Experiments with a fixed camera angle of 0 degrees
     - Also gathering the time difference data in the time grid
 
+- Wed June 25 18:00:50 Rover Gaussian
+    - Experiments using a fixed camera angle of 15 degrees
+    - The area of the workspace was 2000x2000
+    - 25, 30, 35 boids with varying number of risk points were used
+
