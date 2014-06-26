@@ -14,7 +14,7 @@ from geometry_msgs.msg import Twist
 class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
-        rospy.init_node("rover", anonymous=False)
+        rospy.init_node("rover", anonymous=True)
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_configurations(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
@@ -42,7 +42,7 @@ class Simulation(object):
         self.drawer = kwargs.get("drawer", None)
         self.show_time_grid = kwargs.get("show_time_grid", True)
 
-    def init_statistics(self,problem, risk_grid, kwargs):
+    def init_statistics(self, problem, risk_grid, kwargs):
         # statistics gathering classes
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(self.pl)
@@ -116,7 +116,7 @@ class Simulation(object):
     def init_controllers(self):
         controllers = dict()
         for quad in self.quad_list:
-            clr = controller.PID(quad, 1, 0.07, 0.5)
+            clr = controller.PID(quad, 1, 0, 0.5)
             controllers[quad] = clr
 
         return controllers
@@ -157,7 +157,8 @@ class Simulation(object):
 
         self.controllers[quad].publish_waypoint(waypoint)
 
-        # quad.set_position(waypoint.x, waypoint.y, waypoint.z)
+        #  Uncomment this line if you want dynamics dude
+        #  quad.set_position(waypoint.x, waypoint.y, waypoint.z)
         quad.set_orientation(beta)
         quad.set_camera_angle(phi)
         return waypoint.x, waypoint.y, waypoint.z, quad.beta
