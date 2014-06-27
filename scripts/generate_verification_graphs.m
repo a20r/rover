@@ -54,6 +54,19 @@ function plot_verification(data)
     ylim([0, 600]);
     xlim([0, 600]);
 
+    figure;
+    x = data(:, x_e);
+    y = data(:, y_e);
+    z = data(:, z_e);
+
+    risk = load("sandbox/risk.out");
+    risk = reshape(risk, 100, 100)
+    nq = 3;
+    plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
+    hold on;
+    plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
+    plot3(x(3:nq:end), y(3:nq:end), z(3:nq:end), 'g', 'linewidth', 2);
+
 endfunction
 
 function run()

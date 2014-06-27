@@ -1,7 +1,7 @@
 {
     "width": 1000,
     "height": 1000,
-    "num_quads": 5,
+    "num_quads": 3,
     "min_height": 60,
     "max_height": 200,
     "step_size": 20,

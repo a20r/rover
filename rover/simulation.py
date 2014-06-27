@@ -114,9 +114,10 @@ class Simulation(object):
         return quad_list
 
     def init_controllers(self):
+        Kp, Ki, Kd = 1, 0, 0.5
         controllers = dict()
         for quad in self.quad_list:
-            clr = controller.PID(quad, 1, 0, 0.5)
+            clr = controller.PID(quad, Kp, Ki, Kd)
             controllers[quad] = clr
 
         return controllers
@@ -157,7 +158,7 @@ class Simulation(object):
 
         self.controllers[quad].publish_waypoint(waypoint)
 
-        #  Uncomment this line if you want dynamics dude
+        #  Uncomment this line if dont you want dynamics dude
         #  quad.set_position(waypoint.x, waypoint.y, waypoint.z)
         quad.set_orientation(beta)
         quad.set_camera_angle(phi)

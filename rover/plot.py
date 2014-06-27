@@ -28,6 +28,7 @@ def plot_risk_grid(risk_grid, filename):
         ]
     )
 
+    np.savetxt("sandbox/risk.out", zs)
     Z = zs.reshape(X.shape)
     ax.pcolormesh(X, Y, Z, cmap=cm.jet)
 
