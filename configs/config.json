@@ -17,7 +17,7 @@
     "practical": false,
     "planner": "rover_gaussian",
 
-    "num_risk_points": 2,
+    "num_risk_points": 4,
     "img_file": "sandbox/test_heatmap.png",
     "out_file": "sandbox/all.txt",
     "verification_file": "sandbox/all_verify.txt"
