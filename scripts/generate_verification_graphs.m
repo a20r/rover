@@ -31,12 +31,37 @@ function plot_verification(data)
     yi = 0:10:999;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
-    contour3(X, Y, risk);
+    % contour3(X, Y, risk);
+    pcolor(X, Y, risk);
+    shading interp;
+    colormap("pink");
+    colorbar;
+    % colorbar;
     hold on;
     plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
     plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
-    xlabel("X"); ylabel("Y"); zlabel("Z");
-    % plot3(x(3:nq:end), y(3:nq:end), z(3:nq:end), 'g', 'linewidth', 2);
+    view(314, 36);
+    xlabel("X"); ylabel("Y"); zlabel("Z"); box off;
+    print("sandbox/trajectories.png", "-dpng");
+
+    figure;
+    pcolor(X, Y, risk);
+    colormap("pink");
+    shading interp;
+    colorbar;
+    print("sandbox/heatmap.png", "-dpng");
+
+    figure;
+    xi = 0:4:999;
+    yi = 0:4:999;
+    [X Y] = meshgrid(xi, yi);
+    grid = load("sandbox/grid.out");
+    grid = grid'';
+    pcolor(X,Y,grid);
+    xlabel("X"); ylabel("Y");
+    colorbar;
+    shading interp;
+    print("sandbox/grid.png", "-dpng");
 
 endfunction
 
