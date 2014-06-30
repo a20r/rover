@@ -81,6 +81,7 @@ class TimeGridPlotter(object):
         self.graph = self.ax.pcolormesh(self.X, self.Y, Z, cmap=cm.jet)
         plt.draw()
         plt.pause(0.0001)
+        np.savetxt("sandbox/grid.out", self.time_grid.grid)
 
 
 def plot_time_grid(time_grid, filename):

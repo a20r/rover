@@ -20,57 +20,48 @@ function plot_verification(data)
     b_r = 9;
 
     figure;
-    subplot(2, 2, 1);
-    hold on;
-    plot(data(:, 1), data(:, x_e), 'bo', 'linewidth', 1);
-    plot(data(:, 1), data(:, x_r), 'r+', 'linewidth', 1);
-    ylim([0 600]);
-    title("X");
-
-    subplot(2, 2, 2);
-    hold on;
-    plot(data(:, 1), data(:, y_e), 'bo', 'linewidth', 1);
-    plot(data(:, 1), data(:, y_r), 'r+', 'linewidth', 1);
-    ylim([0 600]);
-    title("Y");
-
-    subplot(2, 2, 3);
-    hold on;
-    plot(data(:, 1), data(:, z_e), 'r+', 'linewidth', 1);
-    plot(data(:, 1), data(:, z_r), 'bo', 'linewidth', 1);
-    ylim([0 300]);
-    title("Z");
-
-    subplot(2, 2, 4);
-    hold on;
-    plot(data(:, 1), data(:, b_e), 'bo', 'linewidth', 4);
-    plot(data(:, 1), data(:, b_r), 'r+', 'linewidth', 4);
-    title("Beta");
-
-    figure;
-    plot(data(:, x_e), data(:, y_e), 'bo', 'linewidth', 2);
-    hold on;
-    plot(data(:, x_r), data(:, y_r), 'r+', 'linewidth', 2);
-    ylim([0, 600]);
-    xlim([0, 600]);
-
-    figure;
     x = data(:, x_e);
     y = data(:, y_e);
     z = data(:, z_e);
 
     risk = load("sandbox/risk.out");
-    risk = flipud(reshape(risk, 100, 100));
+    risk = reshape(risk, 100, 100);
+    risk = risk';
     xi = 0:10:999;
     yi = 0:10:999;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
-    contour3(X, Y, risk);
+    % contour3(X, Y, risk);
+    pcolor(X, Y, risk);
+    shading interp;
+    colormap("pink");
+    colorbar;
+    % colorbar;
     hold on;
     plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
     plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
-    xlabel("x"); ylabel("y");
-    % plot3(x(3:nq:end), y(3:nq:end), z(3:nq:end), 'g', 'linewidth', 2);
+    view(314, 36);
+    xlabel("X"); ylabel("Y"); zlabel("Z"); box off;
+    print("sandbox/trajectories.png", "-dpng");
+
+    figure;
+    pcolor(X, Y, risk);
+    colormap("pink");
+    shading interp;
+    colorbar;
+    print("sandbox/heatmap.png", "-dpng");
+
+    figure;
+    xi = 0:4:999;
+    yi = 0:4:999;
+    [X Y] = meshgrid(xi, yi);
+    grid = load("sandbox/grid.out");
+    grid = grid'';
+    pcolor(X,Y,grid);
+    xlabel("X"); ylabel("Y");
+    colorbar;
+    shading interp;
+    print("sandbox/grid.png", "-dpng");
 
 endfunction
 
