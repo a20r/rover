@@ -17,7 +17,7 @@
     "show_time_grid": false,
     "practical": true,
     "names": {
-        "95": "waypoint"
+        "95": "cmd_vel"
     },
     "planner": "rover_gaussian",
 

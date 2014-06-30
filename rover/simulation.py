@@ -53,6 +53,7 @@ class Simulation(object):
     def init_pubs(self, names):
         pub_dict = dict()
         for name, topic_name in names.iteritems():
+            #  YO Change this shit bro
             pub_dict[name] = rospy.Publisher(
                 topic_name, Twist, queue_size=10
             )
@@ -138,15 +139,18 @@ class Simulation(object):
         waypoint = Twist()
         waypoint.angular.x = 0
         waypoint.angular.y = 0
-        waypoint.angular.z = math.radians(beta)
+        waypoint.angular.z = math.radians(beta - quad.beta)
 
-        waypoint.linear.x = quad.x + heading.x * self.problem.step_size
-        waypoint.linear.y = quad.y + heading.y * self.problem.step_size
-        waypoint.linear.z = quad.z + heading.z
+        waypoint.linear.x = heading.x * self.problem.step_size
+        waypoint.linear.y = heading.y * self.problem.step_size
+        waypoint.linear.z = 0  # heading.z
 
         pub_waypoint = self.convert_coordinates_vicon(waypoint)
         self.pubs[quad.get_name()].publish(pub_waypoint)
-        return waypoint.linear.x, waypoint.linear.y, waypoint.linear.z, beta
+        return (
+            quad.x + waypoint.linear.x,
+            quad.y + waypoint.linear.y,
+            quad.z + waypoint.linear.z, beta)
 
     def publish_simulated_configuration(self, quad, heading, beta, phi):
         # Add control theory stuff here
