@@ -16,10 +16,13 @@
     "orientation_freedom": 20,
     "show_time_grid": false,
     "practical": true,
+    "planner": "rover_gaussian",
+
     "names": {
         "95": "cmd_vel"
     },
-    "planner": "rover_gaussian",
+    "ns_host": "132.250.85.150",
+    "ns_port": 8000,
 
     "num_risk_points": 3,
     "img_file": "sandbox/test_heatmap.png",

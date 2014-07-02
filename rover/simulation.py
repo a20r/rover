@@ -8,6 +8,7 @@ import rospy
 import tf
 import violations
 import controller
+import zmqros.server.swarm
 from geometry_msgs.msg import Twist
 
 
@@ -15,10 +16,23 @@ class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
         rospy.init_node("rover", anonymous=True)
+
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_configurations(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
         self.init_statistics(problem, risk_grid, kwargs)
+        self.init_zmqros(problem)
+
+        self.msg_type = "geometry_msgs/Twist"
+        self.max_z_vel = 50 #  cm/s
+
+    def init_zmqros(self, problem):
+        if self.practical:
+            self.swarm = zmqros.server.swarm.create_swarm_from_ns(
+                problem.ns_host, problem.ns_port
+            )
+        else:
+            self.ns = None
 
     def init_problem_instance(self, problem, risk_grid, kwargs):
         # problem instance setup
@@ -135,25 +149,39 @@ class Simulation(object):
 
         return quad_list
 
+    def saturate(self, val, max_val):
+        if val > max_val:
+            return max_val
+        else:
+            return val
+
     def publish_practical_configuration(self, quad, heading, beta, phi):
-        waypoint = Twist()
-        waypoint.angular.x = 0
-        waypoint.angular.y = 0
-        waypoint.angular.z = math.radians(beta - quad.beta)
 
-        waypoint.linear.x = heading.x * self.problem.step_size
-        waypoint.linear.y = heading.y * self.problem.step_size
-        waypoint.linear.z = 0  # heading.z
+        vel = Twist()
+        vel.angular.x = 0
+        vel.angular.y = 0
+        vel.angular.z = math.radians(beta - quad.beta)
 
-        pub_waypoint = self.convert_coordinates_vicon(waypoint)
-        self.pubs[quad.get_name()].publish(pub_waypoint)
-        return (
-            quad.x + waypoint.linear.x,
-            quad.y + waypoint.linear.y,
-            quad.z + waypoint.linear.z, beta)
+        vel.linear.x = heading.x * self.problem.step_size
+        vel.linear.y = heading.y * self.problem.step_size
+        vel.linear.z = self.saturate(50 * heading.z / 5.0, self.max_z_vel)
+
+        pub_vel = self.convert_coordinates_vicon(vel)
+        self.swarm[quad.get_name()].send_message(
+            self.msg_type,
+            self.names[quad.get_name()],
+            pub_vel
+        )
+
+        expected = [0, 0, 0, 0]
+        expected[0] = quad.x + vel.linear.x * self.problem.step_size
+        expected[1] = quad.y + vel.linear.y * self.problem.step_size
+        expected[2] = quad.z + vel.linear.z
+        expected[3] = beta
+
+        return tuple(expected)
 
     def publish_simulated_configuration(self, quad, heading, beta, phi):
-        # Add control theory stuff here
         waypoint = point.Point(
             quad.x + heading.get_x() * self.problem.step_size,
             quad.y + heading.get_y() * self.problem.step_size,
@@ -164,6 +192,7 @@ class Simulation(object):
 
         #  Uncomment this line if dont you want dynamics dude
         #  quad.set_position(waypoint.x, waypoint.y, waypoint.z)
+
         quad.set_orientation(beta)
         quad.set_camera_angle(phi)
         return waypoint.x, waypoint.y, waypoint.z, quad.beta
