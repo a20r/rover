@@ -95,6 +95,14 @@ class Quadcopter(object):
         self.z = z
         return self
 
+    def set_x(self, x):
+        self.x = x
+        return self
+
+    def set_y(self, y):
+        self.y = y
+        return self
+
     def set_z(self, z):
         self.z = z
         return self

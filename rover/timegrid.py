@@ -41,13 +41,13 @@ class TimeGrid(object):
                     x_o = x_i - x
                     y_o = y_i - y
 
-                    x_i_n = x_o * math.cos(beta) - y_o * math.sin(beta)
-                    y_i_n = y_o * math.cos(beta) + x_o * math.sin(beta)
+                    new_x = x_o * math.cos(beta) - y_o * math.sin(beta) + x
+                    new_y = y_o * math.cos(beta) + x_o * math.sin(beta) + y
 
-                    new_x = x_i_n + x
-                    new_y = y_i_n + y
-
-                    self.raw_set_item(new_x, new_y, ct)
+                    self.raw_set_item(int(new_x), int(new_y), ct)
+                    self.raw_set_item(
+                        int(math.ceil(new_x)), int(math.ceil(new_y)), ct
+                    )
 
     def raw_set_item(self, x, y, value):
         if x >= self.width:
