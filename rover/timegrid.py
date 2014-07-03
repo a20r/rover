@@ -49,6 +49,9 @@ class TimeGrid(object):
                         int(math.ceil(new_x)), int(math.ceil(new_y)), ct
                     )
 
+    def get_max(self):
+        return self.grid.max()
+
     def raw_set_item(self, x, y, value):
         if x >= self.width:
             x = self.width - 1

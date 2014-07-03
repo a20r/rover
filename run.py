@@ -2,9 +2,11 @@
 import rover
 import json
 import sys
+import warnings
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore")
     if len(sys.argv) <= 1:
         rover.run()
     else:

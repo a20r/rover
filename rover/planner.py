@@ -22,7 +22,7 @@ class PlannerInterface(object):
         self.init_num_samples()
 
     def init_num_samples(self):
-        self.num_surf_samples = 100
+        self.num_surf_samples = 30
         self.num_pos_samples = 10
 
     def inside_workspace(self, x, y):
@@ -52,6 +52,7 @@ class PlannerInterface(object):
         min_phi = None
         min_beta = None
         min_pos = None
+        max_time = self.problem.grid.get_max()
 
         for phi in sample_phis:
             for beta in sample_betas:
@@ -61,18 +62,25 @@ class PlannerInterface(object):
                     work_quad.set_camera_angle(phi)
 
                     surface_samples = self.get_surface_samples(work_quad, beta)
-                    total_time = 0.0
+                    avg_time = 0.0
+
+                    num_samples = len(surface_samples)
 
                     for p in surface_samples:
-                        total_time += self.problem.grid[p.x, p.y]
+                        if not self.inside_workspace(p.x, p.y):
+                            avg_time += max_time
+                        else:
+                            t_s = self.problem.grid[p.x, p.y]
+                            avg_time += t_s / float(num_samples)
 
-                    if min_time is None or total_time < min_time:
-                        min_time = total_time
+                    if min_time is None or avg_time < min_time:
+                        min_time = avg_time
                         min_phi = phi
                         min_beta = beta
                         min_pos = position
 
         min_direction = (min_pos - quad).to_unit_vector()
+        min_direction.set_z(0)
 
         return min_direction, min_beta, min_phi
 
@@ -97,15 +105,15 @@ class PlannerInterface(object):
 
             if el_eval_x + el_eval_y <= 1:
                 xr, yr = self.rotate(x, y, quad.x, quad.y, beta)
-                if self.inside_workspace(xr, yr):
-                    ps.append(point.Point(xr, yr))
+                ps.append(point.Point(xr, yr))
         return ps
 
     def get_position_samples(self, quad):
         angles = np.linspace(0, 2 * math.pi, self.num_pos_samples)
+
         ps = list()
         for angle in angles:
-            r = 10 * self.problem.step_size
+            r = 2 * self.problem.step_size
             x = r * math.cos(angle) + quad.x
             y = r * math.sin(angle) + quad.y
 
@@ -147,7 +155,7 @@ class PlannerInterface(object):
         else:
             num_samples_beta = num_samples
 
-        sample_betas = self.get_random_list(
+        sample_betas = np.linspace(
             quad.beta - self.problem.orientation_freedom,
             quad.beta + self.problem.orientation_freedom + 1,
             num_samples_beta

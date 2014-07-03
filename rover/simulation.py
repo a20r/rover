@@ -42,7 +42,7 @@ class Simulation(object):
         self.drawer = kwargs.get("drawer", None)
         self.show_time_grid = kwargs.get("show_time_grid", True)
 
-    def init_statistics(self,problem, risk_grid, kwargs):
+    def init_statistics(self, problem, risk_grid, kwargs):
         # statistics gathering classes
         self.mca = stats.MonteCarloArea(problem, 1000)
         self.sqa = stats.SensorQualityAverage(self.pl)
@@ -272,9 +272,9 @@ class Simulation(object):
                     conf_allowed, vio = self.is_safe(quad)
 
                     if conf_allowed:
-                        heading, beta, phi = self.pl.get_next_configuration(
-                            quad
-                        )
+
+                        heading, beta, phi = self.pl\
+                            .get_next_configuration(quad)
 
                         expected = self.publish_configuration(
                             quad, heading, beta, phi, i
