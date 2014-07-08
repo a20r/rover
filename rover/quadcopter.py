@@ -44,6 +44,9 @@ class Quadcopter(object):
     def get_pos_2d(self):
         return (self.x, self.y)
 
+    def get_position(self):
+        return point.Point(self.x, self.y, self.z)
+
     def get_point_2d(self):
         return point.Point(self.x, self.y)
 

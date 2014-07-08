@@ -24,7 +24,7 @@ class Simulation(object):
         self.init_zmqros(problem)
 
         self.msg_type = "geometry_msgs/Twist"
-        self.max_z_vel = 50 #  cm/s
+        self.max_z_vel = 50  # cm/s
 
     def init_zmqros(self, problem):
         if self.practical:
@@ -129,7 +129,7 @@ class Simulation(object):
         return quad_list
 
     def init_controllers(self):
-        Kp, Ki, Kd = 1, 0, 0.5
+        Kp, Ki, Kd = 1, 0.01, 0.5
         controllers = dict()
         for quad in self.quad_list:
             clr = controller.PID(quad, Kp, Ki, Kd)
@@ -209,9 +209,9 @@ class Simulation(object):
             self.problem.grid.update_grid(quad, iteration + 2)
         return expected
 
-    def publish_hover(self, quad):
+    def publish_hover(self, quad, iteration):
         expected = self.publish_configuration(
-            quad, point.Point(0, 0, 0), quad.beta, quad.phi
+            quad, point.Point(0, 0, 0), quad.beta, quad.phi, iteration
         )
         return expected
 
@@ -269,18 +269,25 @@ class Simulation(object):
 
     def is_safe(self, quad):
         if quad.x > self.problem.width or quad.x < 0:
-            return False, violations.X_OUT
+            return False, violations.X_OUT, None
 
         if quad.y > self.problem.height or quad.y < 0:
-            return False, violations.Y_OUT
+            return False, violations.Y_OUT, None
 
         too_high = quad.z > self.problem.max_height
         too_low = quad.z < self.problem.min_height
 
         if too_high or too_low:
-            return False, violations.Z_OUT
+            return False, violations.Z_OUT, None
 
-        return True, violations.NONE
+        for q in self.quad_list:
+            distance = q.get_point_2d().dist_to(quad.get_point_2d())
+            too_close = distance < self.problem.min_safe_distance
+            is_self = q == quad
+            if too_close and not is_self:
+                return False, violations.TOO_CLOSE, q
+
+        return True, violations.NONE, None
 
     def run(self):
         for i in xrange(self.problem.num_steps):
@@ -304,18 +311,26 @@ class Simulation(object):
                         self.prev_waypoints[quad], i
                     )
 
-                    conf_allowed, vio = self.is_safe(quad)
+                    conf_allowed, vio, extra = self.is_safe(quad)
 
                     if conf_allowed:
-                        heading, beta, phi = self.pl.get_next_configuration(
-                            quad
-                        )
+                        heading, beta, phi = self.pl\
+                            .get_next_configuration(quad)
 
                         expected = self.publish_configuration(
                             quad, heading, beta, phi, i
                         )
                     else:
-                        expected = self.publish_towards_center(quad, vio, i)
+                        if vio == violations.TOO_CLOSE:
+                            heading = (quad.get_position() - extra)\
+                                .to_unit_vector()
+                            expected = self.publish_configuration(
+                                quad, heading, quad.beta, quad.phi, i
+                            )
+                        else:
+                            expected = self.publish_towards_center(
+                                quad, vio, i
+                            )
 
                     self.prev_waypoints[quad] = expected
 

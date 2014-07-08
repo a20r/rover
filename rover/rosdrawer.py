@@ -51,29 +51,6 @@ class Drawer(object):
 
         return self
 
-    def draw_prop(self, x, y, z, hash_val):
-        if not rospy.is_shutdown():
-            marker = Marker()
-            marker.header.frame_id = "/my_frame"
-            marker.lifetime = rospy.Duration(self.duration)
-            marker.type = marker.CYLINDER
-            marker.action = marker.ADD
-            marker.scale.x = 15
-            marker.scale.y = 15
-            marker.scale.z = 1
-            marker.color.a = 1.0
-            marker.color.r = 0.0
-            marker.color.g = 1.0
-            marker.color.b = 0.0
-            marker.pose.orientation.w = 1.0
-            marker.pose.position.x = x
-            marker.pose.position.y = y
-            marker.pose.position.z = z
-            marker.id = hash_val
-            self.markers.append(marker)
-
-        return self
-
     def draw_quad_sensor_coverage(self, quad):
         quad_id = self.hash32(quad)
         if not rospy.is_shutdown():
@@ -105,20 +82,38 @@ class Drawer(object):
 
         return self
 
+    def draw_quad_base(self, quad):
+        quad_id = self.hash32(quad)
+        if not rospy.is_shutdown():
+            marker = Marker()
+            marker.header.frame_id = "/my_frame"
+            marker.lifetime = rospy.Duration(self.duration)
+            marker.type = marker.MESH_RESOURCE
+            marker.mesh_resource = "package://hector_quadrotor_description/"\
+                + "meshes/quadrotor/quadrotor_base.dae"
+            marker.action = marker.ADD
+            marker.scale.x = 100
+            marker.scale.y = 100
+            marker.scale.z = 100
+            marker.mesh_use_embedded_materials = True
+
+            marker.pose.orientation.w = math.cos(
+                math.radians(quad.get_orientation() / 2)
+            )
+            marker.pose.orientation.x = 0
+            marker.pose.orientation.y = 0
+            marker.pose.orientation.z = math.sin(
+                math.radians(quad.get_orientation() / 2)
+            )
+
+            marker.pose.position.x = quad.get_x()
+            marker.pose.position.y = quad.get_y()
+            marker.pose.position.z = quad.get_z()
+            marker.id = quad_id
+            self.markers.append(marker)
+
     def draw_quad(self, quad):
-        dist = 10
-        self.draw_prop(
-            quad.x - dist, quad.y - dist, quad.z, self.hash32(quad) + 1
-        )
-        self.draw_prop(
-            quad.x - dist, quad.y + dist, quad.z, self.hash32(quad) + 2
-        )
-        self.draw_prop(
-            quad.x + dist, quad.y - dist, quad.z, self.hash32(quad) + 3
-        )
-        self.draw_prop(
-            quad.x + dist, quad.y + dist, quad.z, self.hash32(quad) + 4
-        )
+        self.draw_quad_base(quad)
 
         self.draw_quad_sensor_coverage(quad)
         self.draw_line(
