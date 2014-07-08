@@ -121,7 +121,7 @@ class Simulation(object):
             )
 
             quad = quadcopter.Quadcopter(self.problem)
-            quad.set_position(s_x, s_y, self.problem.min_height)
+            quad.set_position(s_x, s_y, self.problem.max_height)
             quad.set_orientation(0)
             quad.set_camera_angle(self.problem.initial_camera_angle)
             quad_list.append(quad)

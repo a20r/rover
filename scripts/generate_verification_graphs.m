@@ -19,11 +19,11 @@ function plot_verification(data)
     z_r = 8;
     b_r = 9;
 
-    figure;
     x = data(:, x_e);
     y = data(:, y_e);
     z = data(:, z_e);
 
+    figure;
     risk = load("sandbox/risk.out");
     risk = reshape(risk, 100, 100);
     risk = risk';
@@ -32,24 +32,25 @@ function plot_verification(data)
     [X Y] = meshgrid(xi, yi);
     nq = 2;
     % contour3(X, Y, risk);
-    pcolor(X, Y, risk);
+    surf(X, Y, 100 * risk);
     shading interp;
-    colormap("pink");
+    colormap("winter");
     colorbar;
-    % colorbar;
     hold on;
     plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
     plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
     view(314, 36);
     xlabel("X"); ylabel("Y"); zlabel("Z"); box off;
-    print("sandbox/trajectories.png", "-dpng");
+    xlim([0 1000]);
+    ylim([0 1000]);
+    % print("sandbox/trajectories.png", "-dpng");
 
     figure;
-    pcolor(X, Y, risk);
-    colormap("pink");
+    surf(X, Y, risk);
+    colormap("jet");
     shading interp;
     colorbar;
-    print("sandbox/heatmap.png", "-dpng");
+    % print("sandbox/heatmap.png", "-dpng");
 
     figure;
     xi = 0:4:999;
@@ -61,7 +62,7 @@ function plot_verification(data)
     xlabel("X"); ylabel("Y");
     colorbar;
     shading interp;
-    print("sandbox/grid.png", "-dpng");
+    % print("sandbox/grid.png", "-dpng");
 
 endfunction
 
