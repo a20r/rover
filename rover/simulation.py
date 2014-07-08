@@ -344,7 +344,7 @@ class Simulation(object):
 
         if not self.drawer is None:
             self.drawer.clear_all()
-            self.drawer.draw_risk_grid(self.risk_grid)
+            # self.drawer.draw_risk_grid(self.risk_grid)
 
             for quad in self.quad_list:
                 self.drawer.draw_quad(quad)

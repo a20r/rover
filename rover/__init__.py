@@ -19,7 +19,6 @@ def run(**kwargs):
         dr = rosdrawer.Drawer(problem)
 
         risk_grid = riskgrid.RiskGrid(problem)
-        risk_grid.add_random_points(kwargs.get("num_risk_points", 4))
 
         plot.plot_risk_grid(
             risk_grid,
