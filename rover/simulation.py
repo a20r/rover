@@ -129,7 +129,7 @@ class Simulation(object):
         return quad_list
 
     def init_controllers(self):
-        Kp, Ki, Kd = 1, 0.01, 0.5
+        Kp, Ki, Kd = 1, 0, 0.5
         controllers = dict()
         for quad in self.quad_list:
             clr = controller.PID(quad, Kp, Ki, Kd)
@@ -290,6 +290,9 @@ class Simulation(object):
         return True, violations.NONE, None
 
     def run(self):
+        if not self.drawer is None:
+            self.drawer.draw_risk_grid(self.risk_grid)
+
         for i in xrange(self.problem.num_steps):
             for quad in self.quad_list:
                 try:
@@ -344,7 +347,7 @@ class Simulation(object):
 
         if not self.drawer is None:
             self.drawer.clear_all()
-            # self.drawer.draw_risk_grid(self.risk_grid)
+            #self.drawer.draw_risk_grid(self.risk_grid)
 
             for quad in self.quad_list:
                 self.drawer.draw_quad(quad)

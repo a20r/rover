@@ -2,6 +2,7 @@
 import random
 import math
 import point
+import costgrid
 
 
 class PlannerInterface(object):
@@ -17,6 +18,7 @@ class PlannerInterface(object):
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
         self.time_threshold = 1
+        self.cost_grid = costgrid.CostGrid(self.problem.grid, self.risk_grid)
 
     def inside_workspace(self, x, y):
         b_x = True
@@ -55,8 +57,8 @@ class PlannerInterface(object):
             if not self.inside_workspace(x, y):
                 raise ValueError()
 
-            time_dict[(x, y, inner_angle)] = self.problem.grid[x, y]
-            total_time += self.problem.grid[x, y]
+            time_dict[(x, y, inner_angle)] = self.cost_grid[x, y]
+            total_time += self.cost_grid[x, y]
             counter += 1
 
             inner_angle += self.angle_step

@@ -2,6 +2,9 @@
 import collections
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
+from std_msgs.msg import ColorRGBA
+import matplotlib.cm as cm
+import matplotlib.colors as colors
 import rospy
 import math
 
@@ -18,6 +21,9 @@ class Drawer(object):
         self.clear_all().update()
         self.markers = collections.deque(list(), 1000)
         self.duration = 3
+        norm = colors.Normalize(vmin=0, vmax=1)
+        self.sm = cm.ScalarMappable(norm=norm)
+        self.sm.set_cmap("jet")
 
     def hash32(self, value):
         return hash(value) & 0xffffffff
@@ -62,7 +68,7 @@ class Drawer(object):
             marker.scale.x = 2 * quad.get_ellipse_major()
             marker.scale.y = 2 * quad.get_ellipse_minor()
             marker.scale.z = 1
-            marker.color.a = 0.3
+            marker.color.a = 0.6
             marker.color.r = 1.0
             marker.color.g = 0.0
             marker.color.b = 1.0
@@ -92,9 +98,9 @@ class Drawer(object):
             marker.mesh_resource = "package://hector_quadrotor_description/"\
                 + "meshes/quadrotor/quadrotor_base.dae"
             marker.action = marker.ADD
-            marker.scale.x = 100
-            marker.scale.y = 100
-            marker.scale.z = 100
+            marker.scale.x = 80
+            marker.scale.y = 80
+            marker.scale.z = 80
             marker.mesh_use_embedded_materials = True
 
             marker.pose.orientation.w = math.cos(
@@ -125,26 +131,32 @@ class Drawer(object):
         return self
 
     def draw_risk_grid(self, risk_grid):
-        for i, (_, _, r_point) in enumerate(risk_grid.get_risk_points()):
-            if not rospy.is_shutdown():
-                marker = Marker()
-                marker.header.frame_id = "/my_frame"
-                marker.lifetime = rospy.Duration(self.duration)
-                marker.type = marker.CYLINDER
-                marker.action = marker.ADD
-                marker.scale.x = 20
-                marker.scale.y = 20
-                marker.scale.z = 40
-                marker.color.a = 1
-                marker.color.r = 1.0
-                marker.color.g = 0.0
-                marker.color.b = 0.0
-                marker.pose.orientation.w = 1.0
-                marker.pose.position.x = r_point.get_x()
-                marker.pose.position.y = r_point.get_y()
-                marker.pose.position.z = 0
-                marker.id = i
-                self.markers.append(marker)
+        if not rospy.is_shutdown():
+            p_list = list()
+            c_list = list()
+            x_gen = xrange(0, self.problem.width, 10)
+            y_gen = xrange(0, self.problem.height, 10)
+
+            for i in x_gen:
+                for j in y_gen:
+                    risk = risk_grid[i, j]
+                    pnt = Point(i, j, -50)
+                    r, g, b, a = self.sm.to_rgba(risk)
+                    clr = ColorRGBA(r, g, b, a)
+                    p_list.append(pnt)
+                    c_list.append(clr)
+
+            marker = Marker()
+            marker.header.frame_id = "/my_frame"
+            marker.lifetime = rospy.Duration(10000000)
+            marker.type = marker.POINTS
+            marker.scale.x = 10
+            marker.scale.y = 10
+            marker.action = marker.ADD
+            marker.points = p_list
+            marker.colors = c_list
+            marker.id = 1
+            self.pub.publish(marker)
         return self
 
     def update(self):
