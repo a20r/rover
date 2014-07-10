@@ -21,8 +21,9 @@
     "names": {
         "95": "cmd_vel"
     },
-    "ns_host": "132.250.85.150",
-    "ns_port": 8000,
+
+    "min_safe_distance": 150,
+    "scene": "s1.out",
 
     "num_risk_points": 3,
     "img_file": "sandbox/test_heatmap.png",

@@ -18,6 +18,7 @@
     "planner": "rover_gaussian",
 
     "min_safe_distance": 150,
+    "scene": "scenes/s1.out",
 
     "num_risk_points": 4,
     "img_file": "sandbox/test_heatmap.png",

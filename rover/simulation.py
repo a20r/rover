@@ -8,7 +8,7 @@ import rospy
 import tf
 import violations
 import controller
-import zmqros.server.swarm
+import zmqros
 from geometry_msgs.msg import Twist
 
 
@@ -29,7 +29,7 @@ class Simulation(object):
     def init_zmqros(self, problem):
         if self.practical:
             self.swarm = zmqros.server.swarm.create_swarm_from_ns(
-                problem.ns_host, problem.ns_port
+                zmqros.get_ns_host(), zmqros.get_ns_port()
             )
         else:
             self.ns = None
