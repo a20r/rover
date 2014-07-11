@@ -15,6 +15,7 @@ class Quadcopter(object):
         self.problem = problem
         self.hash_val = int(100000 * random.random())
         self.name = name
+        self.speed = self.problem.step_size
 
         # in degrees
         self.viewing_angle = problem.viewing_angle
@@ -37,6 +38,9 @@ class Quadcopter(object):
 
     def get_camera_angle(self):
         return self.phi
+
+    def get_speed(self):
+        return self.speed
 
     def get_viewing_angle(self):
         return self.viewing_angle
@@ -98,6 +102,10 @@ class Quadcopter(object):
         self.z = z
         return self
 
+    def set_speed(self, speed):
+        self.speed = speed
+        return self
+
     def set_z(self, z):
         self.z = z
         return self
@@ -113,8 +121,8 @@ class Quadcopter(object):
 
     def move_2d(self, unit_heading):
 
-        h_x = int(unit_heading.get_x() * self.problem.step_size)
-        h_y = int(unit_heading.get_y() * self.problem.step_size)
+        h_x = int(unit_heading.get_x() * self.speed)
+        h_y = int(unit_heading.get_y() * self.speed)
 
         self.x = self.x + (1 - self.learning_rate) * self.heading_x +\
             self.learning_rate * h_x

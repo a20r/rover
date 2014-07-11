@@ -8,4 +8,4 @@ class CostGrid(object):
 
     def __getitem__(self, index):
         x, y = index[0], index[1]
-        return 100 * self.risk_grid[x, y] + self.time_grid[x, y]
+        return self.time_grid[x, y]

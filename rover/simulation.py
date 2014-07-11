@@ -9,6 +9,7 @@ import tf
 import violations
 import controller
 import zmqros
+import motionblur
 from geometry_msgs.msg import Twist
 
 
@@ -25,6 +26,9 @@ class Simulation(object):
 
         self.msg_type = "geometry_msgs/Twist"
         self.max_z_vel = 50  # cm/s
+        self.mb = motionblur.MotionBlur(problem, self.practical)
+        self.dv = 1
+        self.pvc = dict()
 
     def init_zmqros(self, problem):
         if self.practical:
@@ -162,11 +166,12 @@ class Simulation(object):
         vel.angular.y = 0
         vel.angular.z = math.radians(beta - quad.beta)
 
-        vel.linear.x = heading.x * self.problem.step_size
-        vel.linear.y = heading.y * self.problem.step_size
+        vel.linear.x = heading.x * quad.speed
+        vel.linear.y = heading.y * quad.speed
         vel.linear.z = self.saturate(50 * heading.z / 5.0, self.max_z_vel)
 
         pub_vel = self.convert_coordinates_vicon(vel)
+
         self.swarm[quad.get_name()].send_message(
             self.msg_type,
             self.names[quad.get_name()],
@@ -174,8 +179,8 @@ class Simulation(object):
         )
 
         expected = [0, 0, 0, 0]
-        expected[0] = quad.x + vel.linear.x * self.problem.step_size
-        expected[1] = quad.y + vel.linear.y * self.problem.step_size
+        expected[0] = quad.x + vel.linear.x * quad.speed
+        expected[1] = quad.y + vel.linear.y * quad.speed
         expected[2] = quad.z + vel.linear.z
         expected[3] = beta
 
@@ -183,8 +188,8 @@ class Simulation(object):
 
     def publish_simulated_configuration(self, quad, heading, beta, phi):
         waypoint = point.Point(
-            quad.x + heading.get_x() * self.problem.step_size,
-            quad.y + heading.get_y() * self.problem.step_size,
+            quad.x + heading.get_x() * quad.speed,
+            quad.y + heading.get_y() * quad.speed,
             quad.z + heading.get_z()
         )
 
@@ -324,6 +329,8 @@ class Simulation(object):
             heading, beta, phi = self.pl\
                 .get_next_configuration(quad)
 
+            self.minimize_motion_blur(quad)
+
             expected = self.publish_configuration(
                 quad, heading, beta, phi, i
             )
@@ -340,6 +347,35 @@ class Simulation(object):
                 )
 
         self.prev_waypoints[quad] = expected
+
+    def minimize_motion_blur(self, quad):
+        blur = self.mb.get_blur(quad)
+        norm_speed = quad.get_speed() / float(self.problem.step_size)
+
+        try:
+            pvc_q = self.pvc[quad]
+        except KeyError:
+            self.pvc[quad] = norm_speed - blur
+            quad.speed -= self.dv
+            return self
+
+        if quad.get_speed() > self.problem.step_size:
+            quad.speed -= self.dv
+
+        if quad.get_speed() < 0:
+            quad.speed += self.dv
+
+        dvc = norm_speed - blur - pvc_q
+
+        if dvc > 0:
+            quad.speed += self.dv
+        elif dvc < 0:
+            quad.speed -= self.dv
+
+        self.pvc[quad] = norm_speed - blur
+        print quad.get_speed()
+
+        return self
 
     def visualize(self):
         if self.show_time_grid:
