@@ -303,43 +303,43 @@ class Simulation(object):
                 finally:
                     quad.set_position(rpx, rpy, rpz)
                     quad.set_orientation(rb)
-
-                    if self.practical:
-                        # if it is not practical, it updates the grid with
-                        # the new position in the publish_configuration method
-                        self.problem.grid.update_grid(quad, i + 2)
+                    self.execute_safety(quad, i)
 
                     self.write_verification_results(
                         (rpx, rpy, rpz, rb),
                         self.prev_waypoints[quad], i
                     )
 
-                    conf_allowed, vio, extra = self.is_safe(quad)
-
-                    if conf_allowed:
-                        heading, beta, phi = self.pl\
-                            .get_next_configuration(quad)
-
-                        expected = self.publish_configuration(
-                            quad, heading, beta, phi, i
-                        )
-                    else:
-                        if vio == violations.TOO_CLOSE:
-                            heading = (quad.get_position() - extra)\
-                                .to_unit_vector()
-                            expected = self.publish_configuration(
-                                quad, heading, quad.beta, quad.phi, i
-                            )
-                        else:
-                            expected = self.publish_towards_center(
-                                quad, vio, i
-                            )
-
-                    self.prev_waypoints[quad] = expected
-
             self.visualize()
             self.update_stats(i)
             self.write_stats_results()
+
+    def execute_safety(self, quad, i):
+        if self.practical:
+            self.problem.grid.update_grid(quad, i + 2)
+
+        conf_allowed, vio, extra = self.is_safe(quad)
+
+        if conf_allowed:
+            heading, beta, phi = self.pl\
+                .get_next_configuration(quad)
+
+            expected = self.publish_configuration(
+                quad, heading, beta, phi, i
+            )
+        else:
+            if vio == violations.TOO_CLOSE:
+                heading = (quad.get_position() - extra)\
+                    .to_unit_vector()
+                expected = self.publish_configuration(
+                    quad, heading, quad.beta, quad.phi, i
+                )
+            else:
+                expected = self.publish_towards_center(
+                    quad, vio, i
+                )
+
+        self.prev_waypoints[quad] = expected
 
     def visualize(self):
         if self.show_time_grid:
