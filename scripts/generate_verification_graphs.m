@@ -41,8 +41,8 @@ function plot_verification(data)
     plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
     view(314, 36);
     xlabel("X"); ylabel("Y"); zlabel("Z"); box off;
-    xlim([0 1000]);
-    ylim([0 1000]);
+    xlim([-50 1050]);
+    ylim([-50 1050]);
     % print("sandbox/trajectories.png", "-dpng");
 
     figure;
@@ -50,7 +50,7 @@ function plot_verification(data)
     colormap("jet");
     shading interp;
     colorbar;
-    % print("sandbox/heatmap.png", "-dpng");
+    %print("sandbox/heatmap.png", "-dpng");
 
     figure;
     xi = 0:4:999;

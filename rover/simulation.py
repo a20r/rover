@@ -9,7 +9,6 @@ import tf
 import violations
 import controller
 import zmqros
-import motionblur
 from geometry_msgs.msg import Twist
 
 
@@ -26,9 +25,6 @@ class Simulation(object):
 
         self.msg_type = "geometry_msgs/Twist"
         self.max_z_vel = 50  # cm/s
-        self.mb = motionblur.MotionBlur(problem, self.practical)
-        self.dv = 1
-        self.pvc = dict()
 
     def init_zmqros(self, problem):
         if self.practical:
@@ -125,7 +121,7 @@ class Simulation(object):
             )
 
             quad = quadcopter.Quadcopter(self.problem)
-            quad.set_position(s_x, s_y, self.problem.max_height)
+            quad.set_position(s_x, s_y, self.problem.min_height)
             quad.set_orientation(0)
             quad.set_camera_angle(self.problem.initial_camera_angle)
             quad_list.append(quad)
@@ -308,7 +304,7 @@ class Simulation(object):
                 finally:
                     quad.set_position(rpx, rpy, rpz)
                     quad.set_orientation(rb)
-                    self.execute_safety(quad, i)
+                    self.execute_control(quad, i)
 
                     self.write_verification_results(
                         (rpx, rpy, rpz, rb),
@@ -319,7 +315,7 @@ class Simulation(object):
             self.update_stats(i)
             self.write_stats_results()
 
-    def execute_safety(self, quad, i):
+    def execute_control(self, quad, i):
         if self.practical:
             self.problem.grid.update_grid(quad, i + 2)
 
@@ -328,8 +324,6 @@ class Simulation(object):
         if conf_allowed:
             heading, beta, phi = self.pl\
                 .get_next_configuration(quad)
-
-            self.minimize_motion_blur(quad)
 
             expected = self.publish_configuration(
                 quad, heading, beta, phi, i
@@ -347,35 +341,6 @@ class Simulation(object):
                 )
 
         self.prev_waypoints[quad] = expected
-
-    def minimize_motion_blur(self, quad):
-        blur = self.mb.get_blur(quad)
-        norm_speed = quad.get_speed() / float(self.problem.step_size)
-
-        try:
-            pvc_q = self.pvc[quad]
-        except KeyError:
-            self.pvc[quad] = norm_speed - blur
-            quad.speed -= self.dv
-            return self
-
-        if quad.get_speed() > self.problem.step_size:
-            quad.speed -= self.dv
-
-        if quad.get_speed() < 0:
-            quad.speed += self.dv
-
-        dvc = norm_speed - blur - pvc_q
-
-        if dvc > 0:
-            quad.speed += self.dv
-        elif dvc < 0:
-            quad.speed -= self.dv
-
-        self.pvc[quad] = norm_speed - blur
-        print quad.get_speed()
-
-        return self
 
     def visualize(self):
         if self.show_time_grid:
@@ -402,7 +367,8 @@ class Simulation(object):
                 str(self.mca.get_moving_average_efficiency()) + " " +
                 str(self.sqa.get_moving_average()) + " " +
                 str(self.ra.get_moving_average()) + " " +
-                str(self.atd.get_average()) + "\n"
+                str(self.atd.get_average()) + " " +
+                str(self.pl.mb.get_average_blur()) + "\n"
             )
 
     def write_verification_results(self, expected_pos, out_pos, iteration):

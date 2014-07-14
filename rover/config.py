@@ -22,4 +22,5 @@ class Problem(object):
         self.initial_camera_angle = kwargs.get("initial_camera_angle", 15)
         self.min_safe_distance = kwargs.get("min_safe_distance", 100)
         self.scene = kwargs.get("scene", "scene/s1.out")
+        self.practical = kwargs.get("practical", False)
         self.grid = timegrid.TimeGrid(self.width, self.height, self)

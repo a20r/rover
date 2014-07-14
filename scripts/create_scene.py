@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib
+import matplotlib.pylab
 import math
 import random
 
@@ -134,6 +135,45 @@ def distort_space(space, height_func):
         side /= 2
         squares *= 2
         i += 1
+        return 0
+
+
+def normal_dist(x, sigma):
+    return math.exp(
+        -0.5 * math.pow(float(x) / sigma, 2)
+    ) / (math.sqrt(2 * math.pi) * sigma)
+
+
+def get_distance(x, y):
+    return math.sqrt(
+        math.pow(x[0] - y[0], 2) +
+        math.pow(x[1] - y[1], 2)
+    )
+
+
+def create_gaussian_risk(size, num_risk_points):
+    pnt_list = list()
+    sigma = 500 / 3.0
+    space = np.zeros((dim, dim))
+
+    K = 1.0 / normal_dist(0, sigma)
+
+    for _ in xrange(num_risk_points):
+        x = random.randint(0, dim)
+        y = random.randint(0, dim)
+        pnt_list.append((x, y))
+
+    for j in xrange(0, dim, 1):
+        for i in xrange(0, dim, 1):
+            max_risk = 0
+            for p in pnt_list:
+                risk = K * normal_dist(get_distance((i, j), p), sigma)
+                if risk > max_risk:
+                    max_risk = risk
+
+            space[j, i] = max_risk
+
+    return space
 
 
 def save_surface(space, path):
@@ -180,5 +220,11 @@ if __name__ == "__main__":
     import sys
     dim = int(sys.argv[1])
     name = sys.argv[2]
-    space = get_space(dim, dim)
+    print sys.argv
+
+    if sys.argv[3] == "gauss":
+        space = create_gaussian_risk(dim, int(sys.argv[4]))
+    elif sys.argv[3] == "rtm":
+        space = get_space(dim, dim)
+
     save_surface(space, name)

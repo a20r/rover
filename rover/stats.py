@@ -119,3 +119,18 @@ class AverageTimeDifference(object):
 
     def get_average(self):
         return self.avg
+
+
+class AverageMotionBlur(object):
+
+    def __init__(self):
+        self.avg = 0.0
+        self.learning_rate = 0.5
+
+    def update(self, val):
+        self.avg = (1 - self.learning_rate) * self.avg\
+            + val * self.learning_rate
+        return self
+
+    def get_average(self):
+        return self.avg

@@ -120,7 +120,6 @@ class Quadcopter(object):
         return self
 
     def move_2d(self, unit_heading):
-
         h_x = int(unit_heading.get_x() * self.speed)
         h_y = int(unit_heading.get_y() * self.speed)
 

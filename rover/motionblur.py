@@ -1,19 +1,27 @@
 
 import math
 import random
+import stats
 
 
 class MotionBlur(object):
 
-    def __init__(self, problem, practical):
-        self.practical = practical
+    def __init__(self, problem):
+        self.practical = problem.practical
         self.problem = problem
+        self.amb = stats.AverageMotionBlur()
 
     def get_blur(self, quad):
         if self.practical:
-            return self.get_blur_practical(quad)
+            blur = self.get_blur_practical(quad)
         else:
-            return self.get_blur_simulation(quad)
+            blur = self.get_blur_simulation(quad)
+
+        self.amb.update(blur)
+        return blur
+
+    def get_average_blur(self):
+        return self.amb.get_average()
 
     def get_blur_practical(self, quad):
         return 0

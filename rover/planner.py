@@ -3,6 +3,7 @@ import random
 import math
 import point
 import costgrid
+import motionblur
 
 
 class PlannerInterface(object):
@@ -19,6 +20,9 @@ class PlannerInterface(object):
         self.quad_list = quads
         self.time_threshold = 1
         self.cost_grid = costgrid.CostGrid(self.problem.grid, self.risk_grid)
+        self.mb = motionblur.MotionBlur(problem)
+        self.dv = 1
+        self.pvc = dict()
 
     def inside_workspace(self, x, y):
         b_x = True
@@ -163,11 +167,41 @@ class PlannerInterface(object):
 
         return sample_betas
 
+    def minimize_motion_blur(self, quad):
+        blur = self.mb.get_blur(quad)
+        w_speed = quad.get_speed()
+        norm_speed = w_speed / float(self.problem.step_size)
+
+        try:
+            pvc_q = self.pvc[quad]
+        except KeyError:
+            self.pvc[quad] = norm_speed - blur
+            quad.speed = 0
+            return self
+
+        if quad.get_speed() > self.problem.step_size:
+            quad.speed -= self.dv
+
+        if quad.get_speed() < 0:
+            quad.speed += self.dv
+
+        dvc = norm_speed - blur - pvc_q
+
+        if dvc > 0:
+            quad.speed += self.dv
+        elif dvc < 0:
+            quad.speed -= self.dv
+
+        self.pvc[quad] = norm_speed - blur
+
+        return self
+
     def get_next_configuration(self, quad):
         heading, beta, phi = self.get_new_direction(quad)
         new_z = self.determine_height(quad)
         uheading = heading.to_unit_vector()
         uheading.set_z(new_z - quad.get_z())
+        self.minimize_motion_blur(quad)
         return uheading, beta, phi
 
     def get_random_list(self, nmin, nmax, num):
