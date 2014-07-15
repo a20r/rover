@@ -1,4 +1,5 @@
 
+import time
 import point
 import stats
 import plot
@@ -121,7 +122,7 @@ class Simulation(object):
             )
 
             quad = quadcopter.Quadcopter(self.problem)
-            quad.set_position(s_x, s_y, self.problem.min_height)
+            quad.set_position(s_x, s_y, 10)
             quad.set_orientation(0)
             quad.set_camera_angle(self.problem.initial_camera_angle)
             quad_list.append(quad)
@@ -306,10 +307,10 @@ class Simulation(object):
                     quad.set_orientation(rb)
                     self.execute_control(quad, i)
 
-                    self.write_verification_results(
-                        (rpx, rpy, rpz, rb),
-                        self.prev_waypoints[quad], i
-                    )
+                    # self.write_verification_results(
+                    #    (rpx, rpy, rpz, rb),
+                    #    self.prev_waypoints[quad], i
+                    # )
 
             self.visualize()
             self.update_stats(i)

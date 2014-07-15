@@ -24,17 +24,17 @@ function plot_verification(data)
     z = data(:, z_e);
 
     figure;
-    risk = load("sandbox/risk.out");
+    risk = load("sandbox/works/risk.out");
     risk = reshape(risk, 100, 100);
     risk = risk';
     xi = 0:10:999;
     yi = 0:10:999;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
-    % contour3(X, Y, risk);
-    surf(X, Y, 100 * risk);
+    pcolor(X, Y, risk);
+    %surf(X, Y, risk);
     shading interp;
-    colormap("winter");
+    colormap("jet");
     colorbar;
     hold on;
     plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
@@ -46,7 +46,7 @@ function plot_verification(data)
     % print("sandbox/trajectories.png", "-dpng");
 
     figure;
-    surf(X, Y, risk);
+    pcolor(X, Y, risk);
     colormap("jet");
     shading interp;
     colorbar;
@@ -56,7 +56,7 @@ function plot_verification(data)
     xi = 0:4:999;
     yi = 0:4:999;
     [X Y] = meshgrid(xi, yi);
-    grid = load("sandbox/grid.out");
+    grid = load("sandbox/works/grid.out");
     grid = grid'';
     pcolor(X,Y,grid);
     xlabel("X"); ylabel("Y");
@@ -67,7 +67,7 @@ function plot_verification(data)
 endfunction
 
 function run()
-    file_name = 'sandbox/all_verify.txt';
+    file_name = 'sandbox/works/all_verify.txt';
     data = load(file_name);
     plot_verification(data);
     waitForEnd();
