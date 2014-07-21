@@ -1,0 +1,11 @@
+2014-07-21T14:05:33.379772579 0.328821s info: Creating directory /home/wallar/Documents/Projects/rover/rethinkdb_data
+2014-07-21T14:05:33.417178753 0.366228s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/home/wallar/Documents/Projects/rover/rethinkdb_data' did not already exist.)
+2014-07-21T14:05:33.417257614 0.366306s info: Running rethinkdb 1.13.3-0ubuntu1~trusty (GCC 4.8.2)...
+2014-07-21T14:05:33.419486139 0.368535s info: Running on Linux 3.13.0-27-generic x86_64
+2014-07-21T14:05:33.419530604 0.368579s info: Using cache size of 6421 MB
+2014-07-21T14:05:33.419716305 0.368765s info: Loading data from directory /home/wallar/Documents/Projects/rover/rethinkdb_data
+2014-07-21T14:05:34.474754305 1.423803s info: Listening for intracluster connections on port 29015
+2014-07-21T14:05:34.476970699 1.426020s info: Listening for client driver connections on port 28015
+2014-07-21T14:05:34.477105460 1.426154s info: Listening for administrative HTTP connections on port 8080
+2014-07-21T14:05:34.481444697 1.430494s info: Listening on addresses: 127.0.0.1, 132.250.85.150, ::1, fe80::56ee:75ff:fe10:7a99%2
+2014-07-21T14:05:34.481462844 1.430511s info: Server ready

@@ -20,8 +20,8 @@ class TimeGrid(object):
     def update_grid(self, quad, ct):
         x = quad.x // self.scaling_factor
         y = quad.y // self.scaling_factor
-        r_ma = int(quad.get_ellipse_major() // self.scaling_factor)
-        r_mi = int(quad.get_ellipse_minor() // self.scaling_factor)
+        r_ma = int(quad.get_ellipse_major() // self.scaling_factor) + 0.1
+        r_mi = int(quad.get_ellipse_minor() // self.scaling_factor) + 0.1
         h = (quad.get_ellipse_center_dist() + quad.x) // self.scaling_factor
         k = quad.y // self.scaling_factor
 

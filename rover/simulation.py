@@ -1,5 +1,4 @@
 
-import time
 import point
 import stats
 import plot
@@ -16,7 +15,7 @@ from geometry_msgs.msg import Twist
 class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
-        rospy.init_node("rover", anonymous=True)
+        rospy.init_node("rover", anonymous=False)
 
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_configurations(problem, risk_grid, kwargs)
@@ -26,6 +25,7 @@ class Simulation(object):
 
         self.msg_type = "geometry_msgs/Twist"
         self.max_z_vel = 50  # cm/s
+        self.max_o_vel = 30  # deg/s
 
     def init_zmqros(self, problem):
         if self.practical:
@@ -101,7 +101,14 @@ class Simulation(object):
         quad_list = list()
         for name, _ in self.pubs.iteritems():
             quad = quadcopter.Quadcopter(self.problem, name)
-            x, y, z, b = self.get_configuration(quad)
+
+            try:
+                x, y, z, b = self.get_configuration(quad)
+            except tf.Exception as e:
+                print "ERROR: Could not initialize quad positions"
+                print e
+                exit()
+
             quad.set_position(x, y, z)
             quad.set_orientation(math.degrees(b))
             quad_list.append(quad)
@@ -161,7 +168,9 @@ class Simulation(object):
         vel = Twist()
         vel.angular.x = 0
         vel.angular.y = 0
-        vel.angular.z = math.radians(beta - quad.beta)
+        vel.angular.z = math.radians(
+            self.saturate(beta - quad.beta, self.max_o_vel)
+        )
 
         vel.linear.x = heading.x * quad.speed
         vel.linear.y = heading.y * quad.speed
@@ -256,8 +265,8 @@ class Simulation(object):
 
     def convert_coordinates_vicon(self, waypoint):
         pos = waypoint.linear
-        pos.x = (pos.x - self.problem.width / 2) / 100.0
-        pos.y = (pos.y - self.problem.height / 2) / 100.0
+        pos.x = pos.x / 100.0
+        pos.y = pos.y / 100.0
         pos.z = pos.z / 100.0
         waypoint.linear = pos
         return waypoint
@@ -301,6 +310,12 @@ class Simulation(object):
                     rpx, rpy, rpz, rb = self.get_configuration(quad)
                 except tf.Exception as e:
                     rpx, rpy, rpz, rb = quad.x, quad.y, quad.z, quad.beta
+                    if self.practical:
+                        self.swarm[quad.get_name()].send_message(
+                            "std_msgs/Empty",
+                            self.names[quad.get_name()],
+                            None
+                        )
                     print e
                 finally:
                     quad.set_position(rpx, rpy, rpz)

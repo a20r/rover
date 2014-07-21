@@ -10,15 +10,12 @@ class PlannerInterface(object):
 
     def __init__(self, problem, risk_grid, quads):
         self.problem = problem
-        self.quad_spacing = 20
-        self.initial_orientation = 0
         self.risk_grid = risk_grid
         self.num_samples = 100
-        self.radius_ext = 8
+        self.radius_ext = 20
         self.angle_range = math.pi / 8
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
-        self.time_threshold = 1
         self.cost_grid = costgrid.CostGrid(self.problem.grid, self.risk_grid)
         self.mb = motionblur.MotionBlur(problem)
         self.dv = 1
@@ -201,7 +198,7 @@ class PlannerInterface(object):
         new_z = self.determine_height(quad)
         uheading = heading.to_unit_vector()
         uheading.set_z(new_z - quad.get_z())
-        self.minimize_motion_blur(quad)
+        # self.minimize_motion_blur(quad)
         return uheading, beta, phi
 
     def get_random_list(self, nmin, nmax, num):

@@ -1,6 +1,6 @@
 {
-    "width": 600,
-    "height": 600,
+    "width":520,
+    "height": 520,
     "num_quads": 1,
     "min_height": 90,
     "max_height": 250,
@@ -19,7 +19,7 @@
     "planner": "rover_gaussian",
 
     "names": {
-        "95": "cmd_vel"
+        "92": "cmd_vel"
     },
 
     "min_safe_distance": 150,
