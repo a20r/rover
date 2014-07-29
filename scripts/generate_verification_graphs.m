@@ -24,11 +24,11 @@ function plot_verification(data)
     z = data(:, z_e);
 
     figure;
-    risk = load("sandbox/works/risk.out");
-    risk = reshape(risk, 100, 100);
+    risk = load("sandbox/risk.out");
+    risk = reshape(risk, 52, 52);
     risk = risk';
-    xi = 0:10:999;
-    yi = 0:10:999;
+    xi = 0:10:510;
+    yi = 0:10:510;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
     pcolor(X, Y, risk);
@@ -56,7 +56,7 @@ function plot_verification(data)
     xi = 0:4:999;
     yi = 0:4:999;
     [X Y] = meshgrid(xi, yi);
-    grid = load("sandbox/works/grid.out");
+    grid = load("sandbox/grid.out");
     grid = grid'';
     pcolor(X,Y,grid);
     xlabel("X"); ylabel("Y");
@@ -67,7 +67,7 @@ function plot_verification(data)
 endfunction
 
 function run()
-    file_name = 'sandbox/works/all_verify.txt';
+    file_name = 'sandbox/all_verify.txt';
     data = load(file_name);
     plot_verification(data);
     waitForEnd();

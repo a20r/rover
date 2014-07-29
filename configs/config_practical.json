@@ -19,7 +19,8 @@
     "planner": "rover_gaussian",
 
     "names": {
-        "92": "cmd_vel"
+        "rowlf": "cmd_vel",
+        "gonzo": "cmd_vel"
     },
 
     "min_safe_distance": 150,

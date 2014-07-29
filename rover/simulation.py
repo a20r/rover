@@ -18,10 +18,10 @@ class Simulation(object):
         rospy.init_node("rover", anonymous=False)
 
         self.init_problem_instance(problem, risk_grid, kwargs)
-        self.init_configurations(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
-        self.init_statistics(problem, risk_grid, kwargs)
         self.init_zmqros(problem)
+        self.init_configurations(problem, risk_grid, kwargs)
+        self.init_statistics(problem, risk_grid, kwargs)
 
         self.msg_type = "geometry_msgs/Twist"
         self.max_z_vel = 50  # cm/s
@@ -29,7 +29,7 @@ class Simulation(object):
 
     def init_zmqros(self, problem):
         if self.practical:
-            self.swarm = zmqros.server.swarm.create_swarm_from_ns(
+            self.swarm = zmqros.coordinator.create_swarm_from_ns(
                 zmqros.get_ns_host(), zmqros.get_ns_port()
             )
         else:
@@ -56,6 +56,9 @@ class Simulation(object):
         # visualization variables
         self.drawer = kwargs.get("drawer", None)
         self.show_time_grid = kwargs.get("show_time_grid", True)
+
+        if not self.drawer is None:
+            self.drawer.draw_risk_grid(self.risk_grid)
 
     def init_statistics(self, problem, risk_grid, kwargs):
         # statistics gathering classes
@@ -104,9 +107,8 @@ class Simulation(object):
 
             try:
                 x, y, z, b = self.get_configuration(quad)
-            except tf.Exception as e:
-                print "ERROR: Could not initialize quad positions"
-                print e
+            except tf.Exception:
+                raise RuntimeError("Could not initialize quad positions")
                 exit()
 
             quad.set_position(x, y, z)
@@ -228,10 +230,8 @@ class Simulation(object):
 
     def publish_towards_center(self, quad, vio, iteration):
         vc = point.Point(0, 0, 0)
-        if vio == violations.X_OUT:
+        if vio == violations.X_OUT or vio == violations.Y_OUT:
             vc.x = self.problem.width / 2 - quad.x
-            uvc = vc.to_unit_vector()
-        elif vio == violations.Y_OUT:
             vc.y = self.problem.height / 2 - quad.y
             uvc = vc.to_unit_vector()
         elif vio == violations.Z_OUT:
@@ -245,8 +245,15 @@ class Simulation(object):
 
     def get_configuration(self, quad):
         if self.practical:
-            tf_world = "/world"
-            our_obj = "/" + quad.get_name() + "/base_link"
+            try:
+                tf_world = "/world"
+                quad_id = str(self.swarm.get_id_by_name(quad.get_name()))
+                our_obj = "/" + quad_id + "/base_link"
+            except KeyError:
+                raise AttributeError(
+                    "{} does not exist in this world"
+                    .format(quad.get_name())
+                )
 
             self.listener.waitForTransform(
                 tf_world, our_obj,
@@ -301,31 +308,29 @@ class Simulation(object):
         return True, violations.NONE, None
 
     def run(self):
-        if not self.drawer is None:
-            self.drawer.draw_risk_grid(self.risk_grid)
-
         for i in xrange(self.problem.num_steps):
             for quad in self.quad_list:
                 try:
                     rpx, rpy, rpz, rb = self.get_configuration(quad)
                 except tf.Exception as e:
                     rpx, rpy, rpz, rb = quad.x, quad.y, quad.z, quad.beta
+
                     if self.practical:
+                        print "Error"
                         self.swarm[quad.get_name()].send_message(
-                            "std_msgs/Empty",
-                            self.names[quad.get_name()],
-                            None
+                            "std_msgs/Empty", "/land", None
                         )
+
                     print e
                 finally:
                     quad.set_position(rpx, rpy, rpz)
                     quad.set_orientation(rb)
                     self.execute_control(quad, i)
 
-                    # self.write_verification_results(
-                    #    (rpx, rpy, rpz, rb),
-                    #    self.prev_waypoints[quad], i
-                    # )
+                    self.write_verification_results(
+                        (rpx, rpy, rpz, rb),
+                        self.prev_waypoints[quad], i
+                    )
 
             self.visualize()
             self.update_stats(i)

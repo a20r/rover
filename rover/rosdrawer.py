@@ -140,7 +140,7 @@ class Drawer(object):
             for i in x_gen:
                 for j in y_gen:
                     risk = risk_grid[i, j]
-                    pnt = Point(i, j, -50)
+                    pnt = Point(i, j, -10)
                     r, g, b, a = self.sm.to_rgba(risk)
                     clr = ColorRGBA(r, g, b, a)
                     p_list.append(pnt)
