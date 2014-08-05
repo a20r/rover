@@ -22,9 +22,10 @@ surveillance.
 
 ## Install
 You must install [ROS](http://ros.org) and [ZeroMQ-ROS](http://wallarelvo.github.io/zeromq-ros).
-To install the other Python dependencies simply use the Pip and the `requirements.txt` file.
+To install the other Python dependencies simply use Pip and the `requirements.txt` file. Below
+shows how to install the dependencies
 
-    $ # Installs pip
-    $ sudo apt-get install python-pip
+    $ # Gets the repo
+    $ git clone https://github.com/wallarelvo/rover.git && cd rover
     $ # Installs dependencies
     $ sudo pip install -r requirements.txt
