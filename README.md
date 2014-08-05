@@ -62,6 +62,14 @@ Below is a schema for the configuration file to run the simulation.
         on actual quads>,
     "planner": <Algorithm name to run. [USE "rover_gaussian"]>,
 
+    [IF "practical"]
+    "names": {
+        <Name of robot as stored in ZeroMQ-ROS database>: 
+            <Topic to send velocities to. [USE "cmd_vel"]>,
+        ...
+    }
+    [END IF]
+
     "min_safe_distance": <Minimum safe distance between quadrotors>,
     "scene": <Scene to be used for the risk. Samples are shown in `scenes/`>,
 
