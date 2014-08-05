@@ -14,7 +14,7 @@ To run the simulation, use the command below.
     $ # Runs the simulation
     $ python run.py [configuration file name]
     
-### On Quadrotors
+## On Quadrotors
 In order to run Rover on quadrotors, you must have [ZeroMQ-ROS](wallarelvo.github.io/zeromq-ros)
 installed on all of the quadrotors and on the computer you will be running the algorithm from.
 You will also need to have all of the quadrotors pointing to the same name server. This is
