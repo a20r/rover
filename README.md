@@ -3,6 +3,7 @@ Rover
 
 A Planner for Autonomuos Risk-Sensitive Coverage by a Team of Unmanned Aerial Vehicles
 
+## Overview
 This project proposes a path-planning approach
 to enable a team of unmanned aerial vehicles (UAVs) to
 efficiently conduct surveillance of sensitive areas. The proposed
@@ -18,3 +19,14 @@ which each UAV flies. The efficiency and scalability of Rover
 is demonstrated in simulation using complex environments
 and an increasing number of UAVs to conduct risk-sensitive
 surveillance.
+
+## Running
+This is academic code so to all you need to do is run it and watch. A few things need
+to happen in order for you to run the code.
+
+    $ # Runs Rviz in background to view simulation
+    $ rosrun rviz rviz &
+    $ # Sends a static transform in order for visualization markers to be viewed
+    $ roslaunch configs/tf.launch &
+    $ # Runs the simulation
+    $ python run.py [configuration file name]
