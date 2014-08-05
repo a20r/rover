@@ -3,6 +3,8 @@ Rover
 
 A Planner for Autonomuos Risk-Sensitive Coverage by a Team of Unmanned Aerial Vehicles
 
+![Rover](/sandbox/avoid_risk_swarm.png)
+
 ## Overview
 This project proposes a path-planning approach
 to enable a team of unmanned aerial vehicles (UAVs) to
