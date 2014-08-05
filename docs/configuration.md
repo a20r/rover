@@ -1,6 +1,7 @@
 # Configuration
 This project relies on a JSON configuration file. It indicates how the simulation is to be run.
-Below is a schema for the configuration file to run the simulation.
+Below is a schema for the configuration file to run the simulation. Once you create the configuration
+JSON file, you can pass it in as a command line argument to the main program.
 
 ```
 {
