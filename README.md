@@ -3,7 +3,7 @@ Rover
 
 A Planner for Autonomuos Risk-Sensitive Coverage by a Team of Unmanned Aerial Vehicles
 
-![Rover](/sandbox/avoid_risk_swarm.png)
+![Rover](https://raw.github.com/wallarelvo/rover/gh-pages/sandbox/avoid_risk_swarm.png)
 
 ## Overview
 This project proposes a path-planning approach
