@@ -7,3 +7,5 @@ version 0.1
 - [Running](#docs/running)
 - [Configuration](#docs/configuration)
 - [Scripts](#docs/scripts)
+
+#### Created by Alex Wallar
