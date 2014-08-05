@@ -19,3 +19,12 @@ which each UAV flies. The efficiency and scalability of Rover
 is demonstrated in simulation using complex environments
 and an increasing number of UAVs to conduct risk-sensitive
 surveillance.
+
+## Install
+You must install [ROS](http://ros.org) and [ZeroMQ-ROS](http://wallarelvo.github.io/zeromq-ros).
+To install the other Python dependencies simply use the Pip and the `requirements.txt` file.
+
+    $ # Installs pip
+    $ sudo apt-get install python-pip
+    $ # Installs dependencies
+    $ sudo pip install -r requirements.txt
