@@ -64,3 +64,5 @@ tags
 
 #Chutsu stuff
 run.sh
+
+scenes/*.out
