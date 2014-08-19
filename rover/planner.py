@@ -11,9 +11,9 @@ class PlannerInterface(object):
     def __init__(self, problem, risk_grid, quads):
         self.problem = problem
         self.risk_grid = risk_grid
-        self.num_samples = 100
+        self.num_samples = 20
         self.radius_ext = 20
-        self.angle_range = math.pi / 8
+        self.angle_range = math.pi / 10
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
         self.cost_grid = costgrid.CostGrid(self.problem.grid, self.risk_grid)

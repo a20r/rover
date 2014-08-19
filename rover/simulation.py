@@ -1,5 +1,6 @@
 
 import point
+import time
 import stats
 import plot
 import math
@@ -16,6 +17,7 @@ class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
         rospy.init_node("rover", anonymous=False)
+        problem.grid.set_risk_grid(risk_grid)
 
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
@@ -71,7 +73,6 @@ class Simulation(object):
     def init_pubs(self, names):
         pub_dict = dict()
         for name, topic_name in names.iteritems():
-            #  YO Change this shit bro
             pub_dict[name] = rospy.Publisher(
                 topic_name, Twist, queue_size=10
             )
@@ -309,6 +310,7 @@ class Simulation(object):
 
     def run(self):
         for i in xrange(self.problem.num_steps):
+            self.problem.grid.set_start()
             for quad in self.quad_list:
                 try:
                     rpx, rpy, rpz, rb = self.get_configuration(quad)
@@ -334,7 +336,7 @@ class Simulation(object):
 
             self.visualize()
             self.update_stats(i)
-            self.write_stats_results()
+            self.write_stats_results(i + 2)
 
     def execute_control(self, quad, i):
         if self.practical:
@@ -369,7 +371,6 @@ class Simulation(object):
 
         if not self.drawer is None:
             self.drawer.clear_all()
-            #self.drawer.draw_risk_grid(self.risk_grid)
 
             for quad in self.quad_list:
                 self.drawer.draw_quad(quad)
@@ -382,28 +383,31 @@ class Simulation(object):
         self.ra.update_average_risk(self.quad_list)
         self.atd.update_average_time_difference(iteration + 2)
 
-    def write_stats_results(self):
+    def write_stats_results(self, ct):
         if not self.out_file is None:
-            self.out_file.write(
-                str(self.mca.get_moving_average_efficiency()) + " " +
-                str(self.sqa.get_moving_average()) + " " +
-                str(self.ra.get_moving_average()) + " " +
-                str(self.atd.get_average()) + " " +
-                str(self.pl.mb.get_average_blur()) + "\n"
-            )
+            self.out_file.write("{} {} {} {} {} {} {} {} {} {}\n".format(
+                self.mca.get_moving_average_efficiency(),
+                self.sqa.get_moving_average(),
+                self.ra.get_moving_average(),
+                self.atd.get_average(),
+                self.problem.grid.get_cumulative_coverage(),
+                self.problem.grid.get_inter_cum_coverage(),
+                self.problem.grid.get_average_iter_between(),
+                self.problem.grid.get_average_time_between(),
+                self.problem.grid.get_performance(ct),
+                time.time()
+            ))
 
     def write_verification_results(self, expected_pos, out_pos, iteration):
         if not self.verification_file is None:
-            self.verification_file.write(
-                "{} {} {} {} {} {} {} {} {}\n".format(
-                    iteration,
-                    expected_pos[0],
-                    expected_pos[1],
-                    expected_pos[2],
-                    expected_pos[3],
-                    out_pos[0],
-                    out_pos[1],
-                    out_pos[2],
-                    out_pos[3]
-                )
-            )
+            self.verification_file.write("{} {} {} {} {} {} {} {} {}\n".format(
+                iteration,
+                expected_pos[0],
+                expected_pos[1],
+                expected_pos[2],
+                expected_pos[3],
+                out_pos[0],
+                out_pos[1],
+                out_pos[2],
+                out_pos[3]
+            ))

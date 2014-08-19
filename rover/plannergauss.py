@@ -14,14 +14,14 @@ class PlannerGaussian(PlannerInterface):
 
         return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
 
+    def norm_scaled(self, x, mu, sigma):
+        return math.exp(-0.5 * math.pow((x - mu) / sigma, 2))
+
     def sq(self, z, phi):
         hyp_dist = z / math.cos(math.radians(phi))
-        norm_dist = scipy.stats.norm(
-            self.problem.sq_height,
-            self.problem.sq_std
+        return self.norm_scaled(
+            hyp_dist, self.problem.sq_height, self.problem.sq_std
         )
-
-        return norm_dist.pdf(hyp_dist) / norm_dist.pdf(self.problem.sq_height)
 
     def get_risk_sq_func(self, x, y, phi):
         def risk_sq(z):

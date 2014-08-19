@@ -12,23 +12,33 @@ function graphSandboxData()
     data = load('sandbox/all.txt');
     l = size(data)(1);
     x = 1:l;
-    plot(x, data(:, 1), 'b+-', 'linewidth', 4);
+    plot(x, data(:, 5), 'b+-', 'linewidth', 4);
     hold on;
-    plot(x, data(:, 2), 'g+-', 'linewidth', 4); 
-    plot(x, data(:, 3), 'r+-', 'linewidth', 4);
-    plot(x, data(:, 4) ./ max(data(:, 4)), 'm+-', 'linewidth', 4);
-    plot(x, data(:, 5), 'c+-', 'linewidth', 4);
-    ylim([0 1]);
+    plot(x, data(:, 6), 'g+-', 'linewidth', 4);
+    % plot(x, data(:, 7), 'r+-', 'linewidth', 4);
+    % plot(x, data(:, 8), 'm+-', 'linewidth', 4);
+    % plot(x, data(:, 9), 'c+-', 'linewidth', 4);
     title('Rover Results');
     xlabel('Iteration');
     ylabel('%');
-    % legend(
-    %    'Sensor coverage',
-    %    'Sensor quality',
-    %    'Risk',
-    %    'Location', 'EastOutside'
-    %);
+    legend(
+        'Cumulative Coverage',
+        'Coverage to 90%'
+    );
     hold off;
+
+    figure;
+    plot(x, data(:, 7), 'r+', 'linewidth', 4);
+    legend('Average Iterations Between Convergences');
+
+    figure;
+    plot(x, data(:, 8), 'm+', 'linewidth', 4);
+    legend('Average Time Between Convergences');
+
+    figure;
+    plot(x, data(:, 9), 'c+-', 'linewidth', 4);
+    legend('Performance Metric');
+
 endfunction
 
 graphSandboxData();
