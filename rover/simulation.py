@@ -16,8 +16,9 @@ from geometry_msgs.msg import Twist
 class Simulation(object):
 
     def __init__(self, problem, risk_grid, **kwargs):
-        rospy.init_node("rover", anonymous=False)
+        rospy.init_node("rover", anonymous=True)
         problem.grid.set_risk_grid(risk_grid)
+        self.control_noise = kwargs.get("control_noise", 10)
 
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
@@ -144,6 +145,7 @@ class Simulation(object):
         controllers = dict()
         for quad in self.quad_list:
             clr = controller.PID(quad, Kp, Ki, Kd)
+            clr.noise_std = self.control_noise
             controllers[quad] = clr
 
         return controllers

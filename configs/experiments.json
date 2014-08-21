@@ -17,18 +17,30 @@
     "planner": "rover_gaussian",
     "min_safe_distance": 100,
 
-    "min_quads": 1,
-    "max_quads": 35,
-    "quads_step": 5,
+    "num_quads": [1, 5, 10, 15, 20, 25, 30, 35],
+    "sq_heights": [90],
+    "control_noises": [0],
 
-    "sq_heights": [60, 90, 120],
+    "scenes": [
+        "scenes/s_1000_1.out",
+        "scenes/s_1000_2.out",
+        "scenes/s_1000_3.out",
+        "scenes/s_1500_1.out",
+        "scenes/s_1500_2.out",
+        "scenes/s_1500_3.out",
+        "scenes/s_2000_1.out",
+        "scenes/s_2000_2.out",
+        "scenes/s_2000_3.out"
+    ],
 
-    "min_control_noise": 0,
-    "max_control_noise": 1,
-    "control_noise_step" 0.1,
+    "dims":[
+        1000, 1000, 1000,
+        1500, 1500, 1500,
+        2000, 2000, 2000
+    ],
 
-    "scene_dims": [1000, 1500, 2000],
-    "scene_dir": "scenes/",
+    "description": "Testing performance as a function of number of quads",
+    "folder_name": "PerfQuads",
 
     "seed": 0
 }

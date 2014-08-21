@@ -173,10 +173,16 @@ class TimeGrid(object):
         self.copy_grid = self.grid.copy()
 
     def __getitem__(self, index):
-        return self.grid[
-            index[1] // self.scaling_factor,
-            index[0] // self.scaling_factor
-        ]
+        check_x = index[0] // self.scaling_factor
+        check_y = index[1] // self.scaling_factor
+
+        if check_x == self.width:
+            check_x = self.width - 1
+
+        if check_y == self.height:
+            check_y = self.height - 1
+
+        return self.grid[check_y, check_x]
 
     def __setitem__(self, index, value):
         self.grid[

@@ -40,8 +40,5 @@ def run(**kwargs):
         except rospy.ROSInterruptException:
             exit()
     else:
-        if "num_quads" in kwargs.keys():
-            del kwargs["num_quads"]
-
         exps = experiments.Experiments(**kwargs)
         exps.run()
