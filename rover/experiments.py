@@ -1,5 +1,6 @@
 
 import config
+import timegrid
 import rosdrawer
 import plot
 import random
@@ -68,6 +69,9 @@ class Experiments(object):
                     for nq in self.num_quads:
                         self.print_status(scene, sq_height, control_noise, nq)
                         default_problem.num_quads = nq
+                        default_problem.grid = timegrid.TimeGrid(
+                            dim, dim, default_problem
+                        )
                         scene_name = scene.split("/")[1].split(".out")[0]
                         scene_name = scene_name.replace("_", "-")
                         out_file = self.data_file_output.format(
