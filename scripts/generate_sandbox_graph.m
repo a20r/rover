@@ -9,8 +9,8 @@ function waitForEnd()
 endfunction
 
 function graphSandboxData()
-    data = load('experiments/Thu_Aug_21_01_47_30_2014-PerfQuads/data/out_s-1000-1_90_0_1.txt');
-    % data = load('sandbox/all.txt');
+    % data = load('experiments/Thu_Aug_21_01_47_30_2014-PerfQuads/data/out_s-1000-1_90_0_1.txt');
+    data = load('sandbox/all.txt');
     l = size(data)(1);
     x = 1:l;
     plot(x, data(:, 5), 'b+-', 'linewidth', 4);

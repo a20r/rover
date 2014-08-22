@@ -25,10 +25,10 @@ function plot_verification(data)
 
     figure;
     risk = load("sandbox/risk.out");
-    risk = reshape(risk, 52, 52);
+    risk = reshape(risk, 100, 100);
     risk = risk';
-    xi = 0:10:510;
-    yi = 0:10:510;
+    xi = 0:10:999;
+    yi = 0:10:999;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
     pcolor(X, Y, risk);
