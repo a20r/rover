@@ -60,6 +60,7 @@ class TimeGridPlotter(object):
         self.get_zs()
         self.ax.set_xlim(self.x_min, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
+        self.iteration = 0
 
     def get_zs(self):
         zs = np.array(
@@ -81,7 +82,9 @@ class TimeGridPlotter(object):
         self.graph = self.ax.pcolormesh(self.X, self.Y, Z, cmap=cm.jet)
         plt.draw()
         plt.pause(0.0001)
-        np.savetxt("sandbox/grid.out", self.time_grid.grid)
+        filename = "sandbox/grids/{}.out".format(self.iteration)
+        self.iteration += 1
+        np.savetxt(filename, self.time_grid.grid)
 
 
 def plot_time_grid(time_grid, filename):

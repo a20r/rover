@@ -11,7 +11,7 @@ class MonteCarloArea(object):
         self.total_efficiency = 0.0
         self.number_of_updates = 0
         self.moving_average = 0.0
-        self.learning_rate = 0.9
+        self.learning_rate = 1.0
 
     def update_average_efficiency(self, quads):
         num_in = 0
@@ -62,7 +62,7 @@ class SensorQualityAverage(object):
 
     def __init__(self, planner):
         self.moving_average = 0.0
-        self.learning_rate = 0.9
+        self.learning_rate = 1.0
         self.planner = planner
 
     def update_average_sq(self, quads):
@@ -84,7 +84,7 @@ class RiskAverage(object):
 
     def __init__(self, planner):
         self.moving_average = 0.0
-        self.learning_rate = 0.9
+        self.learning_rate = 1.0
         self.planner = planner
 
     def update_average_risk(self, quads):
@@ -125,7 +125,7 @@ class AverageMotionBlur(object):
 
     def __init__(self):
         self.avg = 0.0
-        self.learning_rate = 0.5
+        self.learning_rate = 1.0
 
     def update(self, val):
         self.avg = (1 - self.learning_rate) * self.avg\

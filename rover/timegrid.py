@@ -9,7 +9,7 @@ class TimeGrid(object):
 
     def __init__(self, width, height, problem):
         self.problem = problem
-        self.scaling_factor = 8
+        self.scaling_factor = 10
         self.width = width / self.scaling_factor
         self.height = height / self.scaling_factor
         self.grid = np.zeros((self.height, self.width))
@@ -100,9 +100,9 @@ class TimeGrid(object):
         if sq > self.sq_grid[y_scaled, x_scaled]:
             self.sq_grid[y_scaled, x_scaled] = sq
 
-        ass_risk = self.risk_grid[quad.x, quad.y]
-        if ass_risk > self.ass_risk_grid[y_scaled, x_scaled]:
-            self.ass_risk_grid[y_scaled, x_scaled] = ass_risk
+        # ass_risk = self.risk_grid[quad.x, quad.y]
+        # if ass_risk > self.ass_risk_grid[y_scaled, x_scaled]:
+            # self.ass_risk_grid[y_scaled, x_scaled] = ass_risk
 
     def inside_workspace(self, x_scaled, y_scaled):
         if not x_scaled > 0 or not x_scaled < self.width:
@@ -162,12 +162,10 @@ class TimeGrid(object):
         return self.grid[y, x]
 
     def get_performance(self, ct):
-        uncertainty_grid = ct - self.copy_grid
-        metrics_grid = np.multiply((1 - self.ass_risk_grid), self.sq_grid)
-        perf_grid = np.multiply(metrics_grid, uncertainty_grid)
+        ret_val = self.sq_grid.sum() / float((self.sq_grid > 0).sum())
         self.ass_risk_grid = np.zeros((self.height, self.width))
         self.sq_grid = np.zeros((self.height, self.width))
-        return perf_grid.mean()
+        return ret_val
 
     def set_start(self):
         self.copy_grid = self.grid.copy()

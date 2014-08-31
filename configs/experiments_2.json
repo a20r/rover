@@ -6,7 +6,7 @@
     "step_size": 40,
     "quad_size": 4,
     "viewing_angle": 50,
-    "num_steps": 1000,
+    "num_steps": 750,
     "sq_std": 120,
     "risk_constant": 100,
     "camera_angle_freedom": 0,

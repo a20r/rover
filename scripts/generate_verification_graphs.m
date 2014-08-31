@@ -49,20 +49,44 @@ function plot_verification(data)
     pcolor(X, Y, risk);
     colormap("jet");
     shading interp;
+    xlabel("X"); ylabel("Y");
     colorbar;
     %print("sandbox/heatmap.png", "-dpng");
 
     figure;
-    xi = 0:4:999;
-    yi = 0:4:999;
+    xi = 0:10:999;
+    yi = 0:10:999;
     [X Y] = meshgrid(xi, yi);
-    grid = load("sandbox/grid.out");
+    grid = load('sandbox/grids/1.out');
     grid = grid'';
-    pcolor(X,Y,grid);
+    m = max(max(grid));
+    pcolor(X, Y, m - grid);
     xlabel("X"); ylabel("Y");
     colorbar;
     shading interp;
     % print("sandbox/grid.png", "-dpng");
+
+    for i=1:25:100
+        figure;
+        xi = 0:10:999;
+        yi = 0:10:999;
+        [X Y] = meshgrid(xi, yi);
+        grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
+        % grid = load('sandbox/grid.out');
+        grid = grid'';
+        m = max(max(grid));
+        pcolor(X, Y, m - grid);
+        xlabel("X"); ylabel("Y");
+        colorbar;
+        shading interp;
+
+        figure;
+        cost = 100 .* risk + grid;
+        pcolor(X, Y, cost);
+        colorbar;
+        shading interp;
+        xlabel("X"); ylabel("Y");
+    end
 
 endfunction
 

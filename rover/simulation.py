@@ -339,6 +339,7 @@ class Simulation(object):
             self.visualize()
             self.update_stats(i)
             self.write_stats_results(i + 2)
+            raw_input("press enter bitch")
 
     def execute_control(self, quad, i):
         if self.practical:
