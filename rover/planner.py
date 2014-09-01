@@ -45,6 +45,7 @@ class PlannerInterface(object):
 
         time_dict = dict()
         total_time = 0.0
+        tt = 0.0
         counter = 0
 
         while inner_angle < angle + self.angle_range / 2:
@@ -59,7 +60,8 @@ class PlannerInterface(object):
                 raise ValueError()
 
             time_dict[(x, y, inner_angle)] = 1.0 / self.cost_grid[x, y]
-            total_time += 1.0 / self.cost_grid[x, y]
+            total_time += self.cost_grid[x, y]
+            tt += 1.0 / self.cost_grid[x, y]
             counter += 1
 
             inner_angle += self.angle_step
@@ -68,7 +70,7 @@ class PlannerInterface(object):
         avg_y = 0.0
         avg_angle = 0.0
         for (x, y, i_angle), t in time_dict.iteritems():
-            weight = t / total_time
+            weight = t / tt
             avg_x += x * weight
             avg_y += y * weight
             avg_angle += i_angle * weight
