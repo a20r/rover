@@ -58,8 +58,8 @@ class PlannerInterface(object):
             if not self.inside_workspace(x, y):
                 raise ValueError()
 
-            time_dict[(x, y, inner_angle)] = self.cost_grid[x, y]
-            total_time += self.cost_grid[x, y]
+            time_dict[(x, y, inner_angle)] = 1.0 / self.cost_grid[x, y]
+            total_time += 1.0 / self.cost_grid[x, y]
             counter += 1
 
             inner_angle += self.angle_step
@@ -68,7 +68,7 @@ class PlannerInterface(object):
         avg_y = 0.0
         avg_angle = 0.0
         for (x, y, i_angle), t in time_dict.iteritems():
-            weight = total_time / t
+            weight = t / total_time
             avg_x += x * weight
             avg_y += y * weight
             avg_angle += i_angle * weight
