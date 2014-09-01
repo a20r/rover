@@ -68,7 +68,7 @@ class PlannerInterface(object):
         avg_y = 0.0
         avg_angle = 0.0
         for (x, y, i_angle), t in time_dict.iteritems():
-            weight = t / total_time
+            weight = total_time / t
             avg_x += x * weight
             avg_y += y * weight
             avg_angle += i_angle * weight

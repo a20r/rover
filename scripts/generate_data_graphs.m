@@ -146,10 +146,17 @@ function graphTimeData()
     end
 
     figure;
-    plot(nqs, data ./ 750, 'bo--', 'linewidth', 2, 'markersize', 10);
+    plot(nqs, data ./ (750), 'bo--', 'linewidth', 2, 'markersize', 10);
     % title('Computational efficiency of algorithm');
     xlabel('Number of quads');
     ylabel('Seconds per iteration');
+    hold on;
+
+    figure;
+    plot(nqs, data ./ (750 .* nqs), 'bo--', 'linewidth', 2, 'markersize', 10);
+    % title('Computational efficiency of algorithm');
+    xlabel('Number of quads');
+    ylabel('Seconds per iteration per quadrotor');
     hold on;
 
 endfunction

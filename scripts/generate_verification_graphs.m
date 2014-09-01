@@ -24,11 +24,11 @@ function plot_verification(data)
     z = data(:, z_e);
 
     figure;
-    risk = load("sandbox/risk.out");
+    risk = load('sandbox/risk.out');
     risk = reshape(risk, 100, 100);
     risk = risk';
-    xi = 0:10:999;
-    yi = 0:10:999;
+    xi = 0.1:0.1:10;
+    yi = 0.1:0.1:10;
     [X Y] = meshgrid(xi, yi);
     nq = 2;
     pcolor(X, Y, risk);
@@ -49,44 +49,47 @@ function plot_verification(data)
     pcolor(X, Y, risk);
     colormap("jet");
     shading interp;
-    xlabel("X"); ylabel("Y");
-    colorbar;
+    xlabel("x position [m]", 'FontSize', 15);
+    ylabel("y position [m]", 'FontSize', 15);
+    set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+    colorbar('FontSize', 15);
     %print("sandbox/heatmap.png", "-dpng");
 
-    figure;
-    xi = 0:10:999;
-    yi = 0:10:999;
-    [X Y] = meshgrid(xi, yi);
-    grid = load('sandbox/grids/1.out');
-    grid = grid'';
-    m = max(max(grid));
-    pcolor(X, Y, m - grid);
-    xlabel("X"); ylabel("Y");
-    colorbar;
-    shading interp;
+    % figure;
+    % xi = 0:10:999;
+    % yi = 0:10:999;
+    % [X Y] = meshgrid(xi, yi);
+    % grid = load('sandbox/grids/1.out');
+    % grid = grid'';
+    % m = max(max(grid));
+    % pcolor(X, Y, m - grid);
+    % xlabel("X"); ylabel("Y");
+    % colorbar;
+    % shading interp;
+
     % print("sandbox/grid.png", "-dpng");
 
-    for i=1:25:100
-        figure;
-        xi = 0:10:999;
-        yi = 0:10:999;
-        [X Y] = meshgrid(xi, yi);
-        grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
-        % grid = load('sandbox/grid.out');
-        grid = grid'';
-        m = max(max(grid));
-        pcolor(X, Y, m - grid);
-        xlabel("X"); ylabel("Y");
-        colorbar;
-        shading interp;
+    % for i=1:25:100
+    %     figure;
+    %     xi = 0:10:999;
+    %     yi = 0:10:999;
+    %     [X Y] = meshgrid(xi, yi);
+    %     grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
+    %     % grid = load('sandbox/grid.out');
+    %     grid = grid'';
+    %     m = max(max(grid));
+    %     pcolor(X, Y, m - grid);
+    %     xlabel("X"); ylabel("Y");
+    %     colorbar;
+    %     shading interp;
 
-        figure;
-        cost = 100 .* risk + grid;
-        pcolor(X, Y, cost);
-        colorbar;
-        shading interp;
-        xlabel("X"); ylabel("Y");
-    end
+    %     figure;
+    %     cost = 100 .* risk + grid;
+    %     pcolor(X, Y, cost);
+    %     colorbar;
+    %     shading interp;
+    %     xlabel("X"); ylabel("Y");
+    % end
 
 endfunction
 
