@@ -32,17 +32,23 @@ function plot_verification(data)
     [X Y] = meshgrid(xi, yi);
     nq = 2;
     pcolor(X, Y, risk);
-    %surf(X, Y, risk);
+    % surf(X, Y, risk);
     shading interp;
     colormap("jet");
     colorbar;
     hold on;
-    plot3(x(1:nq:end), y(1:nq:end), z(1:nq:end), 'r', 'linewidth', 2);
-    plot3(x(2:nq:end), y(2:nq:end), z(2:nq:end), 'b', 'linewidth', 2);
+    plot3(x(1:nq:end) ./ 100, y(1:nq:end) ./ 100, z(1:nq:end) ./ 100, 'r', 'linewidth', 2);
+    plot3(x(2:nq:end) ./ 100, y(2:nq:end) ./ 100, z(2:nq:end) ./ 100, 'b', 'linewidth', 2);
     view(314, 36);
-    xlabel("X"); ylabel("Y"); zlabel("Z"); box off;
-    xlim([-50 1050]);
-    ylim([-50 1050]);
+    box off;
+    xlim([-0.5 10.5]);
+    ylim([-0.5 10.5]);
+    xlabel("x [m]", 'FontSize', 15);
+    ylabel("y [m]", 'FontSize', 15);
+    zlabel("z [m]", 'FontSize', 15);
+    set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+    colorbar('FontSize', 15);
+
     % print("sandbox/trajectories.png", "-dpng");
 
     figure;
@@ -53,6 +59,7 @@ function plot_verification(data)
     ylabel("y position [m]", 'FontSize', 15);
     set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
     colorbar('FontSize', 15);
+    % xlim([0 15]); ylim([0 15]);
     %print("sandbox/heatmap.png", "-dpng");
 
     % figure;
@@ -69,27 +76,33 @@ function plot_verification(data)
 
     % print("sandbox/grid.png", "-dpng");
 
-    % for i=1:25:100
-    %     figure;
-    %     xi = 0:10:999;
-    %     yi = 0:10:999;
-    %     [X Y] = meshgrid(xi, yi);
-    %     grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
-    %     % grid = load('sandbox/grid.out');
-    %     grid = grid'';
-    %     m = max(max(grid));
-    %     pcolor(X, Y, m - grid);
-    %     xlabel("X"); ylabel("Y");
-    %     colorbar;
-    %     shading interp;
+    for i=1:25:100
+        figure;
+        xi = 0.1:0.1:10;
+        yi = 0.1:0.1:10;
+        [X Y] = meshgrid(xi, yi);
+        grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
+        % grid = load('sandbox/grid.out');
+        grid = grid'';
+        m = max(max(grid));
+        pcolor(X, Y, m - grid);
+        colorbar;
+        shading interp;
+        xlabel("x position [m]", 'FontSize', 15);
+        ylabel("y position [m]", 'FontSize', 15);
+        set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+        colorbar('FontSize', 15);
 
-    %     figure;
-    %     cost = 100 .* risk + grid;
-    %     pcolor(X, Y, cost);
-    %     colorbar;
-    %     shading interp;
-    %     xlabel("X"); ylabel("Y");
-    % end
+        figure;
+        cost = 100 .* risk + grid;
+        pcolor(X, Y, cost);
+        colorbar;
+        shading interp;
+        xlabel("x position [m]", 'FontSize', 15);
+        ylabel("y position [m]", 'FontSize', 15);
+        set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+        colorbar('FontSize', 15);
+    end
 
 endfunction
 

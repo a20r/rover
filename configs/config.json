@@ -6,7 +6,7 @@
     "max_height": 400,
     "step_size": 20,
     "viewing_angle": 50,
-    "num_steps": 250,
+    "num_steps": 102,
     "sq_height": 90,
     "sq_std": 120,
     "risk_constant": 100,
