@@ -87,6 +87,7 @@ function graphPerfQuads()
     );
     xlabel('Number of quads');
     ylabel('%');
+    ylim([-10 10]);
 
 endfunction
 

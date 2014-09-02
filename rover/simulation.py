@@ -222,7 +222,7 @@ class Simulation(object):
             expected = self.publish_simulated_configuration(
                 quad, heading, beta, phi
             )
-            self.problem.grid.update_grid(quad, iteration + 2)
+            # self.problem.grid.update_grid(quad, iteration + 2)
         return expected
 
     def publish_hover(self, quad, iteration):
@@ -311,30 +311,39 @@ class Simulation(object):
         return True, violations.NONE, None
 
     def run(self):
+        f = open('sandbox/multi_verify.txt')
         for i in xrange(self.problem.num_steps):
             self.problem.grid.set_start()
             for quad in self.quad_list:
-                try:
-                    rpx, rpy, rpz, rb = self.get_configuration(quad)
-                except tf.Exception as e:
-                    rpx, rpy, rpz, rb = quad.x, quad.y, quad.z, quad.beta
+                # try:
+                #     rpx, rpy, rpz, rb = self.get_configuration(quad)
+                # except tf.Exception as e:
+                #     rpx, rpy, rpz, rb = quad.x, quad.y, quad.z, quad.beta
 
-                    if self.practical:
-                        print "Error"
-                        self.swarm[quad.get_name()].send_message(
-                            "std_msgs/Empty", "/land", None
-                        )
+                #     if self.practical:
+                #         print "Error"
+                #         self.swarm[quad.get_name()].send_message(
+                #             "std_msgs/Empty", "/land", None
+                #         )
 
-                    print e
-                finally:
-                    quad.set_position(rpx, rpy, rpz)
-                    quad.set_orientation(rb)
-                    self.execute_control(quad, i)
+                #     print e
+                # finally:
+                #     quad.set_position(rpx, rpy, rpz)
+                #     quad.set_orientation(rb)
+                #     self.execute_control(quad, i)
 
-                    self.write_verification_results(
-                        (rpx, rpy, rpz, rb),
-                        self.prev_waypoints[quad], i
-                    )
+                #     self.write_verification_results(
+                #         (rpx, rpy, rpz, rb),
+                #         self.prev_waypoints[quad], i
+                #     )
+
+                data = f.readline()
+                data = map(float, data.split(" "))
+                quad.x = data[5]
+                quad.y = data[6]
+                quad.z = data[7]
+                quad.beta = data[8]
+                self.problem.grid.update_grid(quad, i + 2)
 
             self.visualize()
             self.update_stats(i)
