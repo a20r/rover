@@ -311,7 +311,7 @@ class Simulation(object):
         return True, violations.NONE, None
 
     def run(self):
-        f = open('sandbox/multi_verify.txt')
+        f = open('sandbox/multi_verify_2.txt')
         for i in xrange(self.problem.num_steps):
             self.problem.grid.set_start()
             for quad in self.quad_list:
