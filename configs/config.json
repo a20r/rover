@@ -18,7 +18,7 @@
     "planner": "rover_gaussian",
 
     "min_safe_distance": 100,
-    "scene": "scenes/s_1000_3.out",
+    "scene": "scenes/s-icra-1000.out",
 
     "img_file": "sandbox/test_heatmap.png",
     "out_file": "sandbox/all.txt",

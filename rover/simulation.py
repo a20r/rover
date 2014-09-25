@@ -9,7 +9,7 @@ import rospy
 import tf
 import violations
 import controller
-import zmqros
+# import zmqros
 from geometry_msgs.msg import Twist
 
 

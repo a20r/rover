@@ -1,8 +1,6 @@
 
 import config
 import timegrid
-import rosdrawer
-import plot
 import random
 import riskgrid
 import simulation
@@ -39,10 +37,10 @@ class Experiments(object):
 
     def init_experiments_folder(self):
         self.experiments_folder = "experiments/{}-{}/".format(
+            self.folder_name,
             time.asctime(
                 time.localtime()
-            ).replace(" ", "_").replace(":", "_"),
-            self.folder_name
+            ).replace(" ", "_").replace(":", "_")
         )
         os.mkdir(self.experiments_folder)
         os.mkdir(self.experiments_folder + "data")
