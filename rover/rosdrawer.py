@@ -20,7 +20,7 @@ class Drawer(object):
 
         self.clear_all().update()
         self.markers = collections.deque(list(), 1000)
-        self.duration = 1
+        self.duration = 10
         norm = colors.Normalize(vmin=0, vmax=1)
         self.sm = cm.ScalarMappable(norm=norm)
         self.sm.set_cmap("jet")
