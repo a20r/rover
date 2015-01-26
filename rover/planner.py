@@ -37,7 +37,7 @@ class PlannerInterface(object):
 
         return b_x and b_y
 
-    def get_sample_direction(self, angle, quad, beta):
+    def get_sample_direction(self, angle, quad, beta, i):
         beta = math.radians(beta)
         sample_radius_ma = quad.get_ellipse_major() + self.radius_ext
         sample_radius_mi = quad.get_ellipse_minor() + self.radius_ext
@@ -59,9 +59,9 @@ class PlannerInterface(object):
             if not self.inside_workspace(x, y):
                 raise ValueError()
 
-            time_dict[(x, y, inner_angle)] = 1.0 / self.cost_grid[x, y]
-            total_time += self.cost_grid[x, y]
-            tt += 1.0 / self.cost_grid[x, y]
+            time_dict[(x, y, inner_angle)] = 1.0 / self.cost_grid.get(x, y, i)
+            total_time += self.cost_grid.get(x, y, i)
+            tt += 1.0 / self.cost_grid.get(x, y, i)
             counter += 1
 
             inner_angle += self.angle_step
@@ -77,7 +77,7 @@ class PlannerInterface(object):
 
         return avg_x, avg_y, avg_angle, total_time / counter
 
-    def get_instance_direction(self, quad, beta):
+    def get_instance_direction(self, quad, beta, i):
         """
         Returns the unit vector of the direction the quad should go
         """
@@ -89,7 +89,7 @@ class PlannerInterface(object):
         while angle < 2 * math.pi + self.angle_range:
             try:
                 x, y, i_angle, avg_time = self.get_sample_direction(
-                    angle, quad, beta
+                    angle, quad, beta, i
                 )
             except ValueError:
                 continue
@@ -105,7 +105,7 @@ class PlannerInterface(object):
 
         return min_x_y, min_time
 
-    def get_new_direction(self, quad):
+    def get_new_direction(self, quad, i):
         min_time = None
         min_direction = None
         min_beta = None
@@ -117,7 +117,8 @@ class PlannerInterface(object):
         for n_p in sample_phis:
             quad.set_camera_angle(n_p)
             for n_b in sample_betas:
-                new_direction, n_time = self.get_instance_direction(quad, n_b)
+                new_direction, n_time = self.get_instance_direction(quad,
+                        n_b, i)
 
                 if min_time is None or n_time < min_time:
                     min_time = n_time
@@ -195,8 +196,8 @@ class PlannerInterface(object):
 
         return self
 
-    def get_next_configuration(self, quad):
-        heading, beta, phi = self.get_new_direction(quad)
+    def get_next_configuration(self, quad, i):
+        heading, beta, phi = self.get_new_direction(quad, i)
         new_z = self.determine_height(quad)
         uheading = heading.to_unit_vector()
         uheading.set_z(new_z - quad.get_z())

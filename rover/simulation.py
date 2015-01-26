@@ -356,8 +356,7 @@ class Simulation(object):
         conf_allowed, vio, extra = self.is_safe(quad)
 
         if conf_allowed:
-            heading, beta, phi = self.pl\
-                .get_next_configuration(quad)
+            heading, beta, phi = self.pl.get_next_configuration(quad, i)
 
             expected = self.publish_configuration(
                 quad, heading, beta, phi, i
