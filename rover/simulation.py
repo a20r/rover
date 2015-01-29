@@ -1,4 +1,5 @@
 
+import random
 import point
 import time
 import stats
@@ -14,6 +15,9 @@ from geometry_msgs.msg import Twist
 
 
 class Simulation(object):
+
+    POSITION_NOISE = 0.3
+    ORIENTATION_NOISE = 0.2
 
     def __init__(self, problem, risk_grid, **kwargs):
         rospy.init_node("rover", anonymous=True)
@@ -271,6 +275,10 @@ class Simulation(object):
 
             return actual_conf
         else:
+            x = quad.x + random.uniform(0, self.POSITION_NOISE)
+            y = quad.y + random.uniform(0, self.POSITION_NOISE)
+            z = quad.z + random.uniform(0, self.POSITION_NOISE)
+            beta = quad.beta + random.uniform(0, self.ORIENTATION_NOISE)
             return quad.x, quad.y, quad.z, quad.beta
 
     def convert_coordinates_vicon(self, waypoint):
