@@ -174,12 +174,41 @@ def get_space(width, height):
     print space.mean()
     return space
 
-    #save_surface(space, path)
+
+def norm_scaled(x, mu, sigma):
+    return math.exp(-0.5 * math.pow((x - mu) / sigma, 2))
+
+
+def dist(a, b):
+    ad1 = math.pow(a[0] - b[0], 2)
+    ad2 = math.pow(a[1] - b[1], 2)
+    return math.sqrt(ad1 + ad2)
+
+
+def create_gaussian(pos_list, dim, sigma):
+    space = np.zeros((dim, dim))
+    for x in xrange(dim):
+        for y in xrange(dim):
+            val = 0
+            for pos in pos_list:
+                d_val = dist(pos, [x, y])
+                g_val = norm_scaled(d_val, 0, sigma)
+                if g_val > val:
+                    val = g_val
+            space[x, y] = val
+    return space
 
 
 if __name__ == "__main__":
     import sys
-    dim = int(sys.argv[1])
-    name = sys.argv[2]
-    space = get_space(dim, dim)
+    space_type = sys.argv[1]
+    dim = int(sys.argv[2])
+    name = sys.argv[3]
+    if space_type == "ds":
+        space = get_space(dim, dim)
+    elif space_type == "g":
+        space = create_gaussian([[dim / 2, dim / 2]], dim, 10)
+    else:
+        print "Dude use the script appropriately"
+
     save_surface(space, name)
