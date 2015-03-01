@@ -9,7 +9,6 @@ function waitForEnd()
 endfunction
 
 function graphSandboxData()
-    % data = load('experiments/Thu_Aug_21_01_47_30_2014-PerfQuads/data/out_s-1000-1_90_0_1.txt');
     data = load('sandbox/all.txt');
     l = size(data)(1);
     x = 1:l;
@@ -27,6 +26,12 @@ function graphSandboxData()
         'Coverage to 90%'
     );
     hold off;
+
+    figure;
+    plot(x, data(:, 2), 'g+-', 'linewidth', 4);
+    hold on;
+    plot(x, data(:, 3), 'r+-', 'linewidth', 4);
+    legend('Average Sensor Quality', 'Average Risk');
 
     figure;
     plot(x, data(:, 7), 'r+', 'linewidth', 4);

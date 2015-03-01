@@ -4,13 +4,12 @@ import point
 
 class PID(object):
 
-    CONTROL_NOISE = 1
-
     def __init__(self, quad, Kp, Ki, Kd):
         self.quad = quad
         self.Kp = Kp
         self.Ki = Ki
         self.Kd = Kd
+        self.noise_std = 0
         self.init_dyn_vars()
 
     def init_dyn_vars(self):
@@ -24,8 +23,12 @@ class PID(object):
         self.sy = 0
         self.sz = 0
 
+    def set_noise_std(self, noise_std):
+        self.noise_std = noise_std
+        return self
+
     def publish_waypoint(self, waypoint):
-        noise = point.get_noisy_point(self.CONTROL_NOISE)
+        noise = point.get_noisy_point(self.noise_std)
         dp = waypoint - self.quad
         dp -= noise
         self.update_sigmas(dp)

@@ -16,13 +16,13 @@ from geometry_msgs.msg import Twist
 
 class Simulation(object):
 
-    POSITION_NOISE = 0.3
-    ORIENTATION_NOISE = 0.2
+    POSITION_NOISE = 0.1
+    ORIENTATION_NOISE = 0.1
 
     def __init__(self, problem, risk_grid, **kwargs):
         rospy.init_node("rover", anonymous=True)
         problem.grid.set_risk_grid(risk_grid)
-        self.control_noise = kwargs.get("control_noise", 10)
+        self.control_noise = kwargs.get("control_noise", 0.1)
 
         self.init_problem_instance(problem, risk_grid, kwargs)
         self.init_visualizations(problem, risk_grid, kwargs)
@@ -149,7 +149,7 @@ class Simulation(object):
         controllers = dict()
         for quad in self.quad_list:
             clr = controller.PID(quad, Kp, Ki, Kd)
-            clr.noise_std = self.control_noise
+            clr.set_noise_std(self.control_noise)
             controllers[quad] = clr
 
         return controllers
@@ -279,7 +279,7 @@ class Simulation(object):
             y = quad.y + random.uniform(0, self.POSITION_NOISE)
             z = quad.z + random.uniform(0, self.POSITION_NOISE)
             beta = quad.beta + random.uniform(0, self.ORIENTATION_NOISE)
-            return quad.x, quad.y, quad.z, quad.beta
+            return x, y, z, beta
 
     def convert_coordinates_vicon(self, waypoint):
         pos = waypoint.linear
