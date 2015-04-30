@@ -173,7 +173,6 @@ class Simulation(object):
             return val
 
     def publish_practical_configuration(self, quad, heading, beta, phi):
-
         vel = Twist()
         vel.angular.x = 0
         vel.angular.y = 0
