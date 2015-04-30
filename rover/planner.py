@@ -37,6 +37,14 @@ class PlannerInterface(object):
 
         return b_x and b_y
 
+    def get_closest_boundary(self, x, y):
+        w = self.problem.width
+        h = self.problem.height
+        if abs(y * w) > abs(x * h):
+            return 0.5 * h * x / abs(y), 0.5 * h * math.sign(y)
+        else:
+            return 0.5 * w * math.sign(x), 0.5 * w * y / abs(x)
+
     def get_sample_direction(self, angle, quad, beta, i):
         beta = math.radians(beta)
         sample_radius_ma = quad.get_ellipse_major() + self.radius_ext
@@ -57,7 +65,7 @@ class PlannerInterface(object):
             y = old_y * math.cos(beta) + old_x * math.sin(beta) + quad.y
 
             if not self.inside_workspace(x, y):
-                raise ValueError()
+                x, y = self.get_closest_boundary(x, y)
 
             time_dict[(x, y, inner_angle)] = 1.0 / self.cost_grid.get(x, y, i)
             total_time += self.cost_grid.get(x, y, i)
@@ -118,7 +126,7 @@ class PlannerInterface(object):
             quad.set_camera_angle(n_p)
             for n_b in sample_betas:
                 new_direction, n_time = self.get_instance_direction(quad,
-                        n_b, i)
+                                                                    n_b, i)
 
                 if min_time is None or n_time < min_time:
                     min_time = n_time
