@@ -1,7 +1,7 @@
 {
     "width": 300,
     "height": 300,
-    "num_quads": 10,
+    "num_quads": 3,
     "min_height": 5,
     "max_height": 400,
     "step_size": 5,
@@ -18,7 +18,7 @@
     "planner": "rover_gaussian",
 
     "min_safe_distance": 10,
-    "scene": "scenes/s-1000.out",
+    "scene": "scenes/s-300.out",
 
     "img_file": "sandbox/test_heatmap.png",
     "out_file": "sandbox/all.txt",

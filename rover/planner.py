@@ -12,7 +12,7 @@ class PlannerInterface(object):
         self.problem = problem
         self.risk_grid = risk_grid
         self.num_samples = 20
-        self.radius_ext = 20
+        self.radius_ext = 2
         self.angle_range = math.pi / 10
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
@@ -118,7 +118,7 @@ class PlannerInterface(object):
             quad.set_camera_angle(n_p)
             for n_b in sample_betas:
                 new_direction, n_time = self.get_instance_direction(quad,
-                        n_b, i)
+                                                                    n_b, i)
 
                 if min_time is None or n_time < min_time:
                     min_time = n_time
