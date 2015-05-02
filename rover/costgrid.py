@@ -14,7 +14,10 @@ class CostGrid(object):
 
     def get(self, x, y, i):
         r_val = self.risk_grid[x, y] + random.uniform(0, self.RISK_STD)
-        u_val = math.exp(i - self.time_grid[x, y])
+        try:
+            u_val = math.exp(i - self.time_grid[x, y])
+        except OverflowError:
+            u_val = 0
 
         if r_val > 1:
             r_val = 1
