@@ -5,7 +5,7 @@ import random
 
 class CostGrid(object):
 
-    RISK_CONST = 100
+    RISK_CONST = 20
     RISK_STD = 0.05
 
     def __init__(self, time_grid, risk_grid):

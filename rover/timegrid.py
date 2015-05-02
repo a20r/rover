@@ -162,7 +162,11 @@ class TimeGrid(object):
         return self.grid[y, x]
 
     def get_performance(self, ct):
-        ret_val = self.sq_grid.sum() / float((self.sq_grid > 0).sum())
+        den = float((self.sq_grid > 0).sum())
+        if den > 0:
+            ret_val = self.sq_grid.sum() / den
+        else:
+            ret_val = 1
         self.ass_risk_grid = np.zeros((self.height, self.width))
         self.sq_grid = np.zeros((self.height, self.width))
         return ret_val

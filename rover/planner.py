@@ -37,13 +37,31 @@ class PlannerInterface(object):
 
         return b_x and b_y
 
+    def sign(self, val):
+        if val < 0:
+            return -1
+        else:
+            return 1
+
     def get_closest_boundary(self, x, y):
         w = self.problem.width
         h = self.problem.height
         if abs(y * w) > abs(x * h):
-            return 0.5 * h * x / abs(y), 0.5 * h * math.sign(y)
+            r_x, r_y = 0.5 * h * x / abs(y), 0.5 * h * self.sign(y)
         else:
-            return 0.5 * w * math.sign(x), 0.5 * w * y / abs(x)
+            r_x, r_y = 0.5 * w * self.sign(x), 0.5 * w * y / abs(x)
+
+        if r_x >= w:
+            r_x = w - 1
+        elif r_x < 0:
+            r_x = 0
+
+        if r_y >= h:
+            r_y = h - 1
+        elif r_y < 0:
+            r_y = 0
+
+        return r_x, r_y
 
     def get_sample_direction(self, angle, quad, beta, i):
         beta = math.radians(beta)
