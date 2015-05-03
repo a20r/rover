@@ -1,34 +1,34 @@
 {
     "experimental": true,
 
-    "min_height": 60,
+    "min_height": 5,
     "max_height": 400,
-    "step_size": 40,
-    "quad_size": 4,
+    "step_size": 5,
     "viewing_angle": 50,
     "num_steps": 750,
-    "sq_std": 120,
-    "risk_constant": 100,
+    "sq_std": 20,
+    "risk_constant": 20,
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,
     "show_time_grid": false,
     "practical": false,
     "planner": "rover_gaussian",
-    "min_safe_distance": 100,
+    "min_safe_distance": 10,
 
     "num_quads": [10, 20, 30],
-    "sq_heights": [60, 90, 120],
+    "sq_heights": [5, 10, 15],
     "control_noises": [0],
 
     "scenes": [
-        "scenes/s_1500_1.out",
-        "scenes/s_1500_2.out",
-        "scenes/s_1500_3.out"
+        "scenes/s-500-0.out",
+        "scenes/s-500-1.out",
+        "scenes/s-500-2.out",
+        "scenes/s-gauss.out"
     ],
 
     "dims":[
-        1500, 1500, 1500
+        500, 500, 500, 500
     ],
 
     "description": "Testing performance as a function of sq_height",
