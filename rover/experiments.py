@@ -22,6 +22,7 @@ class Experiments(object):
         self.control_noises = kwargs.get("control_noises")
         self.scenes = kwargs.get("scenes")
         self.dims = kwargs.get("dims")
+        self.risk_stds = kwargs.get("risk_stds", [0.05])
 
         self.planner_name = kwargs.get("planner")
         self.show_time_grid = kwargs.get("show_time_grid", False)
@@ -56,30 +57,32 @@ class Experiments(object):
 
     def run(self):
         for dim, scene in zip(self.dims, self.scenes):
-            default_problem = config.Problem(
-                width=dim, height=dim, **self.kwargs
-            )
-            default_problem.scene = scene
-            risk_grid = riskgrid.RiskGrid(default_problem)
-            for sq_height in self.sq_heights:
-                default_problem.sq_height = sq_height
-                for control_noise in self.control_noises:
-                    for nq in self.num_quads:
-                        self.print_status(scene, sq_height, control_noise, nq)
-                        default_problem.num_quads = nq
-                        default_problem.grid = timegrid.TimeGrid(
-                            dim, dim, default_problem
-                        )
-                        scene_name = scene.split("/")[1].split(".out")[0]
-                        scene_name = scene_name.replace("_", "-")
-                        out_file = self.data_file_output.format(
-                            scene_name, sq_height, control_noise, nq
-                        )
+            for r_std in self.risk_stds:
+                default_problem = config.Problem(
+                    width=dim, height=dim, risk_std=r_std, **self.kwargs
+                )
+                default_problem.scene = scene
+                risk_grid = riskgrid.RiskGrid(default_problem)
+                for sq_height in self.sq_heights:
+                    default_problem.sq_height = sq_height
+                    for control_noise in self.control_noises:
+                        for nq in self.num_quads:
+                            self.print_status(scene, sq_height,
+                                              control_noise, nq)
+                            default_problem.num_quads = nq
+                            default_problem.grid = timegrid.TimeGrid(
+                                dim, dim, default_problem
+                            )
+                            scene_name = scene.split("/")[1].split(".out")[0]
+                            scene_name = scene_name.replace("_", "-")
+                            out_file = self.data_file_output.format(
+                                scene_name, sq_height, control_noise, nq
+                            )
 
-                        sim = simulation.Simulation(
-                            default_problem, risk_grid,
-                            out_file=out_file, algorithm=self.pl,
-                            show_time_grid=self.show_time_grid
-                        )
+                            sim = simulation.Simulation(
+                                default_problem, risk_grid,
+                                out_file=out_file, algorithm=self.pl,
+                                show_time_grid=self.show_time_grid
+                            )
 
-                        sim.run()
+                            sim.run()

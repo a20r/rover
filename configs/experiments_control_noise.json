@@ -13,12 +13,14 @@
     "orientation_freedom": 20,
     "show_time_grid": false,
     "practical": false,
+    "crappy": false,
     "planner": "rover_gaussian",
     "min_safe_distance": 10,
 
     "num_quads": [10, 20, 30],
     "sq_heights": [10],
     "control_noises": [0, 2, 4, 6, 8, 10],
+    "risk_stds": [0.05],
 
     "scenes": [
         "scenes/s-500-0.out",

@@ -20,6 +20,7 @@ class PlannerInterface(object):
         self.mb = motionblur.MotionBlur(problem)
         self.dv = 1
         self.pvc = dict()
+        self.directives = dict()
 
     def inside_workspace(self, x, y):
         b_x = True
@@ -222,13 +223,28 @@ class PlannerInterface(object):
 
         return self
 
+    def get_crappy_direction(self, quad, i):
+        r_point = point.get_random_point(
+            self.problem.width, self.problem.height)
+        if not quad in self.directives:
+            self.directives[quad] = r_point
+        if self.directives[quad].dist_to(quad) < 1:
+            self.directives[quad] = r_point
+
+        heading = (self.directives[quad] - quad).to_unit_vector()
+        beta = quad.get_orientation()
+        phi = quad.get_viewing_angle()
+        return heading, beta, phi
+
     def get_next_configuration(self, quad, i):
-        heading, beta, phi = self.get_new_direction(quad, i)
-        new_z = self.determine_height(quad)
-        uheading = heading.to_unit_vector()
-        uheading.set_z(new_z - quad.get_z())
-        # self.minimize_motion_blur(quad)
-        return uheading, beta, phi
+        if self.problem.crappy:
+            return self.get_crappy_direction(quad, i)
+        else:
+            heading, beta, phi = self.get_new_direction(quad, i)
+            new_z = self.determine_height(quad)
+            uheading = heading.to_unit_vector()
+            uheading.set_z(new_z - quad.get_z())
+            return uheading, beta, phi
 
     def get_random_list(self, nmin, nmax, num):
         nmin = int(nmin)

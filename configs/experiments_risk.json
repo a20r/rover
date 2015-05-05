@@ -1,0 +1,40 @@
+{
+    "experimental": true,
+
+    "min_height": 5,
+    "max_height": 400,
+    "step_size": 5,
+    "viewing_angle": 50,
+    "num_steps": 750,
+    "sq_std": 20,
+    "risk_constant": 20,
+    "camera_angle_freedom": 0,
+    "initial_camera_angle": 15,
+    "orientation_freedom": 20,
+    "show_time_grid": false,
+    "practical": false,
+    "crappy": false,
+    "planner": "rover_gaussian",
+    "min_safe_distance": 10,
+
+    "num_quads": [10, 20, 30],
+    "sq_heights": [10],
+    "control_noises": [0],
+    "risk_stds": [0.05, 0.15, 0.2, 0.25],
+
+    "scenes": [
+        "scenes/s-500-0.out",
+        "scenes/s-500-1.out",
+        "scenes/s-500-2.out",
+        "scenes/s-gauss.out"
+    ],
+
+    "dims":[
+        500, 500, 500, 500
+    ],
+
+    "description": "Testing performance as a function of sq_height",
+    "folder_name": "PerfSQHeight",
+
+    "seed": 0
+}

@@ -13,35 +13,28 @@
     "orientation_freedom": 20,
     "show_time_grid": false,
     "practical": false,
+    "crappy": false,
     "planner": "rover_gaussian",
     "min_safe_distance": 10,
 
-    "num_quads": [1, 5, 10, 15, 20, 25, 30],
-    "sq_heights": [10],
+    "num_quads": [10, 20, 30],
+    "sq_heights": [5, 10, 15],
     "control_noises": [0],
+    "risk_stds": [0.05],
 
     "scenes": [
-        "scenes/s-300-0.out",
-        "scenes/s-300-1.out",
-        "scenes/s-300-2.out",
         "scenes/s-500-0.out",
         "scenes/s-500-1.out",
         "scenes/s-500-2.out",
-        "scenes/s-1000-0.out",
-        "scenes/s-1000-1.out",
-        "scenes/s-1000-2.out",
         "scenes/s-gauss.out"
     ],
 
-    "dims": [
-        300, 300, 300,
-        500, 500, 500,
-        1000, 1000, 1000,
-        500
+    "dims":[
+        500, 500, 500, 500
     ],
 
-    "description": "Testing performance as a function of number of quads",
-    "folder_name": "PerfQuads",
+    "description": "Testing performance as a function of sq_height",
+    "folder_name": "PerfSQHeight",
 
     "seed": 0
 }

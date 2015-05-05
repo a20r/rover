@@ -10,6 +10,7 @@
     "sq_height": 10,
     "sq_std": 20,
     "risk_constant": 20,
+    "risk_std": 0.05,
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,

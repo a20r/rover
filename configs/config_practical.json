@@ -11,6 +11,7 @@
     "sq_height": 90,
     "sq_std": 120,
     "risk_constant": 100,
+    "risk_std": 0.05,
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,
