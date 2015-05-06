@@ -10,8 +10,8 @@ def plot_risk_grid(risk_grid, filename):
     ax.set_xlabel("X Location")
     ax.set_ylabel("Y Location")
 
-    x_step = 10
-    y_step = 10
+    x_step = 1
+    y_step = 1
     x_min = 0
     y_min = 0
     x_max = risk_grid.problem.width

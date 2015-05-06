@@ -66,3 +66,4 @@ tags
 run.sh
 
 scenes/*.out
+*.out

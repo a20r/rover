@@ -1,6 +1,6 @@
 {
-    "width": 500,
-    "height": 500,
+    "width": 300,
+    "height": 300,
     "num_quads": 2,
     "min_height": 5,
     "max_height": 400,
@@ -14,13 +14,13 @@
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,
-    "show_time_grid": false,
+    "show_time_grid": true,
     "practical": false,
     "crappy": false,
     "planner": "rover_gaussian",
 
     "min_safe_distance": 10,
-    "scene": "scenes/gauss-test.out",
+    "scene": "scenes/s-300-1.out",
 
     "img_file": "sandbox/test_heatmap.png",
     "out_file": "sandbox/all.txt",

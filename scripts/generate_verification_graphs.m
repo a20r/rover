@@ -9,45 +9,45 @@ function waitForEnd()
 endfunction
 
 function plot_verification(data)
-    x_e = 2;
-    y_e = 3;
-    z_e = 4;
-    b_e = 5;
+    % x_e = 2;
+    % y_e = 3;
+    % z_e = 4;
+    % b_e = 5;
 
-    x_r = 6;
-    y_r = 7;
-    z_r = 8;
-    b_r = 9;
+    % x_r = 6;
+    % y_r = 7;
+    % z_r = 8;
+    % b_r = 9;
 
-    x = data(:, x_e);
-    y = data(:, y_e);
-    z = data(:, z_e);
+    % x = data(:, x_e);
+    % y = data(:, y_e);
+    % z = data(:, z_e);
 
-    figure;
+    % figure;
     risk = load('sandbox/risk.out');
-    risk = reshape(risk, 50, 50);
+    risk = reshape(risk, 300, 300);
     risk = risk';
-    xi = 0.1:50;
-    yi = 0.1:50;
-    [X Y] = meshgrid(xi, yi);
-    nq = 2;
-    pcolor(X, Y, risk);
-    % surf(X, Y, risk);
-    shading interp;
-    colormap("jet");
-    hold on;
-    grid on;
-    plot3(x(1:nq:end) ./ 10, y(1:nq:end) ./ 10, z(1:nq:end) ./ 10, 'r', 'linewidth', 2);
-    plot3(x(2:nq:end) ./ 10, y(2:nq:end) ./ 10, z(2:nq:end) ./ 10, 'k', 'linewidth', 2);
-    view(314, 36);
-    box off;
-    xlim([0, 50]);
-    ylim([0, 50]);
-    xlabel("x [m]", 'FontSize', 20, 'fontname', 'Helvetica');
-    ylabel("y [m]", 'FontSize', 20, 'fontname', 'Helvetica');
-    zlabel("z [m]", 'FontSize', 20, 'fontname', 'Helvetica');
-    colorbar('FontSize', 20, 'fontname', 'Helvetica');
-    set(gca, 'fontsize', 20, 'fontname', 'Helvetica');
+    % xi = 0.1:50;
+    % yi = 0.1:50;
+    % [X Y] = meshgrid(xi, yi);
+    % nq = 2;
+    % pcolor(X, Y, risk);
+    % % surf(X, Y, risk);
+    % shading interp;
+    % colormap("jet");
+    % hold on;
+    % grid on;
+    % plot3(x(1:nq:end) ./ 10, y(1:nq:end) ./ 10, z(1:nq:end) ./ 10, 'r', 'linewidth', 2);
+    % plot3(x(2:nq:end) ./ 10, y(2:nq:end) ./ 10, z(2:nq:end) ./ 10, 'k', 'linewidth', 2);
+    % view(314, 36);
+    % box off;
+    % xlim([0, 50]);
+    % ylim([0, 50]);
+    % xlabel("x [m]", 'FontSize', 20, 'fontname', 'Helvetica');
+    % ylabel("y [m]", 'FontSize', 20, 'fontname', 'Helvetica');
+    % zlabel("z [m]", 'FontSize', 20, 'fontname', 'Helvetica');
+    % colorbar('FontSize', 20, 'fontname', 'Helvetica');
+    % set(gca, 'fontsize', 20, 'fontname', 'Helvetica');
     % print('../SSCI14-PARCov/tasefigs/trajpractical.png', '-dpng');
 
     % figure;
@@ -77,39 +77,39 @@ function plot_verification(data)
 
     % print("sandbox/grid.png", "-dpng");
 
-    % k = 1;
-    % for i=[1 25 75 100]
-    %     figure;
-    %     xi = 0.1:0.1:10;
-    %     yi = 0.1:0.1:10;
-    %     [X Y] = meshgrid(xi, yi);
-    %     grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
-    %     % grid = load('sandbox/grid.out');
-    %     grid = grid'';
-    %     m = max(max(grid));
-    %     grid(find(grid == m)) = m - 1;
-    %     pcolor(X, Y, m - 1 - grid);
-    %     colorbar;
-    %     shading interp;
-    %     xlabel("x position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
-    %     ylabel("y position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
-    %     set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
-    %     colorbar('FontSize', 15, 'fontname', 'Helvetica');
-    %     % print(strcat('../SSCI14-PARCov/tasefigs/grid', num2str(k), '.png'), '-dpng');
+    k = 1;
+    for i=[1 25 75 100]
+        figure;
+        xi = 1:300;
+        yi = 1:300;
+        [X Y] = meshgrid(xi, yi);
+        grid = load(strcat('sandbox/grids/', num2str(i), '.out'));
+        % grid = load('sandbox/grid.out');
+        grid = grid'';
+        m = max(max(grid));
+        grid(find(grid == m)) = m - 1;
+        pcolor(X, Y, exp(m - 1 - grid));
+        colorbar;
+        shading interp;
+        xlabel("x position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
+        ylabel("y position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
+        set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+        colorbar('FontSize', 15, 'fontname', 'Helvetica');
+        print(strcat('sandbox/figs_tase/grids/grid', num2str(k), '.jpg'), '-djpg');
 
-    %     figure;
-    %     cost = 100 .* risk + grid;
-    %     pcolor(X, Y, cost);
-    %     colorbar;
-    %     shading interp;
-    %     xlabel("x position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
-    %     ylabel("y position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
-    %     set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
-    %     colorbar('FontSize', 15, 'fontname', 'Helvetica');
-    %     % print(strcat('../SSCI14-PARCov/tasefigs/cost', num2str(k), '.png'), '-dpng');
-    %     k = k + 1;
+        figure;
+        cost = risk - exp(m - 1 - grid);
+        pcolor(X, Y, cost);
+        colorbar;
+        shading interp;
+        xlabel("x position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
+        ylabel("y position [m]", 'FontSize', 13, 'fontname', 'Helvetica');
+        set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
+        colorbar('FontSize', 15, 'fontname', 'Helvetica');
+        print(strcat('sandbox/figs_tase/grids/cost', num2str(k), '.jpg'), '-djpg');
+        k = k + 1;
 
-    % end
+    end
 
 endfunction
 
