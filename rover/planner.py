@@ -228,12 +228,12 @@ class PlannerInterface(object):
             self.problem.width, self.problem.height)
         if not quad in self.directives:
             self.directives[quad] = r_point
-        if self.directives[quad].dist_to(quad) < 1:
+        if self.directives[quad].dist_to(quad) < 10:
             self.directives[quad] = r_point
 
         heading = (self.directives[quad] - quad).to_unit_vector()
         beta = quad.get_orientation()
-        phi = quad.get_viewing_angle()
+        phi = math.radians(self.problem.viewing_angle)
         return heading, beta, phi
 
     def get_next_configuration(self, quad, i):

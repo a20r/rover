@@ -1,85 +1,21 @@
 
-function makeGraphs()
-    figure;
-    risk = load('scenes/s_1000_1.out');
-    risk = risk';
-    pcolor(risk);
+function makeGraphs(scene, dim)
+    % f = figure('visible','off');
+    risk = load(scene);
+    r_dim = size(risk)(1);
+    [X, Y] = meshgrid(0:10:dim, 0:10:dim);
+    pcolor(X, Y, risk((r_dim - dim):10:r_dim, (r_dim - dim):10:r_dim));
     hold on;
-    xlabel('X'); ylabel('Y');
+    xlabel('x position [m]');
+    ylabel('y position [m]');
     shading interp;
-    xlim([0 1000]); ylim([0 1000]);
-
-    figure;
-    risk = load('scenes/s_1000_2.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 1000]); ylim([0 1000]);
-
-    figure;
-    risk = load('scenes/s_1000_3.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 1000]); ylim([0 1000]);
-
-    figure;
-    risk = load('scenes/s_1500_1.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 1500]); ylim([0 1500]);
-
-    figure;
-    risk = load('scenes/s_1500_2.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 1500]); ylim([0 1500]);
-
-    figure;
-    risk = load('scenes/s_1500_3.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 1500]); ylim([0 1500]);
-
-    figure;
-    risk = load('scenes/s_2000_1.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 2000]); ylim([0 2000]);
-
-    figure;
-    risk = load('scenes/s_2000_2.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 2000]); ylim([0 2000]);
-
-    figure;
-    risk = load('scenes/s_2000_3.out');
-    risk = risk';
-    pcolor(risk);
-    hold on;
-    xlabel('X'); ylabel('Y');
-    shading interp;
-    xlim([0 2000]); ylim([0 2000]);
+    xlim([0 dim]); ylim([0 dim]);
+    fontname = 'Helvetica';
+    fontsize = 20;
+    set([gca; findall(gca, 'Type','text')], 'FontSize', fontsize);
+    set([gca; findall(gca, 'Type','text')], 'FontName', fontname);
+    print(strcat('sandbox/figs_tase/', scene, '.png'), '-dpng');
+    hold off;
 endfunction
 
 function waitForEnd()
@@ -91,7 +27,13 @@ function waitForEnd()
     end
 endfunction
 
-makeGraphs();
-waitForEnd();
-
-
+% makeGraphs('scenes/s-300-0.out', 300);
+% makeGraphs('scenes/s-300-1.out', 300);
+% makeGraphs('scenes/s-300-2.out', 300);
+% makeGraphs('scenes/s-500-0.out', 500);
+% makeGraphs('scenes/s-500-1.out', 500);
+% makeGraphs('scenes/s-500-2.out', 500);
+makeGraphs('scenes/s-1000-0.out', 1000);
+makeGraphs('scenes/s-1000-1.out', 1000);
+makeGraphs('scenes/s-1000-2.out', 1000);
+% waitForEnd();
