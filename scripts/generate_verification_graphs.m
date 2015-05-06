@@ -78,7 +78,7 @@ function plot_verification(data)
     % print("sandbox/grid.png", "-dpng");
 
     k = 1;
-    for i=[1 2 3 4]
+    for i=[1 10 20 40]
         figure;
         xi = 1:300;
         yi = 1:300;
