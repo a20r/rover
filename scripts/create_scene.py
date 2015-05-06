@@ -207,7 +207,7 @@ if __name__ == "__main__":
     if space_type == "ds":
         space = get_space(dim, dim)
     elif space_type == "g":
-        space = create_gaussian([[dim / 2, dim / 2]], dim, 10)
+        space = create_gaussian([[dim / 2, dim / 2]], dim, 50)
     else:
         print "Dude use the script appropriately"
 

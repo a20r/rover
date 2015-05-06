@@ -1,12 +1,12 @@
 {
-    "width": 300,
-    "height": 300,
-    "num_quads": 3,
+    "width": 500,
+    "height": 500,
+    "num_quads": 2,
     "min_height": 5,
     "max_height": 400,
     "step_size": 5,
     "viewing_angle": 50,
-    "num_steps": 250,
+    "num_steps": 400,
     "sq_height": 10,
     "sq_std": 20,
     "risk_constant": 20,
@@ -20,7 +20,7 @@
     "planner": "rover_gaussian",
 
     "min_safe_distance": 10,
-    "scene": "scenes/s-300-1.out",
+    "scene": "scenes/gauss-test.out",
 
     "img_file": "sandbox/test_heatmap.png",
     "out_file": "sandbox/all.txt",
