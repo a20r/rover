@@ -82,7 +82,6 @@ class Point(object):
 def get_random_point(width, height):
     x = random.randint(0, width)
     y = random.randint(0, height)
-
     return Point(x, y)
 
 

@@ -32,9 +32,9 @@ class Experiments(object):
         self.init_experiments_folder()
 
         self.data_file_output = self.experiments_folder\
-            + "data/out_{0}_{1}_{2}_{3}.txt"
+            + "data/out_{0}_{1}_{2}_{3}_{4}.txt"
         self.status_output = "Scene -> {} :: SQ Height -> {} :: "\
-            + "Control Noise -> {} :: Num Quads -> {} ==="
+            + "Control Noise -> {} :: Num Quads -> {} :: R STD -> {} ==="
 
     def init_experiments_folder(self):
         self.experiments_folder = "experiments/{}-{}/".format(
@@ -52,7 +52,7 @@ class Experiments(object):
     def print_status(self, scene, sq_height, ctrl_noise, nq):
         print "===", time.asctime(time.localtime()), "::",
         print self.status_output.format(
-            scene, sq_height, ctrl_noise, nq
+            scene, sq_height, ctrl_noise, nq, r_std
         )
 
     def run(self):
@@ -68,7 +68,7 @@ class Experiments(object):
                     for control_noise in self.control_noises:
                         for nq in self.num_quads:
                             self.print_status(scene, sq_height,
-                                              control_noise, nq)
+                                              control_noise, nq, r_std)
                             default_problem.num_quads = nq
                             default_problem.grid = timegrid.TimeGrid(
                                 dim, dim, default_problem
@@ -76,7 +76,7 @@ class Experiments(object):
                             scene_name = scene.split("/")[1].split(".out")[0]
                             scene_name = scene_name.replace("_", "-")
                             out_file = self.data_file_output.format(
-                                scene_name, sq_height, control_noise, nq
+                                scene_name, sq_height, control_noise, nq, r_std
                             )
 
                             sim = simulation.Simulation(
