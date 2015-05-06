@@ -49,7 +49,7 @@ class Experiments(object):
             config_str = json.dumps(self.kwargs)
             f.write(config_str)
 
-    def print_status(self, scene, sq_height, ctrl_noise, nq):
+    def print_status(self, scene, sq_height, ctrl_noise, nq, r_std):
         print "===", time.asctime(time.localtime()), "::",
         print self.status_output.format(
             scene, sq_height, ctrl_noise, nq, r_std
