@@ -34,7 +34,7 @@
     ],
 
     "description": "Testing performance as a function of number of quads",
-    "folder_name": "PerfQuads",
+    "folder_name": "PerfCrappy",
 
     "seed": 0
 }

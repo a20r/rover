@@ -34,7 +34,7 @@
     ],
 
     "description": "Testing performance as a function of sq_height",
-    "folder_name": "PerfSQHeight",
+    "folder_name": "PerfRiskSTD",
 
     "seed": 0
 }
