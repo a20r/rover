@@ -78,7 +78,7 @@ function plot_verification(data)
     % print("sandbox/grid.png", "-dpng");
 
     k = 1;
-    for i=[1 25 75 100]
+    for i=[1 2 3 4]
         figure;
         xi = 1:300;
         yi = 1:300;
@@ -96,9 +96,10 @@ function plot_verification(data)
         set(gca, 'fontsize', 15, 'fontname', 'Helvetica');
         colorbar('FontSize', 15, 'fontname', 'Helvetica');
         print(strcat('sandbox/figs_tase/grids/grid', num2str(k), '.jpg'), '-djpg');
+        close;
 
         figure;
-        cost = risk - exp(m - 1 - grid);
+        cost = 20 * risk - exp(m - 1 - grid);
         pcolor(X, Y, cost);
         colorbar;
         shading interp;
@@ -108,6 +109,7 @@ function plot_verification(data)
         colorbar('FontSize', 15, 'fontname', 'Helvetica');
         print(strcat('sandbox/figs_tase/grids/cost', num2str(k), '.jpg'), '-djpg');
         k = k + 1;
+        close;
 
     end
 
