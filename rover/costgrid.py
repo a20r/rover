@@ -12,7 +12,7 @@ class CostGrid(object):
         self.RISK_STD = risk_grid.problem.risk_std
 
     def get(self, x, y, i):
-        r_val = self.risk_grid[x, y] + random.uniform(0, self.RISK_STD)
+        r_val = self.risk_grid[x, y] + random.gauss(0, self.RISK_STD)
         try:
             u_val = math.exp(i - self.time_grid[x, y])
         except OverflowError:
