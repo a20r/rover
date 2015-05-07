@@ -80,6 +80,7 @@ function plot_verification(data)
     k = 1;
     for i=[1 10 20 40]
         figure;
+        set(gcf, 'visible', 'off');
         xi = 1:300;
         yi = 1:300;
         [X Y] = meshgrid(xi, yi);

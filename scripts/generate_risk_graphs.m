@@ -1,6 +1,6 @@
 
 function makeGraphs(scene, dim)
-    % f = figure('visible','off');
+    set(gcf, 'Visible', 'off');
     if dim > 500
         div = 10
     else
@@ -16,7 +16,7 @@ function makeGraphs(scene, dim)
     shading interp;
     xlim([0 dim]); ylim([0 dim]);
     fontname = 'Helvetica';
-    fontsize = 20;
+    fontsize = 30;
     set([gca; findall(gca, 'Type','text')], 'FontSize', fontsize);
     set([gca; findall(gca, 'Type','text')], 'FontName', fontname);
     print(strcat('sandbox/figs_tase/', scene, '.jpg'), '-djpg');
