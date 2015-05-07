@@ -16,7 +16,7 @@ function makeGraphs(scene, dim)
     shading interp;
     xlim([0 dim]); ylim([0 dim]);
     fontname = 'Helvetica';
-    fontsize = 30;
+    fontsize = 40;
     set([gca; findall(gca, 'Type','text')], 'FontSize', fontsize);
     set([gca; findall(gca, 'Type','text')], 'FontName', fontname);
     print(strcat('sandbox/figs_tase/', scene, '.jpg'), '-djpg');
