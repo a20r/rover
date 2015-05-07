@@ -71,7 +71,7 @@ class Quadcopter(object):
         ))
         M = self.z * math.tan(math.radians(self.phi))
         if random.random() < 0.1:
-            print "major:", P - self.problem.sq_height * math.tan(math.radians(self.phi))
+            print "major:",  self.problem.sq_height * math.tan(math.radians(self.phi + self.problem.viewing_angle)) - self.problem.sq_height * math.tan(math.radians(self.phi))
         return P - M
 
     def get_ellipse_minor(self):
