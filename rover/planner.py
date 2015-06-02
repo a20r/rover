@@ -3,7 +3,6 @@ import random
 import math
 import point
 import costgrid
-import motionblur
 
 
 class PlannerInterface(object):
@@ -17,7 +16,6 @@ class PlannerInterface(object):
         self.angle_step = 2 * math.pi / self.num_samples
         self.quad_list = quads
         self.cost_grid = costgrid.CostGrid(self.problem.grid, self.risk_grid)
-        self.mb = motionblur.MotionBlur(problem)
         self.dv = 1
         self.pvc = dict()
         self.directives = dict()
@@ -193,35 +191,6 @@ class PlannerInterface(object):
         )
 
         return sample_betas
-
-    def minimize_motion_blur(self, quad):
-        blur = self.mb.get_blur(quad)
-        w_speed = quad.get_speed()
-        norm_speed = w_speed / float(self.problem.step_size)
-
-        try:
-            pvc_q = self.pvc[quad]
-        except KeyError:
-            self.pvc[quad] = norm_speed - blur
-            quad.speed = 0
-            return self
-
-        if quad.get_speed() > self.problem.step_size:
-            quad.speed -= self.dv
-
-        if quad.get_speed() < 0:
-            quad.speed += self.dv
-
-        dvc = norm_speed - blur - pvc_q
-
-        if dvc > 0:
-            quad.speed += self.dv
-        elif dvc < 0:
-            quad.speed -= self.dv
-
-        self.pvc[quad] = norm_speed - blur
-
-        return self
 
     def get_crappy_direction(self, quad, i):
         r_point = point.get_random_point(

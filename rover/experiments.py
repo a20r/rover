@@ -34,7 +34,7 @@ class Experiments(object):
         self.data_file_output = self.experiments_folder\
             + "data/out_{0}_{1}_{2}_{3}_{4}.txt"
         self.status_output = "Scene -> {} :: SQ Height -> {} :: "\
-            + "Control Noise -> {} :: Num Quads -> {} :: R STD -> {} ==="
+            + "Control Noise -> {} :: Num Quads -> {} :: Risk STD -> {} ==="
 
     def init_experiments_folder(self):
         self.experiments_folder = "experiments/{}-{}/".format(
