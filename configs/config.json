@@ -14,7 +14,7 @@
     "camera_angle_freedom": 0,
     "initial_camera_angle": 15,
     "orientation_freedom": 20,
-    "show_time_grid": true,
+    "show_time_grid": false,
     "practical": false,
     "crappy": false,
     "planner": "rover_gaussian",
