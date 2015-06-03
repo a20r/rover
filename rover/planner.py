@@ -5,7 +5,7 @@ import point
 import costgrid
 
 
-class PlannerInterface(object):
+class Planner2D(object):
 
     def __init__(self, problem, risk_grid, quads):
         self.problem = problem
@@ -228,13 +228,9 @@ class PlannerInterface(object):
 
 """ For higher order functionality """
 
-import plannergauss
-import plannermono
-import lawnmower
+import raplanner
 
 
 planners = {
-    "rover_monotonic": plannermono.PlannerMonotonic,
-    "rover_gaussian": plannergauss.PlannerGaussian,
-    "lawnmower": lawnmower.LawnMower
+    "RiskAltitude": raplanner.RiskAltitudePlanner,
 }

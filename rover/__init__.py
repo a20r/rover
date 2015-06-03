@@ -7,7 +7,7 @@ import plot
 import experiments
 import planner
 import rospy
-import plannergauss
+import raplanner
 
 
 def run(**kwargs):
@@ -26,8 +26,8 @@ def run(**kwargs):
         )
 
         pl = planner.planners.get(
-            kwargs.get("planner", "rover_gaussian"),
-            plannergauss.PlannerGaussian
+            kwargs.get("planner"),
+            raplanner.RiskAltitudePlanner
         )
 
         sim = simulation.Simulation(

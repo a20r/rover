@@ -1,7 +1,7 @@
 {
     "width": 300,
     "height": 300,
-    "num_quads": 2,
+    "num_quads": 10,
     "min_height": 5,
     "max_height": 400,
     "step_size": 5,
@@ -17,7 +17,7 @@
     "show_time_grid": false,
     "practical": false,
     "crappy": false,
-    "planner": "rover_gaussian",
+    "planner": "RiskAltitude",
 
     "min_safe_distance": 10,
     "scene": "scenes/s-300-1.out",

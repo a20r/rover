@@ -1,10 +1,10 @@
 
-from planner import PlannerInterface
+import planner
 import math
 import scipy.stats
 
 
-class PlannerGaussian(PlannerInterface):
+class RiskAltitudePlanner(planner.Planner2D):
 
     def risk(self, x, y, z):
         init_risk = float(self.risk_grid.get_risk(x, y))
@@ -19,6 +19,9 @@ class PlannerGaussian(PlannerInterface):
         return init_risk * norm_dist.pdf(z) / norm_dist.pdf(0)
 
     def norm_scaled(self, x, mu, sigma):
+        """
+        This normalizes the function such that SQ is 1 when x == mu
+        """
         return math.exp(-0.5 * math.pow((x - mu) / sigma, 2))
 
     def sq(self, z, phi):

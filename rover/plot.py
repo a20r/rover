@@ -39,6 +39,40 @@ def plot_risk_grid(risk_grid, filename):
     return plt
 
 
+def plot_time_grid(time_grid, filename):
+    fig = plt.figure("TimeGrid Map")
+    ax = fig.add_subplot(111)
+    ax.set_xlabel("X Location")
+    ax.set_ylabel("Y Location")
+
+    x_step = 1
+    y_step = 1
+    x_min = 0
+    y_min = 0
+    x_max = time_grid.width - 1
+    y_max = time_grid.height - 1
+
+    x = np.arange(x_min, x_max, x_step)
+    y = np.arange(y_min, y_max, y_step)
+    X, Y = np.meshgrid(x, y)
+
+    zs = np.array(
+        [
+            time_grid.get_raw(x_i, y_max - y_i)
+            for x_i, y_i in zip(np.ravel(X), np.ravel(Y))
+        ]
+    )
+
+    Z = zs.reshape(X.shape)
+    ax.pcolormesh(X, Y, Z, cmap=cm.jet)
+
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+
+    plt.savefig(filename)
+    return plt
+
+
 class TimeGridPlotter(object):
 
     def __init__(self, time_grid):
@@ -85,37 +119,3 @@ class TimeGridPlotter(object):
         filename = "sandbox/grids/{}.out".format(self.iteration)
         self.iteration += 1
         np.savetxt(filename, self.time_grid.grid)
-
-
-def plot_time_grid(time_grid, filename):
-    fig = plt.figure("TimeGrid Map")
-    ax = fig.add_subplot(111)
-    ax.set_xlabel("X Location")
-    ax.set_ylabel("Y Location")
-
-    x_step = 1
-    y_step = 1
-    x_min = 0
-    y_min = 0
-    x_max = time_grid.width - 1
-    y_max = time_grid.height - 1
-
-    x = np.arange(x_min, x_max, x_step)
-    y = np.arange(y_min, y_max, y_step)
-    X, Y = np.meshgrid(x, y)
-
-    zs = np.array(
-        [
-            time_grid.get_raw(x_i, y_max - y_i)
-            for x_i, y_i in zip(np.ravel(X), np.ravel(Y))
-        ]
-    )
-
-    Z = zs.reshape(X.shape)
-    ax.pcolormesh(X, Y, Z, cmap=cm.jet)
-
-    ax.set_xlim(x_min, x_max)
-    ax.set_ylim(y_min, y_max)
-
-    plt.savefig(filename)
-    return plt

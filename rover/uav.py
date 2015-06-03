@@ -4,7 +4,7 @@ import point
 import random
 
 
-class Quadcopter(object):
+class UAV(object):
 
     def __init__(self, problem, name=None):
         self.x = 0

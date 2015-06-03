@@ -5,12 +5,12 @@ import time
 import stats
 import plot
 import math
-import quadcopter
+import uav
 import rospy
 import tf
 import violations
 import controller
-# import zmqros
+import zmqros
 from geometry_msgs.msg import Twist
 
 
@@ -109,7 +109,7 @@ class Simulation(object):
     def init_quads_practical(self):
         quad_list = list()
         for name, _ in self.pubs.iteritems():
-            quad = quadcopter.Quadcopter(self.problem, name)
+            quad = uav.UAV(self.problem, name)
 
             try:
                 x, y, z, b = self.get_configuration(quad)
@@ -136,7 +136,7 @@ class Simulation(object):
                 100 + quad_spacing * self.problem.quad_size * down
             )
 
-            quad = quadcopter.Quadcopter(self.problem)
+            quad = uav.UAV(self.problem)
             quad.set_position(s_x, s_y, 10)
             quad.set_orientation(0)
             quad.set_camera_angle(self.problem.initial_camera_angle)
@@ -274,10 +274,10 @@ class Simulation(object):
 
             return actual_conf
         else:
-            x = quad.x + random.uniform(0, self.POSITION_NOISE)
-            y = quad.y + random.uniform(0, self.POSITION_NOISE)
-            z = quad.z + random.uniform(0, self.POSITION_NOISE)
-            beta = quad.beta + random.uniform(0, self.ORIENTATION_NOISE)
+            x = quad.x + random.gauss(0, self.POSITION_NOISE)
+            y = quad.y + random.gauss(0, self.POSITION_NOISE)
+            z = quad.z + random.gauss(0, self.POSITION_NOISE)
+            beta = quad.beta + random.gauss(0, self.ORIENTATION_NOISE)
             return x, y, z, beta
 
     def convert_coordinates_vicon(self, waypoint):
